@@ -1,6 +1,6 @@
-import React, { useCallback, useState } from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faInfoCircle, faList } from '@fortawesome/free-solid-svg-icons'
+import React, {useCallback, useState} from 'react'
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
+import {faList} from '@fortawesome/free-solid-svg-icons'
 
 import usePersist from '../hooks/usePersist'
 import DropZone from './DropZone'
@@ -36,7 +36,7 @@ const collapseAll = (restoredResults) =>
     }
   }, {})
 
-const MediaInfoJs = ({ className }) => {
+const MediaInfoJs = ({className}) => {
   const [analyzing, setAnalyzing] = useState(false)
   const [results, setResults] = useState({})
 
@@ -47,27 +47,10 @@ const MediaInfoJs = ({ className }) => {
     state: results,
   })
 
-  async function onChangeFile(mediainfo, files) {
-    let file
-    if (files.length >= 2) {
-      for (let i = 0; i < files.length; i++) {
-        file = files[i]
-        if (file) {
-          await get_file_info(mediainfo, file)
-          if (i + 1 == files.length) {
-            return
-          }
-        }
-      }
-    } else {
-      file = files[0]
-      if (file) {
-        await get_file_info(mediainfo, file)
-      }
-    }
-  }
-
-  function get_file_info(mediainfo, file) {
+  /**
+   * Gets file info for a single file.
+   */
+  function getFileInfo(mediainfo, file) {
     return mediainfo
       .analyzeData(() => file.size, readChunk(file))
       .then((result) =>
@@ -89,6 +72,22 @@ const MediaInfoJs = ({ className }) => {
       .finally(() => setAnalyzing(false))
   }
 
+  /**
+   * Gets info for each file in list of files.
+   * It's important to 'await' each call to getFileInfo,
+   * otherwise the info returned is truncated.
+   */
+  async function onChangeFile(mediainfo, files) {
+    for (const file of files) {
+      if (file) {
+        await getFileInfo(mediainfo, file)
+      }
+    }
+  }
+
+  /**
+   * When file(s) dropped, get info for each of them
+   */
   const onDrop = useCallback((files) => {
     if (files) {
       setAnalyzing(true)
@@ -111,7 +110,7 @@ const MediaInfoJs = ({ className }) => {
   )
 
   const onRemove = useCallback(
-    (resultId) => setResults(({ [resultId]: _, ...rest }) => rest),
+    (resultId) => setResults(({[resultId]: _, ...rest}) => rest),
     []
   )
 
@@ -127,10 +126,10 @@ const MediaInfoJs = ({ className }) => {
 
   return (
     <div className={className}>
-      <DropZone analyzing={analyzing} onDrop={onDrop} />
+      <DropZone analyzing={analyzing} onDrop={onDrop}/>
       <div id="results">
         <h2>
-          <FontAwesomeIcon icon={faList} /> results
+          <FontAwesomeIcon icon={faList}/> results
         </h2>
         {resultsContainer}
         {Object.keys(results).length ? null : 'No results yet…'}
