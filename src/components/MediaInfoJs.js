@@ -1,11 +1,15 @@
 import React, { useCallback, useState } from 'react'
-import MediaInfo from 'mediainfo.js'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faInfoCircle, faList } from '@fortawesome/free-solid-svg-icons'
 
 import usePersist from '../hooks/usePersist'
 import DropZone from './DropZone'
 import Result from './Result'
+
+// // using  MediaInfo through npm/react didn't work:
+// import MediaInfo from 'mediainfo.js'
+// // so use it from CDN instead (see public/index.html)
+const MediaInfo = window.MediaInfo
 
 const readChunk = (file) => (chunkSize, offset) =>
   new Promise((resolve, reject) => {
@@ -100,17 +104,6 @@ const MediaInfoJs = ({ className }) => {
   return (
     <div className={className}>
       <DropZone analyzing={analyzing} onDrop={onDrop} />
-      <p>
-        <strong>mediainfo.js</strong> shows information about media files. It
-        works with <code>.avi</code>, <code>.mkv</code>, <code>.mp3</code> and{' '}
-        <a href="https://mediaarea.net/nn/MediaInfo"> many more…</a>
-      </p>
-      <p>
-        <em>
-          <FontAwesomeIcon className="blue" icon={faInfoCircle} size="lg" /> No
-          data is leaving your computer. All analyzing is done in the browser!
-        </em>
-      </p>
       <div id="results">
         <h2>
           <FontAwesomeIcon icon={faList} /> results
@@ -121,5 +114,4 @@ const MediaInfoJs = ({ className }) => {
     </div>
   )
 }
-
 export default MediaInfoJs
