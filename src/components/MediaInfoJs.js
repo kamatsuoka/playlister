@@ -1,6 +1,4 @@
 import React, {useCallback, useState} from 'react'
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faList} from '@fortawesome/free-solid-svg-icons'
 
 import usePersist from '../hooks/usePersist'
 import DropZone from './DropZone'
@@ -50,6 +48,7 @@ const MediaInfoJs = ({className}) => {
   function filterResult(result) {
     const general = result.media.track.filter((track) => track["@type"] === "General")[0]
     return {
+      format: general.Format,
       duration: general.Duration,
       startTime: general.Encoded_Date
     }
@@ -106,18 +105,6 @@ const MediaInfoJs = ({className}) => {
     }
   }, [])
 
-  const onCollapse = useCallback(
-    (resultId) =>
-      setResults((prevResults) => ({
-        ...prevResults,
-        [resultId]: {
-          ...prevResults[resultId],
-          collapsed: !prevResults[resultId].collapsed,
-        },
-      })),
-    []
-  )
-
   const onRemove = useCallback(
     (resultId) => setResults(({[resultId]: _, ...rest}) => rest),
     []
@@ -127,7 +114,6 @@ const MediaInfoJs = ({className}) => {
     <Result
       id={resultId}
       key={resultId}
-      onCollapse={onCollapse}
       onRemove={onRemove}
       result={result}
     />
@@ -137,10 +123,20 @@ const MediaInfoJs = ({className}) => {
     <div className={className}>
       <DropZone analyzing={analyzing} onDrop={onDrop}/>
       <div id="results">
-        <h2>
-          <FontAwesomeIcon icon={faList}/> results
-        </h2>
-        {resultsContainer}
+        <table className="results-table">
+          <thead>
+          <tr>
+            <th>Name</th>
+            <th>Format</th>
+            <th>Start Time</th>
+            <th>Duration</th>
+            <th>{/*(delete button)*/}</th>
+          </tr>
+          </thead>
+          <tbody>
+          {resultsContainer}
+          </tbody>
+        </table>
         {Object.keys(results).length ? null : 'No results yet…'}
       </div>
     </div>

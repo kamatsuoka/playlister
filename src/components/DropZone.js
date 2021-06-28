@@ -18,13 +18,12 @@ const DropZone = ({ analyzing, onDrop }) => {
     >
       {analyzing ? (
         <div id="status" className="hidden">
-          <FontAwesomeIcon icon={faCog} size="lg" spin /> Analyzing file…
+          <FontAwesomeIcon icon={faCog} size="lg" spin /> Analyzing …
         </div>
       ) : (
         <div id="dropcontrols">
           <div id="dropcontrolstext">
-            <FontAwesomeIcon icon={faHandRock} size="lg" /> Drop a media file
-            here!
+            <FontAwesomeIcon icon={faHandRock} size="lg" /> Drop media files here
             <br />
             <span className="small">(or click)</span>
           </div>
