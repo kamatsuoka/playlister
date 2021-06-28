@@ -6,9 +6,9 @@ import usePersist from '../hooks/usePersist'
 import DropZone from './DropZone'
 import Result from './Result'
 
-// // using  MediaInfo through npm/react didn't work:
 // import MediaInfo from 'mediainfo.js'
-// // so use it from CDN instead (see public/index.html)
+// // using MediaInfo through npm/react didn't work,
+// // so using it from CDN instead (see public/index.html)
 const MediaInfo = window.MediaInfo
 
 const readChunk = (file) => (chunkSize, offset) =>
@@ -47,29 +47,53 @@ const MediaInfoJs = ({ className }) => {
     state: results,
   })
 
-  const onDrop = useCallback(([file]) => {
-    if (file) {
+  async function onChangeFile(mediainfo, files) {
+    let file
+    if (files.length >= 2) {
+      for (let i = 0; i < files.length; i++) {
+        file = files[i]
+        if (file) {
+          await get_file_info(mediainfo, file)
+          if (i + 1 == files.length) {
+            return
+          }
+        }
+      }
+    } else {
+      file = files[0]
+      if (file) {
+        await get_file_info(mediainfo, file)
+      }
+    }
+  }
+
+  function get_file_info(mediainfo, file) {
+    return mediainfo
+      .analyzeData(() => file.size, readChunk(file))
+      .then((result) =>
+        setResults((prevResults) => ({
+          [getRandomId()]: {
+            ...result,
+            name: file.name,
+            collapsed: false,
+          },
+          ...prevResults,
+        }))
+      )
+      .catch((error) =>
+        setResults((prevResults) => ({
+          [getRandomId()]: {collapsed: false, error: error.stack},
+          ...prevResults,
+        }))
+      )
+      .finally(() => setAnalyzing(false))
+  }
+
+  const onDrop = useCallback((files) => {
+    if (files) {
       setAnalyzing(true)
       MediaInfo().then((mediainfo) =>
-        mediainfo
-          .analyzeData(() => file.size, readChunk(file))
-          .then((result) =>
-            setResults((prevResults) => ({
-              [getRandomId()]: {
-                ...result,
-                name: file.name,
-                collapsed: false,
-              },
-              ...prevResults,
-            }))
-          )
-          .catch((error) =>
-            setResults((prevResults) => ({
-              [getRandomId()]: { collapsed: false, error: error.stack },
-              ...prevResults,
-            }))
-          )
-          .finally(() => setAnalyzing(false))
+        onChangeFile(mediainfo, files)
       )
     }
   }, [])

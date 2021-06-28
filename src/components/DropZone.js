@@ -8,7 +8,6 @@ import { faHandRock } from '@fortawesome/free-regular-svg-icons'
 const DropZone = ({ analyzing, onDrop }) => {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     disabled: analyzing,
-    multiple: false,
     onDrop,
   })
   return (
