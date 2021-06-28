@@ -47,21 +47,30 @@ const MediaInfoJs = ({className}) => {
     state: results,
   })
 
+  function filterResult(result) {
+    const general = result.media.track.filter((track) => track["@type"] === "General")[0]
+    return {
+      duration: general.Duration,
+      startTime: general.Encoded_Date
+    }
+  }
+
   /**
    * Gets file info for a single file.
    */
   function getFileInfo(mediainfo, file) {
     return mediainfo
       .analyzeData(() => file.size, readChunk(file))
-      .then((result) =>
+      .then((result) => {
         setResults((prevResults) => ({
-          [getRandomId()]: {
-            ...result,
-            name: file.name,
-            collapsed: false,
-          },
-          ...prevResults,
-        }))
+            [getRandomId()]: {
+              ...(filterResult(result)),
+              name: file.name,
+              collapsed: false,
+            },
+            ...prevResults,
+          }))
+        }
       )
       .catch((error) =>
         setResults((prevResults) => ({
