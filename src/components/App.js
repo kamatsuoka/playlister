@@ -3,42 +3,50 @@ import {CSSTransition, SwitchTransition} from 'react-transition-group'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faGithub} from '@fortawesome/free-brands-svg-icons'
 import {faCopyright} from '@fortawesome/free-regular-svg-icons'
+import {BaseProvider, LightTheme} from 'baseui'
+import {Provider as StyletronProvider} from "styletron-react"
+import {Client as Styletron} from "styletron-engine-atomic"
 
 import About from './About'
-import MediaInfoJs from './MediaInfoJs'
+import MediaPage from './MediaPage'
 
 const PAGE_FADE_TIME = 400
+const engine = new Styletron()
 
 function App() {
 
-  const [page, setPage] = useState('mediainfojs')
+  const [page, setPage] = useState('mediapage')
 
   return (
     <>
-      <section id="page">
-        <SwitchTransition>
-          <CSSTransition
-            classNames="page"
-            key={page}
-            mountOnEnter
-            timeout={PAGE_FADE_TIME}
-          >
-            {page === 'mediainfojs' ? <MediaInfoJs/> : <About/>}
-          </CSSTransition>
-        </SwitchTransition>
-      </section>
-      <footer>
-        <p>
-          <a href="https://github.com/kamatsuoka/playlister">
-            <FontAwesomeIcon className="fa-padded" icon={faGithub} size="lg"/>
-            GitHub
-          </a>
-          <span className="pull-right">
+      <StyletronProvider value={engine}>
+        <BaseProvider theme={LightTheme}>
+          <section id="page">
+            <SwitchTransition>
+              <CSSTransition
+                classNames="page"
+                key={page}
+                mountOnEnter
+                timeout={PAGE_FADE_TIME}
+              >
+                {page === 'mediapage' ? <MediaPage/> : <About/>}
+              </CSSTransition>
+            </SwitchTransition>
+          </section>
+          <footer>
+            <p>
+              <a href="https://github.com/kamatsuoka/playlister">
+                <FontAwesomeIcon className="fa-padded" icon={faGithub} size="lg"/>
+                GitHub
+              </a>
+              <span className="pull-right">
             <FontAwesomeIcon flip="horizontal" icon={faCopyright}/>{' '}
-            <a href="https://github.com/kamatsuoka">kamatsuoka</a> 2021
+                <a href="https://github.com/kamatsuoka">kamatsuoka</a> 2021
           </span>
-        </p>
-      </footer>
+            </p>
+          </footer>
+        </BaseProvider>
+      </StyletronProvider>
     </>
   )
 }

@@ -2,7 +2,6 @@ import React, {useCallback, useState} from 'react'
 
 import usePersist from '../hooks/usePersist'
 import DropZone from './DropZone'
-import Result from './Result'
 
 // import MediaInfo from 'mediainfo.js'
 // // using MediaInfo through npm/react didn't work,
@@ -34,9 +33,11 @@ const collapseAll = (restoredResults) =>
     }
   }, {})
 
-const MediaInfoJs = ({className}) => {
+/**
+ * Renders DropZone (and file picker) for one or more media files
+ */
+const MediaInfoJs = ({results, setResults}) => {
   const [analyzing, setAnalyzing] = useState(false)
-  const [results, setResults] = useState({})
 
   usePersist({
     key: 'results',
@@ -105,41 +106,8 @@ const MediaInfoJs = ({className}) => {
     }
   }, [])
 
-  const onRemove = useCallback(
-    (resultId) => setResults(({[resultId]: _, ...rest}) => rest),
-    []
-  )
-
-  const resultsContainer = Object.entries(results).map(([resultId, result]) => (
-    <Result
-      id={resultId}
-      key={resultId}
-      onRemove={onRemove}
-      result={result}
-    />
-  ))
-
   return (
-    <div className={className}>
-      <DropZone analyzing={analyzing} onDrop={onDrop}/>
-      <div id="results">
-        <table className="results-table">
-          <thead>
-          <tr>
-            <th>Name</th>
-            <th>Format</th>
-            <th>Start Time</th>
-            <th>Duration</th>
-            <th className="delete-button"/>
-          </tr>
-          </thead>
-          <tbody>
-          {resultsContainer}
-          </tbody>
-        </table>
-        {Object.keys(results).length ? null : 'No results yet…'}
-      </div>
-    </div>
+    <DropZone analyzing={analyzing} onDrop={onDrop}/>
   )
 }
 export default MediaInfoJs
