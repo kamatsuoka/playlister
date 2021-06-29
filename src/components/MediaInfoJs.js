@@ -56,55 +56,49 @@ const MediaInfoJs = ({results, setResults}) => {
   }
 
   /**
-   * Gets file info for a single file.
-   */
-  function getFileInfo(mediainfo, file) {
-    return mediainfo
-      .analyzeData(() => file.size, readChunk(file))
-      .then((result) => {
-        setResults((prevResults) => ({
-            [getRandomId()]: {
-              ...(filterResult(result)),
-              name: file.name,
-              collapsed: false,
-            },
-            ...prevResults,
-          }))
-        }
-      )
-      .catch((error) =>
-        setResults((prevResults) => ({
-          [getRandomId()]: {collapsed: false, error: error.stack},
-          ...prevResults,
-        }))
-      )
-      .finally(() => setAnalyzing(false))
-  }
-
-  /**
-   * Gets info for each file in list of files.
-   * It's important to 'await' each call to getFileInfo,
-   * otherwise the info returned is truncated.
-   */
-  async function onChangeFile(mediainfo, files) {
-    for (const file of files) {
-      if (file) {
-        await getFileInfo(mediainfo, file)
-      }
-    }
-  }
-
-  /**
-   * When file(s) dropped, get info for each of them
+   * When file(s) dropped, get info for each of them.
    */
   const onDrop = useCallback((files) => {
+    /**
+     * Gets file info for a single file.
+     */
+    const getFileInfo = (mediainfo, file) => {
+      return mediainfo
+        .analyzeData(() => file.size, readChunk(file))
+        .then((result) => {
+            setResults((prevResults) => ({
+              [getRandomId()]: {
+                ...(filterResult(result)),
+                name: file.name,
+                collapsed: false,
+              },
+              ...prevResults,
+            }))
+          }
+        )
+        .catch((error) =>
+          setResults((prevResults) => ({
+            [getRandomId()]: {collapsed: false, error: error.stack},
+            ...prevResults,
+          }))
+        )
+        .finally(() => setAnalyzing(false))
+    }
+
     if (files) {
       setAnalyzing(true)
-      MediaInfo().then((mediainfo) =>
-        onChangeFile(mediainfo, files)
+      MediaInfo().then(async (mediainfo) => {
+          for (const file of files) {
+            if (file) {
+              // need to 'await' each call to getFileInfo,
+              // otherwise the info returned is truncated.
+              await getFileInfo(mediainfo, file)
+            }
+          }
+        }
       )
     }
-  }, [])
+  }, [setResults])
 
   return (
     <DropZone analyzing={analyzing} onDrop={onDrop}/>

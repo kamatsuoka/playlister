@@ -3,12 +3,9 @@ import {findTimeZone, getZonedTime, listTimeZones,} from 'timezone-support/dist/
 import {formatZonedTime} from 'timezone-support/dist/parse-format.js'
 import {SIZE} from "baseui/input"
 import React, {useEffect} from "react"
+import {Checkbox} from "baseui/checkbox"
 
-const TimezoneFix = ({results}) => {
-  const [value, setValue] = React.useState(
-    ""
-  );
-  const [zoneOption, setZoneOption] = React.useState("default")
+const TimezoneOverride = ({value, setValue, override, setOverride}) => {
 
   /**
    * Finds the local time zone id by printing out the local date and searching in the
@@ -42,52 +39,28 @@ const TimezoneFix = ({results}) => {
       const zoneId = findLocalZoneId()
       setValue(zoneId)
     }
-  }, [])
+  }, [setValue, value])
 
-  const onOptionChange = (event) => {
-    setZoneOption(event.target.value)
-  }
-
-  if (results !== null && Object.keys(results).length !== 0) {
-    return (
-      <div id="timezonefix">
-        <div className="radio">Use time zone:</div>
-        <div className="radio">
-          <label>
-            <input
-              type="radio"
-              value="default"
-              checked={zoneOption === "default"}
-              onChange={onOptionChange}
-            />
-            Default
-          </label>
-        </div>
-        <div className="radio">
-          <label>
-            <input
-              type="radio"
-              value="override"
-              checked={zoneOption === "override"}
-              onChange={onOptionChange}
-            />
-            Override
-          </label>
-        </div>
-        <TimezonePicker
-          value={value}
-          size={SIZE.mini}
-          onChange={({id}) => {
-            setValue(id)
-          }}
-          disabled={zoneOption === "default"}
-        />
-      </div>
-    )
-  } else {
-    return null
-  }
+  return (
+    <div id="timezonefix">
+      <Checkbox
+        checked={override}
+        onChange={e => setOverride(e.target.checked)}
+      >
+        Override time zone
+      </Checkbox>
+      <TimezonePicker
+        value={value}
+        size={SIZE.default}
+        onChange={({id}) => {
+          setValue(id)
+        }}
+        disabled={!override}
+        className="picker"
+      />
+    </div>
+  )
 
 }
 
-export default TimezoneFix
+export default TimezoneOverride

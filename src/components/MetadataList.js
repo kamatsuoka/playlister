@@ -2,16 +2,16 @@ import React, {useCallback} from "react"
 import Result from "./Result"
 
 /**
- * List of MediaInfo results
+ * List of file info from MediaInfo
  */
-const MediaResults = ({results, setResults}) => {
+const MetadataList = ({values, setValues}) => {
 
   const onRemove = useCallback(
-    (resultId) => setResults(({[resultId]: _, ...rest}) => rest),
-    []
+    (resultId) => setValues(({[resultId]: _, ...rest}) => rest),
+    [setValues]
   )
 
-  const resultsContainer = Object.entries(results).map(([resultId, result]) => (
+  const resultsContainer = Object.entries(values).map(([resultId, result]) => (
     <Result
       id={resultId}
       key={resultId}
@@ -36,9 +36,8 @@ const MediaResults = ({results, setResults}) => {
         {resultsContainer}
         </tbody>
       </table>
-      {Object.keys(results).length ? null : 'No results yet…'}
     </div>
   )
 }
 
-export default MediaResults
+export default MetadataList
