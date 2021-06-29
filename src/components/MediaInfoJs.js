@@ -130,7 +130,7 @@ const MediaInfoJs = ({className}) => {
             <th>Format</th>
             <th>Start Time</th>
             <th>Duration</th>
-            <th>{/*(delete button)*/}</th>
+            <th className="delete-button"/>
           </tr>
           </thead>
           <tbody>

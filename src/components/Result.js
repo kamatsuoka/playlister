@@ -20,7 +20,7 @@ const Result = ({id, result, onRemove}) => {
     <tr>
       <td>{result.name}</td>
       {details(result)}
-      <td>
+      <td className="delete-button">
         <button
           className="remove"
           onClick={(event) => {
