@@ -18,10 +18,10 @@ const MediaPage = ({className}) => {
     return <React.Fragment>
       <h3>File Metadata</h3>
       <MetadataList values={fileInfo} setValues={setFileInfo}/>
+      <hr/>
       <TimezoneOverride value={timeZone} setValue={setTimeZone}
                         override={overrideTimeZone} setOverride={setOverrideTimeZone}/>
-      <hr/>
-      <h3>Calculated Properties</h3>
+      <h3>Start and End Times</h3>
       <StartEndList fileInfo={fileInfo} overrideTimeZone={overrideTimeZone}
                     startEndList={startEndList} setStartEndList={setStartEndList}/>
     </React.Fragment>
