@@ -2,7 +2,7 @@ import MediaInfoJs from "./MediaInfoJs"
 import React, {useState} from "react"
 import MetadataList from "./MetadataList"
 import TimezoneOverride from "./TimezoneOverride"
-import CalculatedList from "./CalculatedList"
+import StartEndList from "./StartEndList"
 
 /**
  * Page that holds MediaInfo lookup and results
@@ -12,7 +12,7 @@ const MediaPage = ({className}) => {
   const [fileInfo, setFileInfo] = useState({})
   const [timeZone, setTimeZone] = useState("");
   const [overrideTimeZone, setOverrideTimeZone] = useState(false)
-  const [fileProperties, setFileProperties] = useState({})
+  const [startEndList, setStartEndList] = useState([])
 
   const showFiles = (fileInfo) => {
     return <React.Fragment>
@@ -22,8 +22,8 @@ const MediaPage = ({className}) => {
                         override={overrideTimeZone} setOverride={setOverrideTimeZone}/>
       <hr/>
       <h3>Calculated Properties</h3>
-      <CalculatedList fileInfo={fileInfo} overrideTimeZone={overrideTimeZone}
-                      fileProperties={fileProperties} setFileProperties={setFileProperties}/>
+      <StartEndList fileInfo={fileInfo} overrideTimeZone={overrideTimeZone}
+                    startEndList={startEndList} setStartEndList={setStartEndList}/>
     </React.Fragment>
   }
 

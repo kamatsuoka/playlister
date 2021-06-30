@@ -15,7 +15,7 @@ dayjs.extend(utc)
 /**
  * List of calculated file properties
  */
-const CalculatedList = ({fileInfo, overrideTimeZone, fileProperties, setFileProperties}) => {
+const StartEndList = ({fileInfo, overrideTimeZone, startEndList, setStartEndList}) => {
 
   /**
    * Calculate start and end time from file info
@@ -35,29 +35,29 @@ const CalculatedList = ({fileInfo, overrideTimeZone, fileProperties, setFileProp
       }
     }
 
-    const calculateStartEnd = (result) => {
+    const calculateStartEnd = (resultId, result) => {
       const startTime = parseTimestamp(result.startTime)
       const endTime = startTime.add(result.duration, "second")
       return {
+        id: resultId,
         name: result.name,
         startTime: startTime.toISOString(),
         endTime: endTime.toISOString()
       }
     }
 
-    const fileProps = Object.fromEntries(
-      Object.entries(fileInfo)
-        .flatMap(([resultId, result]) =>
-          result.startTime ? [[resultId, calculateStartEnd(result)]] : []
-        )
-    )
-    setFileProperties(fileProps)
-  }, [fileInfo, overrideTimeZone, setFileProperties])
+    // filter out any files that don't have a start time (probably not media files)
+    const startEnds = Object.entries(fileInfo)
+      .flatMap(([resultId, result]) =>
+        result.startTime ? [calculateStartEnd(resultId, result)] : []
+      ).sort((s1, s2) => s1.startTime > s2.startTime ? 1 : -1)
+    setStartEndList(startEnds)
+  }, [fileInfo, overrideTimeZone, setStartEndList])
 
   const displayTemplate = 'ddd MMM D h:mm:ss A z YYYY'
 
   return (
-    <div id="calculated">
+    <div id="start-end">
       <table className="file-list">
         <thead>
         <tr>
@@ -67,14 +67,13 @@ const CalculatedList = ({fileInfo, overrideTimeZone, fileProperties, setFileProp
         </tr>
         </thead>
         <tbody>
-        {Object
-          .entries(fileProperties)
-          .map(([resultId, result]) =>
+        {startEndList
+          .map(startEnd =>
             (
-              <tr key={resultId}>
-                <td>{result.name}</td>
-                <td>{dayjs(result.startTime).format(displayTemplate)}</td>
-                <td>{dayjs(result.endTime).format(displayTemplate)}</td>
+              <tr key={startEnd.id}>
+                <td>{startEnd.name}</td>
+                <td>{dayjs(startEnd.startTime).format(displayTemplate)}</td>
+                <td>{dayjs(startEnd.endTime).format(displayTemplate)}</td>
               </tr>
             ))}
         </tbody>
@@ -83,4 +82,4 @@ const CalculatedList = ({fileInfo, overrideTimeZone, fileProperties, setFileProp
   )
 }
 
-export default CalculatedList
+export default StartEndList
