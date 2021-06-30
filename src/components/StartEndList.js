@@ -54,7 +54,7 @@ const StartEndList = ({fileInfo, overrideTimeZone, startEndList, setStartEndList
     setStartEndList(startEnds)
   }, [fileInfo, overrideTimeZone, setStartEndList])
 
-  const displayTemplate = 'ddd MMM D h:mm:ss A z YYYY'
+  const displayTemplate = 'YYYY-MM-DD HH:mm:ss z'
 
   return (
     <div id="start-end">

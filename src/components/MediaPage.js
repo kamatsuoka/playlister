@@ -4,6 +4,7 @@ import MetadataList from "./MetadataList"
 import TimezoneOverride from "./TimezoneOverride"
 import StartEndList from "./StartEndList"
 import {Button, SIZE} from "baseui/button";
+import PlaylistSettings from "./PlaylistSettings"
 
 /**
  * Page that holds MediaInfo lookup and results
@@ -14,6 +15,8 @@ const MediaPage = ({className}) => {
   const [timeZone, setTimeZone] = useState("");
   const [overrideTimeZone, setOverrideTimeZone] = useState(false)
   const [startEndList, setStartEndList] = useState([])
+  const [playlistSettings, setPlaylistSettings] =
+    useState({prefix: "fcs", cameraView: "chorus", startIndex: 1})
 
   const showFiles = (fileInfo) => {
     return <React.Fragment>
@@ -30,6 +33,8 @@ const MediaPage = ({className}) => {
       <h3>Start and End Times</h3>
       <StartEndList fileInfo={fileInfo} overrideTimeZone={overrideTimeZone}
                     startEndList={startEndList} setStartEndList={setStartEndList}/>
+      <h3>Playlist</h3>
+      <PlaylistSettings startEndList={startEndList} value={playlistSettings} setValue={setPlaylistSettings}/>
     </React.Fragment>
   }
 
