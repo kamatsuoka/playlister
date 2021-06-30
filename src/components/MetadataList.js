@@ -22,7 +22,7 @@ const MetadataList = ({values, setValues}) => {
 
   return (
     <div id="results">
-      <table className="results-table">
+      <table className="file-list">
         <thead>
         <tr>
           <th>Name</th>

@@ -28,7 +28,6 @@ const collapseAll = (restoredResults) =>
       ...acc,
       [key]: {
         ...val,
-        collapsed: true,
       },
     }
   }, {})
@@ -70,7 +69,6 @@ const MediaInfoJs = ({results, setResults}) => {
               [getRandomId()]: {
                 ...(filterResult(result)),
                 name: file.name,
-                collapsed: false,
               },
               ...prevResults,
             }))
@@ -78,7 +76,10 @@ const MediaInfoJs = ({results, setResults}) => {
         )
         .catch((error) =>
           setResults((prevResults) => ({
-            [getRandomId()]: {collapsed: false, error: error.stack},
+            [getRandomId()]: {
+              name: file.name,
+              error: error.stack
+            },
             ...prevResults,
           }))
         )
