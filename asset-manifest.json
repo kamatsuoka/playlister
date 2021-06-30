@@ -1,21 +1,21 @@
 {
   "files": {
     "main.css": "/playlister/static/css/main.9a0041a7.chunk.css",
-    "main.js": "/playlister/static/js/main.ccc39274.chunk.js",
-    "main.js.map": "/playlister/static/js/main.ccc39274.chunk.js.map",
+    "main.js": "/playlister/static/js/main.763055d6.chunk.js",
+    "main.js.map": "/playlister/static/js/main.763055d6.chunk.js.map",
     "runtime-main.js": "/playlister/static/js/runtime-main.e367f922.js",
     "runtime-main.js.map": "/playlister/static/js/runtime-main.e367f922.js.map",
-    "static/js/2.fd20ddc9.chunk.js": "/playlister/static/js/2.fd20ddc9.chunk.js",
-    "static/js/2.fd20ddc9.chunk.js.map": "/playlister/static/js/2.fd20ddc9.chunk.js.map",
+    "static/js/2.7a906d1a.chunk.js": "/playlister/static/js/2.7a906d1a.chunk.js",
+    "static/js/2.7a906d1a.chunk.js.map": "/playlister/static/js/2.7a906d1a.chunk.js.map",
     "index.html": "/playlister/index.html",
     "static/css/main.9a0041a7.chunk.css.map": "/playlister/static/css/main.9a0041a7.chunk.css.map",
-    "static/js/2.fd20ddc9.chunk.js.LICENSE.txt": "/playlister/static/js/2.fd20ddc9.chunk.js.LICENSE.txt",
+    "static/js/2.7a906d1a.chunk.js.LICENSE.txt": "/playlister/static/js/2.7a906d1a.chunk.js.LICENSE.txt",
     "static/media/index.sass": "/playlister/static/media/bg.000a380d.png"
   },
   "entrypoints": [
     "static/js/runtime-main.e367f922.js",
-    "static/js/2.fd20ddc9.chunk.js",
+    "static/js/2.7a906d1a.chunk.js",
     "static/css/main.9a0041a7.chunk.css",
-    "static/js/main.ccc39274.chunk.js"
+    "static/js/main.763055d6.chunk.js"
   ]
 }
