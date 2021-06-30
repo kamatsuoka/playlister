@@ -3,6 +3,7 @@ import React, {useState} from "react"
 import MetadataList from "./MetadataList"
 import TimezoneOverride from "./TimezoneOverride"
 import StartEndList from "./StartEndList"
+import {Button, SIZE} from "baseui/button";
 
 /**
  * Page that holds MediaInfo lookup and results
@@ -16,7 +17,12 @@ const MediaPage = ({className}) => {
 
   const showFiles = (fileInfo) => {
     return <React.Fragment>
-      <h3>File Metadata</h3>
+      <div id="file-metadata">
+        <h3>File Metadata</h3>
+        <div style={{float: 'right'}}>
+          <Button size={SIZE.mini} onClick={() => setFileInfo({})}>Clear All</Button>
+        </div>
+      </div>
       <MetadataList values={fileInfo} setValues={setFileInfo}/>
       <hr/>
       <TimezoneOverride value={timeZone} setValue={setTimeZone}
