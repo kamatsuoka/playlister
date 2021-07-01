@@ -5,6 +5,7 @@ import TimezoneOverride from "./TimezoneOverride"
 import StartEndList from "./StartEndList"
 import PlaylistSettings from "./PlaylistSettings"
 import {StyledLink} from "baseui/link"
+import {H6} from "baseui/typography"
 
 /**
  * Page that holds MediaInfo lookup and results
@@ -21,7 +22,7 @@ const MediaPage = ({className}) => {
   const showFiles = (fileInfo) => {
     return <React.Fragment>
       <div id="file-metadata">
-        <h3>File Metadata</h3>
+        <H6>File Metadata</H6>
       </div>
       <MetadataList values={fileInfo} setValues={setFileInfo}/>
       <div style={{textAlign: 'right'}}>
@@ -30,10 +31,10 @@ const MediaPage = ({className}) => {
       <hr/>
       <TimezoneOverride value={timeZone} setValue={setTimeZone}
                         override={overrideTimeZone} setOverride={setOverrideTimeZone}/>
-      <h3>Start and End Times</h3>
+      <H6>Start and End Times</H6>
       <StartEndList fileInfo={fileInfo} overrideTimeZone={overrideTimeZone}
                     startEndList={startEndList} setStartEndList={setStartEndList}/>
-      <h3>Playlist</h3>
+      <H6>Playlist</H6>
       <PlaylistSettings startEndList={startEndList} value={playlistSettings} setValue={setPlaylistSettings}/>
     </React.Fragment>
   }

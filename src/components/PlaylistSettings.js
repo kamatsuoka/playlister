@@ -5,6 +5,7 @@ import dayjs from "dayjs"
 import {Cell, Grid} from "baseui/layout-grid"
 import {Combobox} from "baseui/combobox"
 import {createTheme, lightThemePrimitives, ThemeProvider} from "baseui"
+import {H6} from "baseui/typography"
 
 const PlaylistSettings = ({startEndList, value, setValue}) => {
 
@@ -61,7 +62,7 @@ const PlaylistSettings = ({startEndList, value, setValue}) => {
           </FormControl>
         </Cell>
       </Grid>
-      <h3>Track Naming</h3>
+      <H6>Track Naming</H6>
       <Grid>
         <Cell span={[1, 2, 2]}>
           <FormControl label="prefix">
