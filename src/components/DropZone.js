@@ -1,36 +1,16 @@
 import React from 'react'
-import classNames from 'classnames'
-import { useDropzone } from 'react-dropzone'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCog } from '@fortawesome/free-solid-svg-icons'
-import { faHandRock } from '@fortawesome/free-regular-svg-icons'
+import {FileUploader} from "baseui/file-uploader";
 
 const DropZone = ({ analyzing, onDrop }) => {
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    disabled: analyzing,
-    onDrop,
-  })
   return (
-    <div
-      id="dropzone"
-      className={classNames('big', 'center', { dragover: isDragActive })}
-      {...getRootProps()}
-    >
-      {analyzing ? (
-        <div id="status" className="hidden">
-          <FontAwesomeIcon icon={faCog} size="lg" spin /> Analyzing …
-        </div>
-      ) : (
-        <div id="dropcontrols">
-          <div id="dropcontrolstext">
-            <FontAwesomeIcon icon={faHandRock} size="lg" /> Drop media files here
-            <br />
-            <span className="small">(or click)</span>
-          </div>
-          <input id="fileinput" type="file" {...getInputProps()} />
-        </div>
-      )}
-    </div>
+    <FileUploader
+      onDrop={onDrop}
+      progressMessage={
+        analyzing
+          ? 'Analyzing ...'
+          : ''
+      }
+    />
   )
 }
 
