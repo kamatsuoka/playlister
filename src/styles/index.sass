@@ -6,9 +6,9 @@ $color-borders: rgba(0, 0, 0, 0.25)
 $color-blue: #458ccc
 $color-brown: #c58d64
 $color-brown-dark: darken($color-brown, 30%)
-$color-brown-trans: fade-out($color-brown, 0.75)
-$color-brown-dark-trans: fade-out($color-brown-dark, 0.75)
-$color-light-trans: rgba(0, 0, 0, 0.1)
+$color-brown-trans: fade-out($color-brown, 0.95)
+$color-brown-dark-trans: fade-out($color-brown-dark, 0.85)
+$color-light-trans: rgba(0, 0, 0, 0.05)
 
 $dur-short: 0.2s
 $dur-long: 0.4s
@@ -182,62 +182,6 @@ nav#menu
   .delete-button
     width: 30px
 
-.result
-  border-radius: 4px
-  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.45)
-  overflow: hidden
-  margin: 1rem 0
-
-  .result-head
-    cursor: pointer
-    text-shadow: 0 1px 0 #d6d6d6
-    background-color: $color-brown-dark-trans
-    padding: 1rem
-    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.25)
-
-    .filename
-      padding-left: 8px
-      +monofont
-
-    .toggle-collapse
-      transition: transform $dur-short
-
-  .ReactCollapse--collapse
-    transition: height $dur-long ease-in-out
-
-  .result-body
-    background-color: $color-brown-trans
-
-    .result-error
-      padding: 1rem
-
-    > table
-      width: 100%
-      padding: 1rem
-      border-spacing: 0
-
-      tr:first-child h2
-        margin-top: 0
-
-      h2
-        margin: 1.5rem 0 0.5rem
-
-      tr
-
-        &:nth-child(odd)
-          background-color: $color-light-trans
-
-        &.header
-          background-color: transparent
-
-      td
-        vertical-align: top
-        padding: 0.1rem 0.4rem
-
-        &:first-child
-          font-weight: bold
-          white-space: nowrap
-
 div#file-metadata
   vertical-align: middle
 
@@ -266,8 +210,9 @@ div#timezonefix
     vertical-align: middle
     width: auto
 
+.calculated-input
+  *
+    color: black
+
 footer
-  position: absolute
-  width: auto
-  bottom: 10px
   margin: 3rem 0 0.7rem

@@ -5,6 +5,9 @@ import localizedFormat from "dayjs/plugin/localizedFormat"
 import advancedFormat from "dayjs/plugin/advancedFormat"
 import timezone from "dayjs/plugin/timezone" // dependent on utc plugin
 import customParseFormat from "dayjs/plugin/customParseFormat"
+import {tableOverrides} from "./TableOverrides"
+import {Table} from 'baseui/table-semantic';
+// import {TableBuilderColumn} from "baseui/table-semantic"
 
 dayjs.extend(localizedFormat)
 dayjs.extend(advancedFormat)
@@ -56,28 +59,16 @@ const StartEndList = ({fileInfo, overrideTimeZone, startEndList, setStartEndList
 
   const displayTemplate = 'YYYY-MM-DD HH:mm:ss z'
 
+  const COLUMNS = ['Name', 'Start Time', 'End Time']
+
   return (
     <div id="start-end">
-      <table className="file-list">
-        <thead>
-        <tr>
-          <th>Name</th>
-          <th>Start Time</th>
-          <th>End Time</th>
-        </tr>
-        </thead>
-        <tbody>
-        {startEndList
-          .map(startEnd =>
-            (
-              <tr key={startEnd.id}>
-                <td>{startEnd.name}</td>
-                <td>{dayjs(startEnd.startTime).format(displayTemplate)}</td>
-                <td>{dayjs(startEnd.endTime).format(displayTemplate)}</td>
-              </tr>
-            ))}
-        </tbody>
-      </table>
+      <Table columns={COLUMNS} overrides={tableOverrides}
+             data={startEndList.map(startEnd => [
+               startEnd.name,
+               dayjs(startEnd.startTime).format(displayTemplate),
+               dayjs(startEnd.endTime).format(displayTemplate)
+             ])}/>
     </div>
   )
 }

@@ -1,5 +1,8 @@
 import React, {useCallback} from "react"
-import Result from "./Result"
+import {TableBuilder, TableBuilderColumn} from 'baseui/table-semantic'
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
+import {faTimes} from "@fortawesome/free-solid-svg-icons"
+import {tableOverrides, tablePadding} from "./TableOverrides"
 
 /**
  * List of file info from MediaInfo
@@ -11,31 +14,55 @@ const MetadataList = ({values, setValues}) => {
     [setValues]
   )
 
-  const resultsContainer = Object.entries(values).map(([resultId, result]) => (
-    <Result
-      id={resultId}
-      key={resultId}
-      onRemove={onRemove}
-      result={result}
-    />
-  ))
+  const DATA = Object.entries(values).map(([resultId, result]) => (
+    {
+      id: resultId,
+      name: result.name,
+      format: result.format,
+      startTime: result.startTime,
+      duration: result.duration
+    }))
+
+  const durationOverrides = {
+    TableHeadCell: {
+      style: ({$theme, $rowIndex}) => ({
+        textAlign: 'right',
+        paddingRight: tablePadding
+      })
+    }
+  }
 
   return (
     <div id="results">
-      <table className="file-list">
-        <thead>
-        <tr>
-          <th>Name</th>
-          <th>Format</th>
-          <th>Start Time</th>
-          <th>Duration</th>
-          <th className="delete-button"/>
-        </tr>
-        </thead>
-        <tbody>
-        {resultsContainer}
-        </tbody>
-      </table>
+      <TableBuilder data={DATA} overrides={tableOverrides}>
+        <TableBuilderColumn header="Name">
+          {row => row.name}
+        </TableBuilderColumn>
+        <TableBuilderColumn header="Format">
+          {row => row.format}
+        </TableBuilderColumn>
+        <TableBuilderColumn header="Start Time">
+          {row => row.startTime}
+        </TableBuilderColumn>
+        <TableBuilderColumn header="Duration" numeric overrides={durationOverrides}>
+          {row => row.duration}
+        </TableBuilderColumn>
+        <TableBuilderColumn header="">
+          {row => <button
+            className="remove"
+            onClick={(event) => {
+              event.stopPropagation()
+              onRemove(row.id)
+            }}
+            tabIndex={0}
+            title="Remove from list"
+            type="button"
+          >
+            <FontAwesomeIcon icon={faTimes} size="lg"/>
+          </button>
+          }
+        </TableBuilderColumn>
+      </TableBuilder>
     </div>
   )
 }

@@ -3,8 +3,8 @@ import React, {useState} from "react"
 import MetadataList from "./MetadataList"
 import TimezoneOverride from "./TimezoneOverride"
 import StartEndList from "./StartEndList"
-import {Button, SIZE} from "baseui/button";
 import PlaylistSettings from "./PlaylistSettings"
+import {StyledLink} from "baseui/link"
 
 /**
  * Page that holds MediaInfo lookup and results
@@ -16,17 +16,17 @@ const MediaPage = ({className}) => {
   const [overrideTimeZone, setOverrideTimeZone] = useState(false)
   const [startEndList, setStartEndList] = useState([])
   const [playlistSettings, setPlaylistSettings] =
-    useState({prefix: "fcs", cameraView: "chorus", startIndex: 1})
+    useState({eventType: "rehearsal", prefix: "fcs", cameraView: "chorus", startIndex: 1})
 
   const showFiles = (fileInfo) => {
     return <React.Fragment>
       <div id="file-metadata">
         <h3>File Metadata</h3>
-        <div style={{float: 'right'}}>
-          <Button size={SIZE.mini} onClick={() => setFileInfo({})}>Clear All</Button>
-        </div>
       </div>
       <MetadataList values={fileInfo} setValues={setFileInfo}/>
+      <div style={{textAlign: 'right'}}>
+        <StyledLink onClick={() => setFileInfo({})}>Clear All</StyledLink>
+      </div>
       <hr/>
       <TimezoneOverride value={timeZone} setValue={setTimeZone}
                         override={overrideTimeZone} setOverride={setOverrideTimeZone}/>
