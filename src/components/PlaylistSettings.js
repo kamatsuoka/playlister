@@ -72,11 +72,13 @@ const PlaylistSettings = ({startEndList, value, setValue}) => {
             />
           </FormControl>
         </Cell>
-        <Cell span={2}>
+        <Cell span={[2, 3, 4]}>
           <FormControl label="camera view">
-            <Input
+            <Combobox
               value={value.cameraView}
               onChange={e => setValue({...value, cameraView: e.target.value})}
+              options={["chorus", "director", "corner", "elevated"]}
+              mapOptionToString={option => option}
             />
           </FormControl>
         </Cell>
