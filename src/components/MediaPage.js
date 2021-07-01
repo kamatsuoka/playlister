@@ -10,13 +10,13 @@ import {Heading, HeadingLevel} from "baseui/heading"
 /**
  * Page that holds MediaInfo lookup and results
  */
-const MediaPage = ({className}) => {
+const MediaPage = ({
+                     className, startEndList, setStartEndList,
+                     playlistSettings, setPlaylistSettings
+                   }) => {
 
   const [fileInfo, setFileInfo] = useState({})
   const [overrideTimeZone, setOverrideTimeZone] = useState(true)
-  const [startEndList, setStartEndList] = useState([])
-  const [playlistSettings, setPlaylistSettings] =
-    useState({eventType: "rehearsal", prefix: "fcs", cameraView: "chorus", startIndex: 1})
 
   const showFiles = (fileInfo) => {
     return (

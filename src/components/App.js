@@ -1,36 +1,39 @@
 import React, {useState} from 'react'
-import {CSSTransition, SwitchTransition} from 'react-transition-group'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faGithub} from '@fortawesome/free-brands-svg-icons'
 import {BaseProvider, LightTheme} from 'baseui'
 import {Provider as StyletronProvider} from "styletron-react"
 import {Client as Styletron} from "styletron-engine-atomic"
+import {Tab, Tabs} from 'baseui/tabs-motion';
 
-import About from './About'
 import MediaPage from './MediaPage'
+import YouTube from "./YouTube"
 
-const PAGE_FADE_TIME = 400
 const engine = new Styletron()
+
 
 function App() {
 
-  const [page] = useState('mediapage')
+  const [activeKey, setActiveKey] = useState(0);
+  const [startEndList, setStartEndList] = useState([])
+  const [playlistSettings, setPlaylistSettings] =
+    useState({eventType: "rehearsal", prefix: "fcs", cameraView: "chorus", startIndex: 1})
 
   return (
     <StyletronProvider value={engine}>
       <BaseProvider theme={LightTheme}>
-        <section id="page">
-          <SwitchTransition>
-            <CSSTransition
-              classNames="page"
-              key={page}
-              mountOnEnter
-              timeout={PAGE_FADE_TIME}
-            >
-              {page === 'mediapage' ? <MediaPage/> : <About/>}
-            </CSSTransition>
-          </SwitchTransition>
-        </section>
+        <Tabs
+          activeKey={activeKey}
+          onChange={({activeKey}) => setActiveKey(activeKey)}
+        >
+          <Tab title="Media">
+            <MediaPage startEndList={startEndList} setStartEndList={setStartEndList}
+                       playlistSettings={playlistSettings} setPlaylistSettings={setPlaylistSettings}/>
+          </Tab>
+          <Tab title="YouTube">
+            <YouTube startEndList={startEndList} playlistSettings={playlistSettings}/>
+          </Tab>
+        </Tabs>
         <footer>
           <p>
             <a href="https://github.com/kamatsuoka/playlister">

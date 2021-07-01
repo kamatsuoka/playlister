@@ -45,7 +45,7 @@ const MetadataList = ({values, setValues}) => {
           {row => row.startTime}
         </TableBuilderColumn>
         <TableBuilderColumn header="Duration" numeric overrides={durationOverrides}>
-          {row => row.duration}
+          {row => parseFloat(row.duration).toFixed(1).toString() + 's'}
         </TableBuilderColumn>
         <TableBuilderColumn header="">
           {row => <button

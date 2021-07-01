@@ -1,6 +1,6 @@
 import React, {useCallback, useState} from 'react'
 
-import usePersist from '../hooks/usePersist'
+import {copyData, usePersist} from '../hooks/usePersist'
 import DropZone from './DropZone'
 
 // import MediaInfo from 'mediainfo.js'
@@ -22,15 +22,6 @@ const readChunk = (file) => (chunkSize, offset) =>
 
 const getRandomId = () => Math.random().toString(36).substr(2, 9)
 
-const collapseAll = (restoredResults) =>
-  Object.entries(restoredResults).reduce((acc, [key, val]) => {
-    return {
-      ...acc,
-      [key]: {
-        ...val,
-      },
-    }
-  }, {})
 
 /**
  * Renders DropZone (and file picker) for one or more media files
@@ -40,7 +31,7 @@ const MediaInfoJs = ({results, setResults}) => {
 
   usePersist({
     key: 'results',
-    onRestore: collapseAll,
+    onRestore: copyData,
     setState: setResults,
     state: results,
   })

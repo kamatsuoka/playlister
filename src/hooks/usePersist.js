@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import {useEffect} from 'react'
 
 const restore = (key) => {
   const restoredJson = window.localStorage.getItem(key)
@@ -17,7 +17,7 @@ const restore = (key) => {
 const save = (key, state) =>
   window.localStorage.setItem(key, JSON.stringify(state))
 
-const usePersist = ({ key, onRestore = (data) => data, setState, state }) => {
+const usePersist = ({key, onRestore, setState, state}) => {
   useEffect(() => {
     setState(onRestore(restore(key)))
   }, [key, onRestore, setState])
@@ -26,4 +26,6 @@ const usePersist = ({ key, onRestore = (data) => data, setState, state }) => {
   }, [key, state])
 }
 
-export default usePersist
+const copyData = data => Object.assign({}, data)
+
+export {copyData, usePersist}
