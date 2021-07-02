@@ -5,19 +5,25 @@ import {copyData, usePersist} from "../hooks/usePersist"
 import {Button} from "baseui/button"
 import PlaylistSettings from "./PlaylistSettings"
 import dayjs from "dayjs"
+import TrackNameSettings from "./TrackNameSettings"
 
 const gapi = window.gapi
 
 
-const YouTube = ({startEndList, playlistSettings, setPlaylistSettings}) => {
-  const [apiData, setApiData] = useState({apiKey: '', clientId: '', channelId: ''})
-  const [googleAuth, setGoogleAuth] = useState()
+const YouTube = ({googleAuth, startEndList}) => {
+  const [channelData, setChannelData] = useState({channelId: ''})
+  const [playlistSettings, setPlaylistSettings] = useState({eventType: "rehearsal"})
+  const [trackNameSettings, setTrackNameSettings] = useState({
+    prefix: "fcs",
+    cameraView: "chorus"
+  })
+  const [foundPlaylist, setFoundPlaylist] = useState({})
 
   usePersist({
-    key: 'apiData',
+    key: 'channelData',
     onRestore: copyData,
-    setState: setApiData,
-    state: apiData,
+    setState: setChannelData,
+    state: channelData,
   })
 
   useEffect(() => {
@@ -31,94 +37,67 @@ const YouTube = ({startEndList, playlistSettings, setPlaylistSettings}) => {
         setPlaylistSettings({...playlistSettings, date: dateSet.values().next().value})
       }
     }
-  })
+  }, [playlistSettings, startEndList])
 
-  function authenticate() {
-    return gapi.auth2.getAuthInstance()
-      .signIn({scope: "https://www.googleapis.com/auth/youtube.force-ssl"})
-      .then(
-        () => console.log("Sign-in successful"),
-        err => console.error("Error signing in", err)
-      )
-  }
+  const MAX_RESULTS = 25
 
-  function loadClient() {
-    gapi.client.setApiKey(apiData.apiKey)
-    return gapi.client.load("https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest")
-      .then(
-        () => console.log("GAPI client loaded for API"),
-        err => console.error("Error loading GAPI client for API", err)
-      )
+  /**
+   * Find existing playlist with same name
+   */
+  const findMatchingPlaylist = (result) => {
+    const totalResults = result.pageInfo.totalResults
+    if (totalResults > MAX_RESULTS)
+      console.warn(`got ${totalResults} playlists from search, there may be more on the next page`)
+    if (totalResults > 0) {
+      const matchingPlaylist = result.items.filter(i => i.snippet.title === playlistSettings.title)
+      if (matchingPlaylist && matchingPlaylist[0]) {
+        return matchingPlaylist.id.playlistId
+      }
+    }
+    return null
   }
 
   // Make sure the client is loaded and sign-in is complete before calling this method.
 
-  function findPlaylist() {
+  function searchPlaylists() {
     return gapi.client.youtube.search.list({
       "part": [
         "snippet"
       ],
-      "channelId": apiData.channelId,
-      "maxResults": 25,
+      "channelId": channelData.channelId,
+      "maxResults": MAX_RESULTS,
       "type": "playlist",
-      "q": playlistSettings.playlistName
+      "q": playlistSettings.title
     }).then(
-      response => console.log("Response", response),
+      response => {
+        const playlistId = findMatchingPlaylist(response.result)
+        if (playlistId) {
+          // TODO: call playlist items api to get count of videos
+        } else {
+          setTrackNameSettings({...trackNameSettings, startIndex: 1})
+        }
+      },
       err => console.error("Execute error", err)
     )
   }
 
-  function initThen(postAuth) {
-    return gapi.load("client:auth2", () =>
-      gapi.auth2.init({client_id: apiData.clientId}).then(auth => {
-        console.log('in init -> then, auth = ', auth)
-        postAuth(auth)
-      })
-    )
-  }
-
-  const searchForPlaylist = () => {
-    if (googleAuth && googleAuth.isSignedIn) {
-      findPlaylist()
-    } else {
-      initThen(async auth => {
-        await authenticate()
-        await loadClient()
-        findPlaylist()
-        setGoogleAuth(auth)
-      })
-    }
-  }
+  const isAuthenticated = () => googleAuth && googleAuth.isSignedIn
 
   return (
     <HeadingLevel>
-      <Heading styleLevel={6}>API Key</Heading>
-      <Input
-        value={apiData.apiKey}
-        onChange={e => setApiData({...apiData, apiKey: e.target.value})}
-      />
-      <Heading styleLevel={6}>Client ID</Heading>
-      <Input
-        value={apiData.clientId}
-        onChange={e => setApiData({...apiData, clientId: e.target.value})}
-      />
       <Heading styleLevel={6}>Channel ID</Heading>
       <Input
-        value={apiData.channelId}
-        onChange={e => setApiData({...apiData, channelId: e.target.value})}
+        value={channelData.channelId}
+        onChange={e => setChannelData({...channelData, channelId: e.target.value})}
       />
       <div style={{marginTop: '20px'}}>
-        <Heading styleLevel={6}>Playlist</Heading>
         <PlaylistSettings startEndList={startEndList} value={playlistSettings} setValue={setPlaylistSettings}/>
       </div>
-
-      <Button onClick={searchForPlaylist}>Check YouTube for Playlist</Button>
-
-      {/*
-      <button onClick={initialize}>initialize</button>
-      <button onClick={() => authenticate().then(loadClient)}>authorize and load</button>
-      <button onClick={execute}>execute</button>
-*/}
+      <Button onClick={searchPlaylists} disabled={!isAuthenticated()}>Check YouTube for Playlist</Button>
+      {isAuthenticated() ? null : <p>Please authenticate first</p>}
+      <div style={{marginTop: '20px'}}>
+        <TrackNameSettings startEndList={startEndList} value={trackNameSettings} setValue={setTrackNameSettings}/>
+      </div>
     </HeadingLevel>
   )
 }

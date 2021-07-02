@@ -3,13 +3,12 @@ import {Input} from "baseui/input"
 import {FormControl} from "baseui/form-control"
 import {Cell, Grid} from "baseui/layout-grid"
 import {Combobox} from "baseui/combobox"
-import {createTheme, lightThemePrimitives, ThemeProvider} from "baseui"
 import {Heading} from "baseui/heading"
 
 
 const PlaylistSettings = ({value, setValue}) => {
 
-  const getDefaultPlaylistName = () => {
+  const getDefaultTitle = () => {
     const d = value.date
     if (d) {
       return d.replaceAll('-', '') + ' ' + value.eventType
@@ -19,20 +18,17 @@ const PlaylistSettings = ({value, setValue}) => {
   }
 
   useEffect(() => {
-    if (!value.playlistName) setValue({...value, playlistName: getDefaultPlaylistName()})
+    if (!value.title) setValue({...value, title: getDefaultTitle()})
   })
 
   return (
-    <ThemeProvider
-      theme={createTheme(lightThemePrimitives, {
-        colors: {inputTextDisabled: 'black'}
-      })}
-    >
+    <React.Fragment>
+      <Heading styleLevel={6}>Playlist</Heading>
       <Grid>
         <Cell span={[1, 2, 3]}>
           <FormControl label="date">
             <Input
-              value={value.date}
+              value={value.date || ''}
               onChange={e => setValue({...value, date: e.target.value})}
             />
           </FormControl>
@@ -48,37 +44,15 @@ const PlaylistSettings = ({value, setValue}) => {
           </FormControl>
         </Cell>
         <Cell span={[2, 3, 4]}>
-          <FormControl label="playlist name">
+          <FormControl label="title">
             <Input
-              value={value.playlistName}
-              onChange={e => setValue({...value, playlistName: e.target.value})}
-              disabled={true}
+              value={value.title || ''}
+              onChange={e => setValue({...value, title: e.target.value})}
             />
           </FormControl>
         </Cell>
       </Grid>
-      <Heading styleLevel={6}>Track Naming</Heading>
-      <Grid>
-        <Cell span={[1, 2, 2]}>
-          <FormControl label="prefix">
-            <Input
-              value={value.prefix}
-              onChange={e => setValue({...value, prefix: e.target.value})}
-            />
-          </FormControl>
-        </Cell>
-        <Cell span={[2, 3, 4]}>
-          <FormControl label="camera view">
-            <Combobox
-              value={value.cameraView}
-              onChange={e => setValue({...value, cameraView: e.target.value})}
-              options={["chorus", "director", "corner", "elevated"]}
-              mapOptionToString={option => option}
-            />
-          </FormControl>
-        </Cell>
-      </Grid>
-    </ThemeProvider>
+    </React.Fragment>
   )
 }
 

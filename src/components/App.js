@@ -8,6 +8,7 @@ import {Tab, Tabs} from 'baseui/tabs-motion';
 
 import MediaPage from './MediaPage'
 import YouTube from "./YouTube"
+import GoogleAuth from "./GoogleAuth"
 
 const engine = new Styletron()
 
@@ -15,12 +16,7 @@ function App() {
 
   const [activeKey, setActiveKey] = useState(0);
   const [startEndList, setStartEndList] = useState([])
-  const [playlistSettings, setPlaylistSettings] =
-    useState({
-      eventType: "rehearsal",
-      prefix: "fcs",
-      cameraView: "chorus"
-    })
+  const [googleAuth, setGoogleAuth] = useState()
 
   return (
     <StyletronProvider value={engine}>
@@ -32,9 +28,11 @@ function App() {
           <Tab title="Media">
             <MediaPage startEndList={startEndList} setStartEndList={setStartEndList}/>
           </Tab>
+          <Tab title="Google Auth">
+            <GoogleAuth googleAuth={googleAuth} setGoogleAuth={setGoogleAuth}/>
+          </Tab>
           <Tab title="YouTube">
-            <YouTube startEndList={startEndList} playlistSettings={playlistSettings}
-                     setPlaylistSettings={setPlaylistSettings}/>
+            <YouTube googleAuth={googleAuth} startEndList={startEndList}/>
           </Tab>
         </Tabs>
         <footer>
