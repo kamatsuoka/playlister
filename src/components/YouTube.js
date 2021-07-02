@@ -39,15 +39,14 @@ const YouTube = ({googleAuth, startEndList}) => {
     }
   }, [playlistSettings, startEndList])
 
-  const MAX_RESULTS = 25
+  const MAX_RESULTS = 50
 
   /**
    * Find existing playlist with same name
    */
   const findMatchingPlaylist = (result) => {
+    console.log(`findMatchPlaylist: result = `, result)
     const totalResults = result.pageInfo.totalResults
-    if (totalResults > MAX_RESULTS)
-      console.warn(`got ${totalResults} playlists from search, there may be more on the next page`)
     if (totalResults > 0) {
       const matchingPlaylist = result.items.filter(i => i.snippet.title === playlistSettings.title)
       if (matchingPlaylist && matchingPlaylist[0]) {
@@ -57,28 +56,87 @@ const YouTube = ({googleAuth, startEndList}) => {
     return null
   }
 
+
   // Make sure the client is loaded and sign-in is complete before calling this method.
 
-  function searchPlaylists() {
-    return gapi.client.youtube.search.list({
+  function searchPlaylists(pageToken = '') {
+    const request = {
       "part": [
-        "snippet"
+        "snippet,contentDetails"
       ],
       "channelId": channelData.channelId,
-      "maxResults": MAX_RESULTS,
-      "type": "playlist",
-      "q": playlistSettings.title
-    }).then(
+      "maxResults": MAX_RESULTS
+    }
+    console.log('request = ', JSON.stringify(request))
+    console.log(`pageToken = "${pageToken}"`)
+    if (pageToken !== '')
+      request.pageToken = pageToken
+    return gapi.client.youtube.playlists.list(request).then(
       response => {
         const playlistId = findMatchingPlaylist(response.result)
         if (playlistId) {
-          // TODO: call playlist items api to get count of videos
+          setFoundPlaylist({
+            ...foundPlaylist,
+            id: playlistId,
+            message: `found playlist ${response.result.snippet.title}`
+          })
+          listPlaylistItems(playlistId)
+        } else if (response.result.nextPageToken) {
+          searchPlaylists(response.result.nextPageToken)
         } else {
-          setTrackNameSettings({...trackNameSettings, startIndex: 1})
+          insertPlaylist()
         }
       },
       err => console.error("Execute error", err)
     )
+  }
+
+  function listPlaylistItems(playlistId) {
+    return gapi.client.youtube.playlistItems.list({
+      "part": [
+        "snippet"
+      ],
+      "playlistId": playlistId
+    })
+      .then(function (response) {
+          // Handle the results here (response.result has the parsed body).
+          console.log("Response", response);
+        },
+        function (err) {
+          console.error("Execute error", err);
+        });
+  }
+
+  function insertPlaylist() {
+    return gapi.client.youtube.playlists.insert({
+      "part": [
+        "snippet,status"
+      ],
+      "resource": {
+        "snippet": {
+          "title": playlistSettings.title,
+          "defaultLanguage": "en"
+        },
+        "status": {
+          "privacyStatus": "unlisted"
+        }
+      }
+    }).then(response => {
+      const playlistId = response.result.id
+      setFoundPlaylist({
+        ...foundPlaylist,
+        id: playlistId,
+        message: `created playlist ${response.result.snippet.title}`
+      })
+      setTrackNameSettings({...trackNameSettings, startIndex: 1})
+    }, err => {
+      console.error("Execute error", err)
+      setFoundPlaylist({
+        ...foundPlaylist,
+        id: '',
+        message: `error creating playlist: ${err}`
+      })
+    })
   }
 
   const isAuthenticated = () => googleAuth && googleAuth.isSignedIn
@@ -93,7 +151,8 @@ const YouTube = ({googleAuth, startEndList}) => {
       <div style={{marginTop: '20px'}}>
         <PlaylistSettings startEndList={startEndList} value={playlistSettings} setValue={setPlaylistSettings}/>
       </div>
-      <Button onClick={searchPlaylists} disabled={!isAuthenticated()}>Check YouTube for Playlist</Button>
+      <Button onClick={() => searchPlaylists()} disabled={!isAuthenticated()}>Find or Create Playlist</Button>
+      <p>{foundPlaylist.message}</p>
       {isAuthenticated() ? null : <p>Please authenticate first</p>}
       <div style={{marginTop: '20px'}}>
         <TrackNameSettings startEndList={startEndList} value={trackNameSettings} setValue={setTrackNameSettings}/>

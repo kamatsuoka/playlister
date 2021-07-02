@@ -45,13 +45,7 @@ const GoogleAuth = ({googleAuth, setGoogleAuth}) => {
 
   const isAuthenticated = () => googleAuth && googleAuth.isSignedIn
 
-  const showAuthStatus = () => {
-    if (isAuthenticated()) {
-      return <p>Authenticated</p>
-    } else {
-      return <p>Click below to authenticate</p>
-    }
-  }
+  const showAuthStatus = () => isAuthenticated() ? <p>👍 Authenticated</p> : <p/>
 
   const initThenAuthenticate = () => {
     initThen(async auth => {
