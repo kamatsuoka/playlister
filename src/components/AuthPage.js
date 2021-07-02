@@ -6,7 +6,7 @@ import {Button} from "baseui/button"
 
 const gapi = window.gapi
 
-const GoogleAuth = ({googleAuth, setGoogleAuth}) => {
+const AuthPage = ({googleAuth, setGoogleAuth}) => {
   const [apiData, setApiData] = useState({apiKey: '', clientId: ''})
 
   usePersist({
@@ -76,4 +76,4 @@ const GoogleAuth = ({googleAuth, setGoogleAuth}) => {
   )
 }
 
-export default GoogleAuth
+export default AuthPage

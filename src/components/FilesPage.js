@@ -5,11 +5,12 @@ import TimezoneOverride from "./TimezoneOverride"
 import StartEndList from "./StartEndList"
 import {StyledLink} from "baseui/link"
 import {Heading, HeadingLevel} from "baseui/heading"
+import {RehearsalData} from "./RehearsalData"
 
 /**
- * Page that holds MediaInfo lookup and results
+ * Page that holds files' MediaInfo data and rehearsal info
  */
-const MediaPage = ({className, startEndList, setStartEndList}) => {
+const FilesPage = ({startEndList, setStartEndList, rehearsalData, setRehearsalData}) => {
 
   const [fileInfo, setFileInfo] = useState({})
   const [overrideTimeZone, setOverrideTimeZone] = useState(true)
@@ -30,16 +31,20 @@ const MediaPage = ({className, startEndList, setStartEndList}) => {
           <StartEndList fileInfo={fileInfo} overrideTimeZone={overrideTimeZone}
                         startEndList={startEndList} setStartEndList={setStartEndList}/>
         </div>
+        <div style={{marginTop: '20px'}}>
+          <Heading styleLevel={6}>Rehearsal Data</Heading>
+          <RehearsalData startEndList={startEndList} value={rehearsalData} setValue={setRehearsalData}/>
+        </div>
       </HeadingLevel>
     )
   }
 
   return (
-    <div className={className}>
+    <div>
       <MediaInfoJs results={fileInfo} setResults={setFileInfo}/>
       {Object.keys(fileInfo).length > 0 ? showFiles(fileInfo) : null}
     </div>
   )
 }
 
-export default MediaPage
+export default FilesPage
