@@ -11,13 +11,16 @@ import YouTube from "./YouTube"
 
 const engine = new Styletron()
 
-
 function App() {
 
   const [activeKey, setActiveKey] = useState(0);
   const [startEndList, setStartEndList] = useState([])
   const [playlistSettings, setPlaylistSettings] =
-    useState({eventType: "rehearsal", prefix: "fcs", cameraView: "chorus", startIndex: 1})
+    useState({
+      eventType: "rehearsal",
+      prefix: "fcs",
+      cameraView: "chorus"
+    })
 
   return (
     <StyletronProvider value={engine}>
@@ -27,11 +30,11 @@ function App() {
           onChange={({activeKey}) => setActiveKey(activeKey)}
         >
           <Tab title="Media">
-            <MediaPage startEndList={startEndList} setStartEndList={setStartEndList}
-                       playlistSettings={playlistSettings} setPlaylistSettings={setPlaylistSettings}/>
+            <MediaPage startEndList={startEndList} setStartEndList={setStartEndList}/>
           </Tab>
           <Tab title="YouTube">
-            <YouTube startEndList={startEndList} playlistSettings={playlistSettings}/>
+            <YouTube startEndList={startEndList} playlistSettings={playlistSettings}
+                     setPlaylistSettings={setPlaylistSettings}/>
           </Tab>
         </Tabs>
         <footer>

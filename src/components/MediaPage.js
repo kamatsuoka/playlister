@@ -3,17 +3,13 @@ import React, {useState} from "react"
 import MetadataList from "./MetadataList"
 import TimezoneOverride from "./TimezoneOverride"
 import StartEndList from "./StartEndList"
-import PlaylistSettings from "./PlaylistSettings"
 import {StyledLink} from "baseui/link"
 import {Heading, HeadingLevel} from "baseui/heading"
 
 /**
  * Page that holds MediaInfo lookup and results
  */
-const MediaPage = ({
-                     className, startEndList, setStartEndList,
-                     playlistSettings, setPlaylistSettings
-                   }) => {
+const MediaPage = ({className, startEndList, setStartEndList}) => {
 
   const [fileInfo, setFileInfo] = useState({})
   const [overrideTimeZone, setOverrideTimeZone] = useState(true)
@@ -33,10 +29,6 @@ const MediaPage = ({
           <TimezoneOverride value={overrideTimeZone} setValue={setOverrideTimeZone}/>
           <StartEndList fileInfo={fileInfo} overrideTimeZone={overrideTimeZone}
                         startEndList={startEndList} setStartEndList={setStartEndList}/>
-        </div>
-        <div style={{marginTop: '20px'}}>
-          <Heading styleLevel={6}>Playlist</Heading>
-          <PlaylistSettings startEndList={startEndList} value={playlistSettings} setValue={setPlaylistSettings}/>
         </div>
       </HeadingLevel>
     )
