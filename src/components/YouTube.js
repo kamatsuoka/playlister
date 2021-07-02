@@ -67,7 +67,6 @@ const YouTube = ({googleAuth, startEndList}) => {
             ...foundPlaylist,
             id: id,
             message: `found playlist "${title}" with ${itemCount} item(s)`,
-            err: ''
           })
           setTrackNameSettings({...trackNameSettings, startIndex: itemCount + 1})
         } else if (response.result.nextPageToken) {
