@@ -1,7 +1,5 @@
-import {Heading, HeadingLevel} from "baseui/heading"
+import {HeadingLevel} from "baseui/heading"
 import React, {useEffect, useState} from "react"
-import {Input} from "baseui/input"
-import {copyData, usePersist} from "../hooks/usePersist"
 import {Button} from "baseui/button"
 import PlaylistSettings from "./PlaylistSettings"
 import dayjs from "dayjs"
@@ -11,20 +9,12 @@ const gapi = window.gapi
 
 
 const YouTube = ({googleAuth, startEndList}) => {
-  const [channelData, setChannelData] = useState({channelId: ''})
   const [playlistSettings, setPlaylistSettings] = useState({eventType: "rehearsal"})
   const [trackNameSettings, setTrackNameSettings] = useState({
     prefix: "fcs",
     cameraView: "chorus"
   })
   const [foundPlaylist, setFoundPlaylist] = useState({})
-
-  usePersist({
-    key: 'channelData',
-    onRestore: copyData,
-    setState: setChannelData,
-    state: channelData,
-  })
 
   useEffect(() => {
     if (!playlistSettings.hasOwnProperty('date')) {
@@ -45,42 +35,41 @@ const YouTube = ({googleAuth, startEndList}) => {
    * Find existing playlist with same name
    */
   const findMatchingPlaylist = (result) => {
-    console.log(`findMatchPlaylist: result = `, result)
-    const totalResults = result.pageInfo.totalResults
-    if (totalResults > 0) {
-      const matchingPlaylist = result.items.filter(i => i.snippet.title === playlistSettings.title)
-      if (matchingPlaylist && matchingPlaylist[0]) {
-        return matchingPlaylist.id.playlistId
+    const matchingPlaylists = result.items.filter(i => i.snippet.title === playlistSettings.title)
+    if (matchingPlaylists && matchingPlaylists[0]) {
+      const playlist = matchingPlaylists[0]
+      return {
+        id: playlist.id, title: playlist.snippet.title,
+        itemCount: playlist.contentDetails.itemCount
       }
     }
-    return null
+    return {}
   }
 
 
   // Make sure the client is loaded and sign-in is complete before calling this method.
 
-  function searchPlaylists(pageToken = '') {
+  function searchPlaylists(nextPageToken = '') {
     const request = {
       "part": [
         "snippet,contentDetails"
       ],
-      "channelId": channelData.channelId,
-      "maxResults": MAX_RESULTS
+      "maxResults": MAX_RESULTS,
+      "mine": true
     }
-    console.log('request = ', JSON.stringify(request))
-    console.log(`pageToken = "${pageToken}"`)
-    if (pageToken !== '')
-      request.pageToken = pageToken
+    if (nextPageToken !== '')
+      request.pageToken = nextPageToken
     return gapi.client.youtube.playlists.list(request).then(
       response => {
-        const playlistId = findMatchingPlaylist(response.result)
-        if (playlistId) {
+        const {id, title, itemCount} = findMatchingPlaylist(response.result)
+        if (id) {
           setFoundPlaylist({
             ...foundPlaylist,
-            id: playlistId,
-            message: `found playlist ${response.result.snippet.title}`
+            id: id,
+            message: `found playlist "${title}" with ${itemCount} item(s)`,
+            err: ''
           })
-          listPlaylistItems(playlistId)
+          setTrackNameSettings({...trackNameSettings, startIndex: itemCount + 1})
         } else if (response.result.nextPageToken) {
           searchPlaylists(response.result.nextPageToken)
         } else {
@@ -89,22 +78,6 @@ const YouTube = ({googleAuth, startEndList}) => {
       },
       err => console.error("Execute error", err)
     )
-  }
-
-  function listPlaylistItems(playlistId) {
-    return gapi.client.youtube.playlistItems.list({
-      "part": [
-        "snippet"
-      ],
-      "playlistId": playlistId
-    })
-      .then(function (response) {
-          // Handle the results here (response.result has the parsed body).
-          console.log("Response", response);
-        },
-        function (err) {
-          console.error("Execute error", err);
-        });
   }
 
   function insertPlaylist() {
@@ -126,7 +99,7 @@ const YouTube = ({googleAuth, startEndList}) => {
       setFoundPlaylist({
         ...foundPlaylist,
         id: playlistId,
-        message: `created playlist ${response.result.snippet.title}`
+        message: `created playlist "${response.result.snippet.title}"`
       })
       setTrackNameSettings({...trackNameSettings, startIndex: 1})
     }, err => {
@@ -134,7 +107,7 @@ const YouTube = ({googleAuth, startEndList}) => {
       setFoundPlaylist({
         ...foundPlaylist,
         id: '',
-        message: `error creating playlist: ${err}`
+        message: `error creating playlist: ${JSON.stringify(err)}`
       })
     })
   }
@@ -143,11 +116,6 @@ const YouTube = ({googleAuth, startEndList}) => {
 
   return (
     <HeadingLevel>
-      <Heading styleLevel={6}>Channel ID</Heading>
-      <Input
-        value={channelData.channelId}
-        onChange={e => setChannelData({...channelData, channelId: e.target.value})}
-      />
       <div style={{marginTop: '20px'}}>
         <PlaylistSettings startEndList={startEndList} value={playlistSettings} setValue={setPlaylistSettings}/>
       </div>
