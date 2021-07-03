@@ -47,7 +47,7 @@ function App() {
               <Tab title="Playlist">
                 <PlaylistPage googleAuth={googleAuth} startEndList={startEndList}
                               rehearsalData={rehearsalData} setRehearsalData={setRehearsalData}
-                              inferredDate={inferredDate}
+                              inferredDate={inferredDate} setActiveKey={setActiveKey}
                               value={playlistSettings} setValue={setPlaylistSettings}/>
               </Tab>
               <Tab title="Videos">

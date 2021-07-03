@@ -2,7 +2,7 @@ import {Heading, HeadingLevel} from "baseui/heading"
 import React, {useState} from "react"
 import {Input} from "baseui/input"
 import {copyData, usePersist} from "../hooks/usePersist"
-import {Button} from "baseui/button"
+import {Button, KIND as BKind} from "baseui/button"
 import {KIND, Notification} from "baseui/notification"
 
 const gapi = window.gapi
@@ -84,8 +84,8 @@ const AuthPage = ({googleAuth, setGoogleAuth}) => {
         onChange={e => setApiData({...apiData, clientId: e.target.value})}
       />
       <div style={{marginTop: '20px'}}>
-        <Button onClick={initThenAuthenticate}>
-          {isAuthenticated() ? "Re-authenticate" : "Authenticate"}
+        <Button onClick={initThenAuthenticate} kind={isAuthenticated() ? BKind.secondary : BKind.primary}>
+          Authenticate
         </Button>
         {showAuthStatus()}
       </div>

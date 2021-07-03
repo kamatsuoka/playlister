@@ -1,17 +1,18 @@
-import {Heading} from "baseui/heading"
 import React, {useState} from "react"
-import {Button} from "baseui/button"
+import {Button, KIND as BKind, SIZE} from "baseui/button"
 import dayjs from "dayjs"
 import {Table} from "baseui/table-semantic"
 import RehearsalData from "./RehearsalData"
 import PlaylistTitle from "./PlaylistTitle"
+import {KIND, Notification} from "baseui/notification"
+import {BaseCard} from "./BaseCard"
 
 const gapi = window.gapi
 
 
 const PlaylistPage = ({
                         googleAuth, rehearsalData, setRehearsalData,
-                        inferredDate, value, setValue
+                        inferredDate, setActiveKey, value, setValue
                       }) => {
   const [playlistStatus, setPlaylistStatus] = useState({message: ''})
   const [playlistTitle, setPlaylistTitle] = useState({titleChoice: 'suggested'})
@@ -72,6 +73,7 @@ const PlaylistPage = ({
           setPlaylistStatus({
             ...playlistStatus,
             message: `Found existing playlist "${playlist.snippet.title}"`,
+            isError: false
           })
         } else if (response.result.nextPageToken) {
           searchPlaylists(response.result.nextPageToken)
@@ -105,14 +107,16 @@ const PlaylistPage = ({
       storePlaylist(playlist)
       setPlaylistStatus({
         ...playlistStatus,
-        message: `Created playlist "${response.result.snippet.title}"`
+        message: `Created playlist "${response.result.snippet.title}"`,
+        isError: false
       })
     }, err => {
       console.error("Execute error", err)
       storePlaylist({})
       setPlaylistStatus({
         ...playlistStatus,
-        message: `Error creating playlist: ${JSON.stringify(err)}`
+        message: `Error creating playlist: ${JSON.stringify(err)}`,
+        isError: true
       })
     })
   }
@@ -129,13 +133,44 @@ const PlaylistPage = ({
         ['published at', value.publishedAt]
       ]
       return (
-        <React.Fragment>
-          <Heading styleLevel={6}>Playlist</Heading>
+        <BaseCard title="Playlist">
           <Table data={DATA} columns={['Field', 'Value']}/>
-        </React.Fragment>
+        </BaseCard>
       )
     }
     return null
+  }
+
+  const showNotification = () => {
+    if (!isAuthenticated()) {
+      return <Notification kind={KIND.negative}
+                           overrides={{
+                             Body: {style: {width: 'auto'}}
+                           }}
+      >
+        Please
+        <Button kind={BKind.minimal} size={SIZE.compact} onClick={() => setActiveKey(1)}
+                overrides={{
+                  BaseButton: {style: {padding: '2px 7px'}}
+                }}
+        >
+          authenticate
+        </Button>
+        to find or create the playlist
+      </Notification>
+    } else if (playlistStatus.message) {
+      const kind = playlistStatus.isError ? KIND.negative : KIND.positive
+      return <Notification kind={kind}
+                           overrides={{
+                             Body: {style: {width: 'auto'}},
+                           }}
+                           closeable
+      >
+        {playlistStatus.message}
+      </Notification>
+    } else {
+      return null
+    }
   }
 
   return (
@@ -143,9 +178,12 @@ const PlaylistPage = ({
       <RehearsalData inferredDate={inferredDate} value={rehearsalData} setValue={setRehearsalData}/>
       <PlaylistTitle inferredDate={inferredDate} rehearsalData={rehearsalData}
                      value={playlistTitle} setValue={setPlaylistTitle}/>
-      <Button onClick={() => searchPlaylists()} disabled={!isAuthenticated()}>Find or Create Playlist</Button>
-      <p>{playlistStatus.message}</p>
-      {isAuthenticated() ? null : <p>Please authenticate first</p>}
+      <Button onClick={() => searchPlaylists()} kind={value.id ? BKind.secondary : BKind.primary}
+              disabled={!isAuthenticated()}
+      >
+        Find or Create Playlist
+      </Button>
+      {showNotification()}
       {showPlaylist()}
     </React.Fragment>
   )
