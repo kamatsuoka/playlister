@@ -3,12 +3,13 @@ import React, {useState} from "react"
 import {Input} from "baseui/input"
 import {copyData, usePersist} from "../hooks/usePersist"
 import {Button} from "baseui/button"
+import {KIND, Notification} from "baseui/notification"
 
 const gapi = window.gapi
 
 const AuthPage = ({googleAuth, setGoogleAuth}) => {
   const [apiData, setApiData] = useState({apiKey: '', clientId: ''})
-
+  const [authMessage, setAuthMessage] = useState({})
   usePersist({
     key: 'apiData',
     onRestore: copyData,
@@ -21,7 +22,11 @@ const AuthPage = ({googleAuth, setGoogleAuth}) => {
       .signIn({scope: "https://www.googleapis.com/auth/youtube.force-ssl"})
       .then(
         () => console.log("Sign-in successful"),
-        err => console.error("Error signing in", err)
+        err => {
+          const msg = "Error signing in"
+          console.error(msg, err)
+          setAuthMessage({error: msg})
+        }
       )
   }
 
@@ -30,14 +35,17 @@ const AuthPage = ({googleAuth, setGoogleAuth}) => {
     return gapi.client.load("https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest")
       .then(
         () => console.log("GAPI client loaded for API"),
-        err => console.error("Error loading GAPI client for API", err)
+        err => {
+          const msg = "Error loading GAPI client for API"
+          console.error(msg, err)
+          setAuthMessage({error: msg})
+        }
       )
   }
 
   function initThen(postAuth) {
     return gapi.load("client:auth2", () =>
       gapi.auth2.init({client_id: apiData.clientId}).then(auth => {
-        console.log('in init -> then, auth = ', auth)
         postAuth(auth)
       })
     )
@@ -45,7 +53,15 @@ const AuthPage = ({googleAuth, setGoogleAuth}) => {
 
   const isAuthenticated = () => googleAuth && googleAuth.isSignedIn
 
-  const showAuthStatus = () => isAuthenticated() ? <p>👍 Authenticated</p> : <p/>
+  const showAuthStatus = () => {
+    if (isAuthenticated()) {
+      return <Notification kind={KIND.positive} closeable>✅ Authenticated</Notification>
+    } else if (authMessage.error) {
+      return <Notification kind={KIND.negative} closeable>{authMessage.error}</Notification>
+    } else {
+      return null
+    }
+  }
 
   const initThenAuthenticate = () => {
     initThen(async auth => {
@@ -54,7 +70,6 @@ const AuthPage = ({googleAuth, setGoogleAuth}) => {
       setGoogleAuth(auth)
     })
   }
-
 
   return (
     <HeadingLevel>
@@ -72,8 +87,8 @@ const AuthPage = ({googleAuth, setGoogleAuth}) => {
         <Button onClick={initThenAuthenticate}>
           {isAuthenticated() ? "Re-authenticate" : "Authenticate"}
         </Button>
+        {showAuthStatus()}
       </div>
-      {showAuthStatus()}
     </HeadingLevel>
   )
 }
