@@ -51,7 +51,8 @@ function App() {
                               value={playlistSettings} setValue={setPlaylistSettings}/>
               </Tab>
               <Tab title="Videos">
-                <VideoPage inferredDate={inferredDate} startEndList={startEndList} playlistSettings={playlistSettings}/>
+                <VideoPage googleAuth={googleAuth} inferredDate={inferredDate} startEndList={startEndList}
+                           playlistSettings={playlistSettings} setActiveKey={setActiveKey}/>
               </Tab>
             </Tabs>
           </HeadingLevel>

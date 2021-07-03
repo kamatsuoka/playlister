@@ -1,11 +1,12 @@
 import React, {useState} from "react"
-import {Button, KIND as BKind, SIZE} from "baseui/button"
+import {Button, KIND as BKind} from "baseui/button"
 import dayjs from "dayjs"
 import {Table} from "baseui/table-semantic"
 import RehearsalData from "./RehearsalData"
 import PlaylistTitle from "./PlaylistTitle"
 import {KIND, Notification} from "baseui/notification"
 import {BaseCard} from "./BaseCard"
+import {StyledLink} from "baseui/link"
 
 const gapi = window.gapi
 
@@ -148,15 +149,9 @@ const PlaylistPage = ({
                              Body: {style: {width: 'auto'}}
                            }}
       >
-        Please
-        <Button kind={BKind.minimal} size={SIZE.compact} onClick={() => setActiveKey(1)}
-                overrides={{
-                  BaseButton: {style: {padding: '2px 7px'}}
-                }}
-        >
-          authenticate
-        </Button>
-        to find or create the playlist
+        Please &nbsp;
+        <StyledLink onClick={() => setActiveKey(1)}>authenticate</StyledLink>
+        &nbsp; first
       </Notification>
     } else if (playlistStatus.message) {
       const kind = playlistStatus.isError ? KIND.negative : KIND.positive

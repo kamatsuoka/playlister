@@ -19,8 +19,9 @@ const FilePage = ({
   const [fileInfo, setFileInfo] = useState({})
   const [overrideTimeZone, setOverrideTimeZone] = useState(true)
 
-  const showFiles = (fileInfo) => {
-    return (
+  return (
+    <div>
+      <MediaInfoJs results={fileInfo} setResults={setFileInfo}/>
       <HeadingLevel>
         <BaseCard title="File Metadata">
           <MetadataList values={fileInfo} setValues={setFileInfo}/>
@@ -35,13 +36,6 @@ const FilePage = ({
         </BaseCard>
         <InferredDate startEndList={startEndList} value={inferredDate} setValue={setInferredDate}/>
       </HeadingLevel>
-    )
-  }
-
-  return (
-    <div>
-      <MediaInfoJs results={fileInfo} setResults={setFileInfo}/>
-      {Object.keys(fileInfo).length > 0 ? showFiles(fileInfo) : null}
     </div>
   )
 }
