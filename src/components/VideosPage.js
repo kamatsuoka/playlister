@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import VideoNameSettings from "./VideoNameSettings"
+import VideoNaming from "./VideoNaming"
 import {Heading, HeadingLevel} from "baseui/heading"
 import VideoList from "./VideoList"
 
@@ -12,7 +12,7 @@ const VideosPage = ({startEndList, playlistSettings}) => {
   return (
     <HeadingLevel>
       <Heading styleLevel={6}>Video Naming</Heading>
-      <VideoNameSettings value={videoNameSettings} setValue={setVideoNameSettings}/>
+      <VideoNaming value={videoNameSettings} setValue={setVideoNameSettings}/>
       <Heading styleLevel={6}>Video List</Heading>
       <VideoList startEndList={startEndList} playlistSettings={playlistSettings}
                  videoNameSettings={videoNameSettings} videoResources={videoResources}

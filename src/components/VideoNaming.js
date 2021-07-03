@@ -5,7 +5,7 @@ import {Cell, Grid} from "baseui/layout-grid"
 import {Combobox} from "baseui/combobox"
 
 
-const VideoNameSettings = ({value, setValue}) => {
+const VideoNaming = ({value, setValue}) => {
 
   return (
     <React.Fragment>
@@ -33,4 +33,4 @@ const VideoNameSettings = ({value, setValue}) => {
   )
 }
 
-export default VideoNameSettings
+export default VideoNaming

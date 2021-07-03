@@ -3,7 +3,7 @@ import React, {useEffect, useState} from "react"
 import {Button} from "baseui/button"
 import PlaylistSettings from "./PlaylistSettings"
 import dayjs from "dayjs"
-import VideoNameSettings from "./VideoNameSettings"
+import VideoNaming from "./VideoNaming"
 
 const gapi = window.gapi
 
@@ -122,7 +122,7 @@ const YouTube = ({googleAuth, startEndList}) => {
       <p>{foundPlaylist.message}</p>
       {isAuthenticated() ? null : <p>Please authenticate first</p>}
       <div style={{marginTop: '20px'}}>
-        <VideoNameSettings startEndList={startEndList} value={trackNameSettings} setValue={setTrackNameSettings}/>
+        <VideoNaming startEndList={startEndList} value={trackNameSettings} setValue={setTrackNameSettings}/>
       </div>
     </HeadingLevel>
   )
