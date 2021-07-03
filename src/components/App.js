@@ -9,6 +9,7 @@ import {Tab, Tabs} from 'baseui/tabs-motion';
 import FilesPage from './FilesPage'
 import AuthPage from "./AuthPage"
 import PlaylistPage from "./PlaylistPage"
+import VideosPage from "./VideosPage"
 
 const engine = new Styletron()
 
@@ -37,6 +38,9 @@ function App() {
           <Tab title="Playlist">
             <PlaylistPage googleAuth={googleAuth} startEndList={startEndList} rehearsalData={rehearsalData}
                           value={playlistSettings} setValue={setPlaylistSettings}/>
+          </Tab>
+          <Tab title="Videos">
+            <VideosPage startEndList={startEndList} playlistSettings={playlistSettings}/>
           </Tab>
         </Tabs>
         <footer>

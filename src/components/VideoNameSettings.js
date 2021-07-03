@@ -3,14 +3,12 @@ import {Input} from "baseui/input"
 import {FormControl} from "baseui/form-control"
 import {Cell, Grid} from "baseui/layout-grid"
 import {Combobox} from "baseui/combobox"
-import {Heading} from "baseui/heading"
 
 
-const TrackNameSettings = ({value, setValue}) => {
+const VideoNameSettings = ({value, setValue}) => {
 
   return (
     <React.Fragment>
-      <Heading styleLevel={6}>Track Naming</Heading>
       <Grid>
         <Cell span={[1, 2, 2]}>
           <FormControl label="prefix">
@@ -24,17 +22,9 @@ const TrackNameSettings = ({value, setValue}) => {
           <FormControl label="camera view">
             <Combobox
               value={value.cameraView}
-              onChange={e => setValue({...value, cameraView: e.target.value})}
+              onChange={e => setValue({...value, cameraView: e})}
               options={["chorus", "director", "corner", "elevated"]}
               mapOptionToString={option => option}
-            />
-          </FormControl>
-        </Cell>
-        <Cell span={[1, 2, 2]}>
-          <FormControl label="start index">
-            <Input
-              value={value.startIndex || ''}
-              onChange={e => setValue({...value, startIndex: e.target.value})}
             />
           </FormControl>
         </Cell>
@@ -43,4 +33,4 @@ const TrackNameSettings = ({value, setValue}) => {
   )
 }
 
-export default TrackNameSettings
+export default VideoNameSettings
