@@ -6,7 +6,7 @@ import advancedFormat from "dayjs/plugin/advancedFormat"
 import timezone from "dayjs/plugin/timezone" // dependent on utc plugin
 import customParseFormat from "dayjs/plugin/customParseFormat"
 import {Table} from 'baseui/table-semantic';
-import {inferredDate} from "./RehearsalData"
+import {BaseCard} from "./BaseCard"
 
 dayjs.extend(localizedFormat)
 dayjs.extend(advancedFormat)
@@ -17,17 +17,24 @@ dayjs.extend(utc)
 /**
  * List of calculated file properties
  */
-const VideoList = ({startEndList, playlistSettings, videoNameSettings, videoResources, setVideoResources}) => {
+const VideoList = ({
+                     inferredDate,
+                     startEndList,
+                     playlistSettings,
+                     videoNameSettings,
+                     videoResources,
+                     setVideoResources
+                   }) => {
   const [tableData, setTableData] = useState([])
 
   useEffect(() => {
-    const date = inferredDate(startEndList)
+    const date = inferredDate.date
     const startIndex = playlistSettings.itemCount + 1
     const pad = (n) => n < 10 ? `0${n}` : `${n}`
     const resources = startEndList.map((startEnd, index) => ({
       kind: "youtube#video",
       snippet: {
-        title: `${videoNameSettings.prefix} ${date.replaceAll('-', '')} ${videoNameSettings.cameraView} ${pad(startIndex + index)}`
+        title: `${videoNameSettings.prefix} ${date} ${videoNameSettings.cameraView} ${pad(startIndex + index)}`
       },
       recordingDetails: {
         recordingDate: dayjs(startEnd.startTime).utc().format()
@@ -37,14 +44,15 @@ const VideoList = ({startEndList, playlistSettings, videoNameSettings, videoReso
     setTableData(startEndList.map(s => s.name).map((n, i) =>
       [n, resources[i].snippet.title, resources[i].recordingDetails.recordingDate])
     )
-  }, [startEndList, playlistSettings, videoNameSettings, setVideoResources])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [startEndList, playlistSettings, videoNameSettings])
 
   const COLUMNS = ['File name', 'Video Name', 'Recording Date']
 
   return (
-    <div id="start-end">
+    <BaseCard title="Video List">
       <Table columns={COLUMNS} data={tableData}/>
-    </div>
+    </BaseCard>
   )
 }
 

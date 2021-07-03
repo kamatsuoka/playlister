@@ -1,28 +1,22 @@
 import React from 'react'
 import {FormControl} from "baseui/form-control"
-import {Cell, Grid} from "baseui/layout-grid"
 import {Combobox} from "baseui/combobox"
-import dayjs from "dayjs"
+import {Input} from "baseui/input"
+import {FlexGrid, FlexGridItem} from "baseui/flex-grid"
+import {BaseCard} from "./BaseCard"
 
-const inferredDate = (startEndList) => {
-  const dateSet = new Set()
-  startEndList.map(f => dayjs(f.startTime)
-    .format("YYYY-MM-DD"))
-    .forEach(d => dateSet.add(d))
-  return dateSet.size > 0 ? dateSet.values().next().value : ''
-}
-
-const RehearsalData = ({startEndList, value, setValue}) => {
+const RehearsalData = ({inferredDate, value, setValue}) => {
 
   return (
-    <Grid>
-      <Cell span={[1, 2, 3]}>
-        <FormControl label="inferred date">
-          <label>{inferredDate(startEndList)}</label>
-        </FormControl>
-      </Cell>
-      <Cell span={[1, 2, 3]}>
-        <FormControl label="event type">
+    <BaseCard title="Rehearsal Data">
+      <FlexGrid flexGridColumnCount={2}
+                flexGridColumnGap="scale800"
+                flexGridRowGap="scale800"
+      >
+        <FlexGridItem><FormControl label="inferred date">
+          <Input disabled value={inferredDate.date || ''}/>
+        </FormControl></FlexGridItem>
+        <FlexGridItem><FormControl label="event type">
           <Combobox
             value={value.eventType}
             onChange={eventType => setValue({...value, eventType: eventType})}
@@ -30,9 +24,10 @@ const RehearsalData = ({startEndList, value, setValue}) => {
             mapOptionToString={option => option}
           />
         </FormControl>
-      </Cell>
-    </Grid>
+        </FlexGridItem>
+      </FlexGrid>
+    </BaseCard>
   )
 }
 
-export {inferredDate, RehearsalData}
+export default RehearsalData

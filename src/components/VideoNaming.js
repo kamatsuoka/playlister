@@ -3,12 +3,13 @@ import {Input} from "baseui/input"
 import {FormControl} from "baseui/form-control"
 import {Cell, Grid} from "baseui/layout-grid"
 import {Combobox} from "baseui/combobox"
+import {BaseCard} from "./BaseCard"
 
 
 const VideoNaming = ({value, setValue}) => {
 
   return (
-    <React.Fragment>
+    <BaseCard title="Video Naming">
       <Grid>
         <Cell span={[1, 2, 2]}>
           <FormControl label="prefix">
@@ -29,7 +30,7 @@ const VideoNaming = ({value, setValue}) => {
           </FormControl>
         </Cell>
       </Grid>
-    </React.Fragment>
+    </BaseCard>
   )
 }
 

@@ -68,10 +68,12 @@ const AuthPage = ({googleAuth, setGoogleAuth}) => {
         value={apiData.clientId}
         onChange={e => setApiData({...apiData, clientId: e.target.value})}
       />
+      <div style={{marginTop: '20px'}}>
+        <Button onClick={initThenAuthenticate}>
+          {isAuthenticated() ? "Re-authenticate" : "Authenticate"}
+        </Button>
+      </div>
       {showAuthStatus()}
-      <Button onClick={initThenAuthenticate}>
-        {isAuthenticated() ? "Re-authenticate" : "Authenticate"}
-      </Button>
     </HeadingLevel>
   )
 }

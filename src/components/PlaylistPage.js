@@ -1,22 +1,24 @@
-import {Heading, HeadingLevel} from "baseui/heading"
+import {Heading} from "baseui/heading"
 import React, {useState} from "react"
 import {Button} from "baseui/button"
 import dayjs from "dayjs"
 import {Table} from "baseui/table-semantic"
-import {ALIGN, Radio, RadioGroup} from "baseui/radio"
-import {inferredDate} from "./RehearsalData"
-import {Input} from "baseui/input"
-import {createTheme, lightThemePrimitives, ThemeProvider} from "baseui"
+import RehearsalData from "./RehearsalData"
+import PlaylistTitle from "./PlaylistTitle"
 
 const gapi = window.gapi
 
-const PlaylistPage = ({googleAuth, startEndList, rehearsalData, value, setValue}) => {
+
+const PlaylistPage = ({
+                        googleAuth, rehearsalData, setRehearsalData,
+                        inferredDate, value, setValue
+                      }) => {
   const [playlistStatus, setPlaylistStatus] = useState({message: ''})
-  const [formChoice, setFormChoice] = useState({titleChoice: 'suggested'})
+  const [playlistTitle, setPlaylistTitle] = useState({titleChoice: 'suggested'})
   const MAX_RESULTS = 50
 
   const suggestedTitle = () => {
-    const date = inferredDate(startEndList)
+    const date = inferredDate.date || ''
     const eventType = rehearsalData.eventType
     return (date && eventType) ? date.replaceAll('-', '') + ' ' + eventType : ''
   }
@@ -57,7 +59,7 @@ const PlaylistPage = ({googleAuth, startEndList, rehearsalData, value, setValue}
       "maxResults": MAX_RESULTS,
       "mine": true
     }
-    const searchTitle = formChoice.titleChoice === 'custom' ? formChoice.customTitle : suggestedTitle()
+    const searchTitle = playlistTitle.titleChoice === 'custom' ? playlistTitle.customTitle : suggestedTitle()
 
     if (nextPageToken !== '')
       request.pageToken = nextPageToken
@@ -137,42 +139,15 @@ const PlaylistPage = ({googleAuth, startEndList, rehearsalData, value, setValue}
   }
 
   return (
-    <HeadingLevel>
-      <Heading styleLevel={6}>Playlist Title</Heading>
-      <div style={{marginBottom: '20px'}}>
-        <ThemeProvider
-          theme={createTheme(lightThemePrimitives, {
-            colors: {inputTextDisabled: 'black'}
-          })}
-        >
-          <RadioGroup
-            value={formChoice.titleChoice}
-            onChange={e => setFormChoice({...formChoice, titleChoice: e.currentTarget.value})}
-            name="titleChoice"
-            align={ALIGN.horizontal}
-          >
-            <Radio value="suggested">Suggested &nbsp;</Radio>
-            <Radio value="custom">Custom</Radio>
-          </RadioGroup>
-          <Input
-            value={formChoice.titleChoice === 'suggested' ?
-              suggestedTitle(inferredDate(startEndList), rehearsalData.eventType) :
-              formChoice.customTitle || ''}
-            onChange={e => {
-              if (formChoice.titleChoice === 'custom')
-                return setFormChoice({...formChoice, customTitle: e.target.value})
-              else
-                return null
-            }}
-            disabled={formChoice.titleChoice !== 'custom'}
-          />
-        </ThemeProvider>
-      </div>
+    <React.Fragment>
+      <RehearsalData inferredDate={inferredDate} value={rehearsalData} setValue={setRehearsalData}/>
+      <PlaylistTitle inferredDate={inferredDate} rehearsalData={rehearsalData}
+                     value={playlistTitle} setValue={setPlaylistTitle}/>
       <Button onClick={() => searchPlaylists()} disabled={!isAuthenticated()}>Find or Create Playlist</Button>
       <p>{playlistStatus.message}</p>
       {isAuthenticated() ? null : <p>Please authenticate first</p>}
       {showPlaylist()}
-    </HeadingLevel>
+    </React.Fragment>
   )
 }
 
