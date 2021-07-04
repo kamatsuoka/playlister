@@ -1,21 +1,21 @@
 {
   "files": {
-    "main.css": "/playlister/static/css/main.73d85592.chunk.css",
-    "main.js": "/playlister/static/js/main.aab647a4.chunk.js",
-    "main.js.map": "/playlister/static/js/main.aab647a4.chunk.js.map",
+    "main.css": "/playlister/static/css/main.ea965258.chunk.css",
+    "main.js": "/playlister/static/js/main.1f21bad9.chunk.js",
+    "main.js.map": "/playlister/static/js/main.1f21bad9.chunk.js.map",
     "runtime-main.js": "/playlister/static/js/runtime-main.e367f922.js",
     "runtime-main.js.map": "/playlister/static/js/runtime-main.e367f922.js.map",
-    "static/js/2.5603758a.chunk.js": "/playlister/static/js/2.5603758a.chunk.js",
-    "static/js/2.5603758a.chunk.js.map": "/playlister/static/js/2.5603758a.chunk.js.map",
+    "static/js/2.ee744560.chunk.js": "/playlister/static/js/2.ee744560.chunk.js",
+    "static/js/2.ee744560.chunk.js.map": "/playlister/static/js/2.ee744560.chunk.js.map",
     "index.html": "/playlister/index.html",
-    "static/css/main.73d85592.chunk.css.map": "/playlister/static/css/main.73d85592.chunk.css.map",
-    "static/js/2.5603758a.chunk.js.LICENSE.txt": "/playlister/static/js/2.5603758a.chunk.js.LICENSE.txt",
-    "static/media/index.sass": "/playlister/static/media/bg.000a380d.png"
+    "static/css/main.ea965258.chunk.css.map": "/playlister/static/css/main.ea965258.chunk.css.map",
+    "static/js/2.ee744560.chunk.js.LICENSE.txt": "/playlister/static/js/2.ee744560.chunk.js.LICENSE.txt",
+    "static/media/index.sass": "/playlister/static/media/OpenSans-SemiBold.c92c6946.woff2"
   },
   "entrypoints": [
     "static/js/runtime-main.e367f922.js",
-    "static/js/2.5603758a.chunk.js",
-    "static/css/main.73d85592.chunk.css",
-    "static/js/main.aab647a4.chunk.js"
+    "static/js/2.ee744560.chunk.js",
+    "static/css/main.ea965258.chunk.css",
+    "static/js/main.1f21bad9.chunk.js"
   ]
 }
