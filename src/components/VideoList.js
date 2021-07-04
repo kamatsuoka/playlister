@@ -34,7 +34,8 @@ const VideoList = ({
     const resources = startEndList.map((startEnd, index) => ({
       kind: "youtube#video",
       snippet: {
-        title: `${videoNameSettings.prefix} ${date} ${videoNameSettings.cameraView} ${pad(startIndex + index)}`
+        title: `${videoNameSettings.prefix} ${date} ${videoNameSettings.cameraView} ${pad(startIndex + index)}`,
+        categoryId: 10 // Music
       },
       recordingDetails: {
         recordingDate: dayjs(startEnd.startTime).utc().format()

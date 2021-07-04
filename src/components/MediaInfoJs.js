@@ -8,10 +8,10 @@ import DropZone from './DropZone'
 // // so using it from CDN instead (see public/index.html)
 const MediaInfo = window.MediaInfo
 
-const readChunk = (file) => (chunkSize, offset) =>
+const readChunk = file => (chunkSize, offset) =>
   new Promise((resolve, reject) => {
     const reader = new FileReader()
-    reader.onload = (event) => {
+    reader.onload = event => {
       if (event.target.error) {
         reject(event.target.error)
       }
@@ -37,7 +37,7 @@ const MediaInfoJs = ({results, setResults}) => {
   })
 
   function filterResult(result) {
-    const general = result.media.track.filter((track) => track["@type"] === "General")[0]
+    const general = result.media.track.filter(track => track["@type"] === "General")[0]
     return {
       format: general.Format,
       duration: general.Duration,
@@ -48,15 +48,16 @@ const MediaInfoJs = ({results, setResults}) => {
   /**
    * When file(s) dropped, get info for each of them.
    */
-  const onDrop = useCallback((files) => {
+  const onDrop = useCallback(files => {
+
     /**
      * Gets file info for a single file.
      */
     const getFileInfo = (mediainfo, file) => {
       return mediainfo
         .analyzeData(() => file.size, readChunk(file))
-        .then((result) => {
-            setResults((prevResults) => ({
+        .then(result => {
+            setResults(prevResults => ({
               [getRandomId()]: {
                 ...(filterResult(result)),
                 name: file.name,
@@ -65,8 +66,8 @@ const MediaInfoJs = ({results, setResults}) => {
             }))
           }
         )
-        .catch((error) =>
-          setResults((prevResults) => ({
+        .catch(error =>
+          setResults(prevResults => ({
             [getRandomId()]: {
               name: file.name,
               error: error.stack
@@ -79,7 +80,7 @@ const MediaInfoJs = ({results, setResults}) => {
 
     if (files) {
       setAnalyzing(true)
-      MediaInfo().then(async (mediainfo) => {
+      MediaInfo().then(async mediainfo => {
           for (const file of files) {
             if (file) {
               // need to 'await' each call to getFileInfo,
@@ -92,8 +93,6 @@ const MediaInfoJs = ({results, setResults}) => {
     }
   }, [setResults])
 
-  return (
-    <DropZone analyzing={analyzing} onDrop={onDrop}/>
-  )
+  return <DropZone analyzing={analyzing} onDrop={onDrop}/>
 }
 export default MediaInfoJs
