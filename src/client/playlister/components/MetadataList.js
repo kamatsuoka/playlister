@@ -1,17 +1,17 @@
-import React, {useCallback} from "react"
-import {TableBuilder, TableBuilderColumn} from 'baseui/table-semantic'
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
-import {faTimes} from "@fortawesome/free-solid-svg-icons"
-import {tableOverrides, tablePadding} from "./TableOverrides"
+import React, { useCallback } from 'react'
+import { TableBuilder, TableBuilderColumn } from 'baseui/table-semantic'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faTimes } from '@fortawesome/free-solid-svg-icons'
+import { tableOverrides, tablePadding } from './TableOverrides'
 
 /**
  * List of file info from MediaInfo
  */
-const MetadataList = ({values, setValues}) => {
+const MetadataList = ({ values, setValues }) => {
 
   const onRemove = useCallback(
-    (resultId) => setValues(({[resultId]: _, ...rest}) => rest),
-    [setValues]
+    (resultId) => setValues(({ [resultId]: _, ...rest }) => rest),
+    [setValues],
   )
 
   const DATA = Object.entries(values).map(([resultId, result]) => (

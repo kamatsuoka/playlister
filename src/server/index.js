@@ -6,6 +6,7 @@ global.onOpen = publicUiFunctions.onOpen
 global.openDialog = publicUiFunctions.openDialog
 global.openDialogBootstrap = publicUiFunctions.openDialogBootstrap
 global.openAboutSidebar = publicUiFunctions.openAboutSidebar
+global.openPlaylister = publicUiFunctions.openPlaylister
 global.getSheetsData = publicSheetFunctions.getSheetsData
 global.addSheet = publicSheetFunctions.addSheet
 global.deleteSheet = publicSheetFunctions.deleteSheet

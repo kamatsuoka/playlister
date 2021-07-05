@@ -1,16 +1,16 @@
-import React, {useEffect} from 'react'
-import dayjs from "dayjs"
-import {BaseCard} from "./BaseCard"
+import React, { useEffect } from 'react'
+import dayjs from 'dayjs'
+import { BaseCard } from './BaseCard'
 
 const inferredDate = (startEndList) => {
   const dateSet = new Set()
   startEndList.map(f => dayjs(f.startTime)
-    .format("YYYYMMDD"))
+    .format('YYYYMMDD'))
     .forEach(d => dateSet.add(d))
   return dateSet.size > 0 ? dateSet.values().next().value : ''
 }
 
-const InferredDate = ({startEndList, value, setValue}) => {
+const InferredDate = ({ startEndList, value, setValue }) => {
 
   useEffect(() => {
     setValue({...value, date: inferredDate(startEndList)})

@@ -1,14 +1,14 @@
-import {ALIGN, Radio, RadioGroup} from "baseui/radio"
-import React, {useEffect} from "react"
-import {Input} from "baseui/input"
-import {BaseCard} from "./BaseCard"
+import { ALIGN, Radio, RadioGroup } from 'baseui/radio'
+import React, { useEffect } from 'react'
+import { Input } from 'baseui/input'
+import { BaseCard } from './BaseCard'
 
-const PlaylistTitle = ({inferredDate, rehearsalData, value, setValue}) => {
+const PlaylistTitle = ({ inferredDate, rehearsalData, value, setValue }) => {
 
   useEffect(() => {
     setValue({
       ...value,
-      suggestedTitle: `${inferredDate.date} ${rehearsalData.eventType}`
+      suggestedTitle: `${inferredDate.date} ${rehearsalData.eventType}`,
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rehearsalData])

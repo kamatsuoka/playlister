@@ -1,14 +1,14 @@
-import React, {useState} from 'react'
-import VideoNaming from "./VideoNaming"
-import VideoList from "./VideoList"
-import {Button} from "baseui/button"
-import {KIND, Notification} from "baseui/notification"
-import {StyledLink} from "baseui/link"
-import {isAuthenticated} from "../util/auth"
+import React, { useState } from 'react'
+import VideoNaming from './VideoNaming'
+import VideoList from './VideoList'
+import { Button } from 'baseui/button'
+import { KIND, Notification } from 'baseui/notification'
+import { StyledLink } from 'baseui/link'
+import { isAuthenticated } from '../util/auth'
 
-const VideoPage = ({inferredDate, startEndList, playlistSettings, setActiveKey}) => {
+const VideoPage = ({ inferredDate, startEndList, playlistSettings, setActiveKey }) => {
   const [videoNaming, setVideoNaming] = useState({
-    prefix: "fcs", cameraView: "chorus", nextIndex: 1, indexOffset: 0
+    prefix: 'fcs', cameraView: 'chorus', nextIndex: 1, indexOffset: 0,
   })
   const [videoResources, setVideoResources] = useState({})
 

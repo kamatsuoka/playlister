@@ -1,5 +1,5 @@
 import React from 'react'
-import {FileUploader} from "baseui/file-uploader";
+import { FileUploader } from 'baseui/file-uploader'
 
 const DropZone = ({ analyzing, onDrop }) => {
   return (

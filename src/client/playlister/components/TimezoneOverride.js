@@ -1,7 +1,7 @@
-import React from "react"
-import {Checkbox} from "baseui/checkbox"
+import React from 'react'
+import { Checkbox } from 'baseui/checkbox'
 
-const TimezoneOverride = ({value, setValue}) => {
+const TimezoneOverride = ({ value, setValue }) => {
 
   return (
     <div>

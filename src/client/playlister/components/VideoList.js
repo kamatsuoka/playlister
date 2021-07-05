@@ -1,12 +1,12 @@
-import React, {useEffect, useState} from "react"
-import dayjs from "dayjs"
+import React, { useEffect, useState } from 'react'
+import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-import localizedFormat from "dayjs/plugin/localizedFormat"
-import advancedFormat from "dayjs/plugin/advancedFormat"
-import timezone from "dayjs/plugin/timezone" // dependent on utc plugin
-import customParseFormat from "dayjs/plugin/customParseFormat"
-import {Table} from 'baseui/table-semantic';
-import {BaseCard} from "./BaseCard"
+import localizedFormat from 'dayjs/plugin/localizedFormat'
+import advancedFormat from 'dayjs/plugin/advancedFormat'
+import timezone from 'dayjs/plugin/timezone' // dependent on utc plugin
+import customParseFormat from 'dayjs/plugin/customParseFormat'
+import { Table } from 'baseui/table-semantic'
+import { BaseCard } from './BaseCard'
 
 dayjs.extend(localizedFormat)
 dayjs.extend(advancedFormat)

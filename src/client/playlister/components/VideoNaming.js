@@ -1,18 +1,18 @@
 import React from 'react'
-import {Input} from "baseui/input"
-import {FormControl} from "baseui/form-control"
-import {Cell, Grid} from "baseui/layout-grid"
-import {Combobox} from "baseui/combobox"
-import {BaseCard} from "./BaseCard"
+import { Input } from 'baseui/input'
+import { FormControl } from 'baseui/form-control'
+import { Cell, Grid } from 'baseui/layout-grid'
+import { Combobox } from 'baseui/combobox'
+import { BaseCard } from './BaseCard'
 
 
-const VideoNaming = ({playlistSettings, value, setValue}) => {
+const VideoNaming = ({ playlistSettings, value, setValue }) => {
 
   return (
-    <BaseCard title="Video Naming">
+    <BaseCard title='Video Naming'>
       <Grid>
         <Cell span={[1, 2, 2]}>
-          <FormControl label="prefix">
+          <FormControl label='prefix'>
             <Input
               value={value.prefix}
               onChange={e => setValue({...value, prefix: e.target.value})}

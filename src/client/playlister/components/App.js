@@ -1,26 +1,26 @@
-import React, {useState} from 'react'
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faGithub} from '@fortawesome/free-brands-svg-icons'
-import {BaseProvider, createTheme, LightTheme, lightThemePrimitives, ThemeProvider} from 'baseui'
-import {Provider as StyletronProvider} from "styletron-react"
-import {Client as Styletron} from "styletron-engine-atomic"
-import {Tab, Tabs} from 'baseui/tabs-motion';
+import React, { useState } from 'react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faGithub } from '@fortawesome/free-brands-svg-icons'
+import { BaseProvider, createTheme, LightTheme, lightThemePrimitives, ThemeProvider } from 'baseui'
+import { Provider as StyletronProvider } from 'styletron-react'
+import { Client as Styletron } from 'styletron-engine-atomic'
+import { Tab, Tabs } from 'baseui/tabs-motion'
 
 import FilePage from './FilePage'
-import AuthPage from "./AuthPage"
-import PlaylistPage from "./PlaylistPage"
-import VideoPage from "./VideoPage"
-import {HeadingLevel} from "baseui/heading"
+import AuthPage from './AuthPage'
+import PlaylistPage from './PlaylistPage'
+import VideoPage from './VideoPage'
+import { HeadingLevel } from 'baseui/heading'
 
 const engine = new Styletron()
 
 function App() {
 
-  const [activeKey, setActiveKey] = useState(0);
+  const [activeKey, setActiveKey] = useState(0)
   const [startEndList, setStartEndList] = useState([])
-  const [rehearsalData, setRehearsalData] = useState({eventType: "rehearsal"})
+  const [rehearsalData, setRehearsalData] = useState({ eventType: 'rehearsal' })
   const [playlistSettings, setPlaylistSettings] = useState({})
-  const [playlistTitle, setPlaylistTitle] = useState({titleChoice: 'suggested'})
+  const [playlistTitle, setPlaylistTitle] = useState({ titleChoice: 'suggested' })
   const [inferredDate, setInferredDate] = useState({})
 
   return (

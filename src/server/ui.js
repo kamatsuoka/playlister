@@ -4,6 +4,7 @@ export const onOpen = () => {
     .addItem('Sheet Editor', 'openDialog')
     .addItem('Sheet Editor (Bootstrap)', 'openDialogBootstrap')
     .addItem('About me', 'openAboutSidebar')
+    .addItem('Playlister', 'openPlaylister')
 
   menu.addToUi()
 }
@@ -25,4 +26,11 @@ export const openDialogBootstrap = () => {
 export const openAboutSidebar = () => {
   const html = HtmlService.createHtmlOutputFromFile('sidebar-about-page')
   SpreadsheetApp.getUi().showSidebar(html)
+}
+
+export const openPlaylister = () => {
+  const html = HtmlService.createHtmlOutputFromFile('playlister')
+    .setWidth(600)
+    .setHeight(600)
+  SpreadsheetApp.getUi().showModalDialog(html, 'Playlister')
 }

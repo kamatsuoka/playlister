@@ -67,6 +67,12 @@ const clientEntrypoints = [
     filename: 'sidebar-about-page',
     template: './src/client/sidebar-about-page/index.html',
   },
+  {
+    name: 'CLIENT - playlister',
+    entry: './src/client/playlister/index.js',
+    filename: 'playlister',
+    template: './src/client/playlister/public/index.html',
+  },
 ]
 
 // define certificate locations

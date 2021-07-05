@@ -33,7 +33,12 @@
     "camelcase": "warn",
     "import/prefer-default-export": "warn",
     "import/no-extraneous-dependencies": "warn",
-    "prefer-object-spread": "warn"
+    "prefer-object-spread": "warn",
+    "semi": [
+      2,
+      "never"
+    ],
+    "arrow-parens": "off"
   },
   "settings": {
     "react": {

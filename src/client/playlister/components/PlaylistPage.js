@@ -1,21 +1,21 @@
-import React, {useState} from "react"
-import {Button, KIND as BKind} from "baseui/button"
-import dayjs from "dayjs"
-import {Table} from "baseui/table-semantic"
-import RehearsalData from "./RehearsalData"
-import PlaylistTitle from "./PlaylistTitle"
-import {KIND, Notification} from "baseui/notification"
-import {BaseCard} from "./BaseCard"
-import {StyledLink} from "baseui/link"
-import {gapi, isAuthenticated} from "../util/auth"
+import React, { useState } from 'react'
+import { Button, KIND as BKind } from 'baseui/button'
+import dayjs from 'dayjs'
+import { Table } from 'baseui/table-semantic'
+import RehearsalData from './RehearsalData'
+import PlaylistTitle from './PlaylistTitle'
+import { KIND, Notification } from 'baseui/notification'
+import { BaseCard } from './BaseCard'
+import { StyledLink } from 'baseui/link'
+import { gapi, isAuthenticated } from '../util/auth'
 
 const PlaylistPage = ({
                         rehearsalData, setRehearsalData,
                         inferredDate, setActiveKey,
                         playlistTitle, setPlaylistTitle,
-                        value, setValue
+                        value, setValue,
                       }) => {
-  const [playlistStatus, setPlaylistStatus] = useState({message: ''})
+  const [playlistStatus, setPlaylistStatus] = useState({ message: '' })
   const MAX_RESULTS = 50
 
   const suggestedTitle = () => {

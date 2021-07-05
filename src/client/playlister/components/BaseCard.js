@@ -1,4 +1,4 @@
-import {Card} from "baseui/card"
+import { Card } from 'baseui/card'
 
 export const BaseCard = ({children, title}) => {
   return (

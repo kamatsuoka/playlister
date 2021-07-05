@@ -1,12 +1,12 @@
-import React, {useEffect} from "react"
-import dayjs from "dayjs"
+import React, { useEffect } from 'react'
+import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-import localizedFormat from "dayjs/plugin/localizedFormat"
-import advancedFormat from "dayjs/plugin/advancedFormat"
-import timezone from "dayjs/plugin/timezone" // dependent on utc plugin
-import customParseFormat from "dayjs/plugin/customParseFormat"
-import {tableOverrides} from "./TableOverrides"
-import {Table} from 'baseui/table-semantic';
+import localizedFormat from 'dayjs/plugin/localizedFormat'
+import advancedFormat from 'dayjs/plugin/advancedFormat'
+import timezone from 'dayjs/plugin/timezone' // dependent on utc plugin
+import customParseFormat from 'dayjs/plugin/customParseFormat'
+import { tableOverrides } from './TableOverrides'
+import { Table } from 'baseui/table-semantic'
 // import {TableBuilderColumn} from "baseui/table-semantic"
 
 dayjs.extend(localizedFormat)

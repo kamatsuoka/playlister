@@ -1,19 +1,19 @@
-import MediaInfoJs from "./MediaInfoJs"
-import React, {useState} from "react"
-import MetadataList from "./MetadataList"
-import TimezoneOverride from "./TimezoneOverride"
-import StartEndList from "./StartEndList"
-import {StyledLink} from "baseui/link"
-import {HeadingLevel} from "baseui/heading"
-import InferredDate from "./InferredDate"
-import {BaseCard} from "./BaseCard"
+import MediaInfoJs from './MediaInfoJs'
+import React, { useState } from 'react'
+import MetadataList from './MetadataList'
+import TimezoneOverride from './TimezoneOverride'
+import StartEndList from './StartEndList'
+import { StyledLink } from 'baseui/link'
+import { HeadingLevel } from 'baseui/heading'
+import InferredDate from './InferredDate'
+import { BaseCard } from './BaseCard'
 
 /**
  * Page that holds files' MediaInfo data and rehearsal info
  */
 const FilePage = ({
                     startEndList, setStartEndList, rehearsalData, setRehearsalData,
-                    inferredDate, setInferredDate
+                    inferredDate, setInferredDate,
                   }) => {
 
   const [fileInfo, setFileInfo] = useState({})

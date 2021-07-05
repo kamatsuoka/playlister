@@ -1,6 +1,6 @@
-import React, {useCallback, useState} from 'react'
+import React, { useCallback, useState } from 'react'
 
-import {copyData, usePersist} from '../hooks/usePersist'
+import { copyData, usePersist } from '../hooks/usePersist'
 import DropZone from './DropZone'
 
 // import MediaInfo from 'mediainfo.js'

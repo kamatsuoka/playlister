@@ -1,4 +1,4 @@
-import {useEffect} from 'react'
+import { useEffect } from 'react'
 
 const restore = (key) => {
   const restoredJson = window.localStorage.getItem(key)

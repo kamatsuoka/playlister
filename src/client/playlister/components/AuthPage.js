@@ -1,13 +1,13 @@
-import {Heading, HeadingLevel} from "baseui/heading"
-import React, {useState} from "react"
-import {Input} from "baseui/input"
-import {copyData, usePersist} from "../hooks/usePersist"
-import {Button, KIND as BKind} from "baseui/button"
-import {KIND, Notification} from "baseui/notification"
-import {gapi, isAuthenticated} from "../util/auth"
+import { Heading, HeadingLevel } from 'baseui/heading'
+import React, { useState } from 'react'
+import { Input } from 'baseui/input'
+import { copyData, usePersist } from '../hooks/usePersist'
+import { Button, KIND as BKind } from 'baseui/button'
+import { KIND, Notification } from 'baseui/notification'
+import { gapi, isAuthenticated } from '../util/auth'
 
 const AuthPage = () => {
-  const [apiData, setApiData] = useState({apiKey: '', clientId: ''})
+  const [apiData, setApiData] = useState({ apiKey: '', clientId: '' })
   const [authMessage, setAuthMessage] = useState({})
   usePersist({
     key: 'apiData',
