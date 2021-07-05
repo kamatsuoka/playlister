@@ -7,16 +7,15 @@ import PlaylistTitle from "./PlaylistTitle"
 import {KIND, Notification} from "baseui/notification"
 import {BaseCard} from "./BaseCard"
 import {StyledLink} from "baseui/link"
-
-const gapi = window.gapi
-
+import {gapi, isAuthenticated} from "../util/auth"
 
 const PlaylistPage = ({
-                        googleAuth, rehearsalData, setRehearsalData,
-                        inferredDate, setActiveKey, value, setValue
+                        rehearsalData, setRehearsalData,
+                        inferredDate, setActiveKey,
+                        playlistTitle, setPlaylistTitle,
+                        value, setValue
                       }) => {
   const [playlistStatus, setPlaylistStatus] = useState({message: ''})
-  const [playlistTitle, setPlaylistTitle] = useState({titleChoice: 'suggested'})
   const MAX_RESULTS = 50
 
   const suggestedTitle = () => {
@@ -37,7 +36,6 @@ const PlaylistPage = ({
   }
 
   const storePlaylist = (playlist) => {
-    console.log('storePlaylist: playlist = ', playlist)
     if (playlist.hasOwnProperty(['id'])) {
       return setValue({
         ...value,
@@ -69,7 +67,6 @@ const PlaylistPage = ({
       response => {
         const playlist = findMatchingPlaylist(response.result, searchTitle)
         if (playlist) {
-          console.log('found matching playlist', playlist)
           storePlaylist(playlist)
           setPlaylistStatus({
             ...playlistStatus,
@@ -101,10 +98,8 @@ const PlaylistPage = ({
         }
       }
     }
-    console.log('insertPlaylist: inserting playlist with props', playlistProps)
     return gapi.client.youtube.playlists.insert(playlistProps).then(response => {
       const playlist = response.result
-      console.log('insertPlaylist: playlist = ', playlist)
       storePlaylist(playlist)
       setPlaylistStatus({
         ...playlistStatus,
@@ -121,8 +116,6 @@ const PlaylistPage = ({
       })
     })
   }
-
-  const isAuthenticated = () => googleAuth && googleAuth.isSignedIn
 
   const showPlaylist = () => {
     if (value.id) {

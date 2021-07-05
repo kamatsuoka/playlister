@@ -4,18 +4,19 @@ import VideoList from "./VideoList"
 import {Button} from "baseui/button"
 import {KIND, Notification} from "baseui/notification"
 import {StyledLink} from "baseui/link"
+import {isAuthenticated} from "../util/auth"
 
-const gapi = window.gapi
-
-const VideoPage = ({googleAuth, inferredDate, startEndList, playlistSettings, setActiveKey}) => {
-  const [videoNameSettings, setVideoNameSettings] = useState({
-    prefix: "fcs", cameraView: "chorus"
+const VideoPage = ({inferredDate, startEndList, playlistSettings, setActiveKey}) => {
+  const [videoNaming, setVideoNaming] = useState({
+    prefix: "fcs", cameraView: "chorus", nextIndex: 1, indexOffset: 0
   })
   const [videoResources, setVideoResources] = useState({})
 
-  const isAuthenticated = () => googleAuth && googleAuth.isSignedIn
-
-  const canUpload = () => isAuthenticated() && Object.keys(videoResources).length > 0 && playlistSettings.id
+  const canUpload = () => {
+    // TODO
+    // return isAuthenticated() && Object.keys(videoResources).length > 0 && playlistSettings.id
+    return false
+  }
 
   const showNotification = () => {
     const overrides = {Body: {style: {width: 'auto'}}}
@@ -39,11 +40,10 @@ const VideoPage = ({googleAuth, inferredDate, startEndList, playlistSettings, se
 
   return (
     <React.Fragment>
-      <VideoNaming value={videoNameSettings} setValue={setVideoNameSettings}/>
+      <VideoNaming playlistSettings={playlistSettings} value={videoNaming} setValue={setVideoNaming}/>
       <VideoList inferredDate={inferredDate} startEndList={startEndList} playlistSettings={playlistSettings}
-                 videoNameSettings={videoNameSettings} videoResources={videoResources}
-                 setVideoResources={setVideoResources}/>
-      <Button disabled={!canUpload()}>Upload not work yet</Button>
+                 videoNaming={videoNaming} setVideoResources={setVideoResources}/>
+      <Button disabled={!canUpload()}>Upload no work</Button>
       {showNotification()}
     </React.Fragment>
   )

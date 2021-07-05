@@ -6,7 +6,7 @@ import {Combobox} from "baseui/combobox"
 import {BaseCard} from "./BaseCard"
 
 
-const VideoNaming = ({value, setValue}) => {
+const VideoNaming = ({playlistSettings, value, setValue}) => {
 
   return (
     <BaseCard title="Video Naming">
@@ -26,6 +26,25 @@ const VideoNaming = ({value, setValue}) => {
               onChange={e => setValue({...value, cameraView: e})}
               options={["chorus", "director", "corner", "elevated"]}
               mapOptionToString={option => option}
+            />
+          </FormControl>
+        </Cell>
+        <Cell span={[1, 2, 2]}>
+          <FormControl label="next index">
+            <Input
+              value={(playlistSettings.itemCount || 0) + 1}
+              type="number"
+              disabled
+            />
+          </FormControl>
+        </Cell>
+        <Cell span={[1, 2, 2]}>
+          <FormControl label="index offset">
+            <Input
+              value={value.indexOffset}
+              type="number"
+              min={-(playlistSettings.itemCount || 0)}
+              onChange={e => setValue({...value, indexOffset: e.target.value})}
             />
           </FormControl>
         </Cell>

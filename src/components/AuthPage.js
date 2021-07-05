@@ -4,10 +4,9 @@ import {Input} from "baseui/input"
 import {copyData, usePersist} from "../hooks/usePersist"
 import {Button, KIND as BKind} from "baseui/button"
 import {KIND, Notification} from "baseui/notification"
+import {gapi, isAuthenticated} from "../util/auth"
 
-const gapi = window.gapi
-
-const AuthPage = ({googleAuth, setGoogleAuth}) => {
+const AuthPage = () => {
   const [apiData, setApiData] = useState({apiKey: '', clientId: ''})
   const [authMessage, setAuthMessage] = useState({})
   usePersist({
@@ -51,23 +50,19 @@ const AuthPage = ({googleAuth, setGoogleAuth}) => {
     )
   }
 
-  const isAuthenticated = () => googleAuth && googleAuth.isSignedIn
-
   const showAuthStatus = () => {
-    if (isAuthenticated()) {
-      return <Notification kind={KIND.positive} closeable>✅ Authenticated</Notification>
+    if (authMessage.message) {
+      return <Notification kind={KIND.positive} closeable>{authMessage.message}</Notification>
     } else if (authMessage.error) {
       return <Notification kind={KIND.negative} closeable>{authMessage.error}</Notification>
-    } else {
-      return null
     }
   }
 
   const initThenAuthenticate = () => {
-    initThen(async auth => {
+    initThen(async () => {
       await authenticate()
       await loadClient()
-      setGoogleAuth(auth)
+      setAuthMessage({message: "✅ Authenticated"})
     })
   }
 

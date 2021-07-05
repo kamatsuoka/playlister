@@ -21,20 +21,19 @@ const VideoList = ({
                      inferredDate,
                      startEndList,
                      playlistSettings,
-                     videoNameSettings,
-                     videoResources,
+                     videoNaming,
                      setVideoResources
                    }) => {
   const [tableData, setTableData] = useState([])
 
   useEffect(() => {
     const date = inferredDate.date
-    const startIndex = playlistSettings.itemCount + 1
+    const startIndex = parseInt(playlistSettings.itemCount || 0) + 1 + parseInt(videoNaming.indexOffset)
     const pad = (n) => n < 10 ? `0${n}` : `${n}`
     const resources = startEndList.map((startEnd, index) => ({
       kind: "youtube#video",
       snippet: {
-        title: `${videoNameSettings.prefix} ${date} ${videoNameSettings.cameraView} ${pad(startIndex + index)}`,
+        title: `${videoNaming.prefix} ${date} ${videoNaming.cameraView} ${pad(startIndex + index)}`,
         categoryId: 10 // Music
       },
       recordingDetails: {
@@ -46,7 +45,7 @@ const VideoList = ({
       [n, resources[i].snippet.title, resources[i].recordingDetails.recordingDate])
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [startEndList, playlistSettings, videoNameSettings])
+  }, [startEndList, playlistSettings, videoNaming])
 
   const COLUMNS = ['File name', 'Video Name', 'Recording Date']
 

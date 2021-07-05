@@ -18,9 +18,9 @@ function App() {
 
   const [activeKey, setActiveKey] = useState(0);
   const [startEndList, setStartEndList] = useState([])
-  const [googleAuth, setGoogleAuth] = useState()
   const [rehearsalData, setRehearsalData] = useState({eventType: "rehearsal"})
   const [playlistSettings, setPlaylistSettings] = useState({})
+  const [playlistTitle, setPlaylistTitle] = useState({titleChoice: 'suggested'})
   const [inferredDate, setInferredDate] = useState({})
 
   return (
@@ -42,16 +42,17 @@ function App() {
                           inferredDate={inferredDate} setInferredDate={setInferredDate}/>
               </Tab>
               <Tab title="Auth">
-                <AuthPage googleAuth={googleAuth} setGoogleAuth={setGoogleAuth}/>
+                <AuthPage/>
               </Tab>
               <Tab title="Playlist">
-                <PlaylistPage googleAuth={googleAuth} startEndList={startEndList}
+                <PlaylistPage startEndList={startEndList}
                               rehearsalData={rehearsalData} setRehearsalData={setRehearsalData}
                               inferredDate={inferredDate} setActiveKey={setActiveKey}
+                              playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
                               value={playlistSettings} setValue={setPlaylistSettings}/>
               </Tab>
               <Tab title="Videos">
-                <VideoPage googleAuth={googleAuth} inferredDate={inferredDate} startEndList={startEndList}
+                <VideoPage inferredDate={inferredDate} startEndList={startEndList}
                            playlistSettings={playlistSettings} setActiveKey={setActiveKey}/>
               </Tab>
             </Tabs>
