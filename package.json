@@ -40,7 +40,7 @@
     "predeploy": "yarn build",
     "deploy": "gh-pages -d build",
     "clasp:login": "clasp login",
-    "clasp:setup": "rimraf .clasp.json && clasp create --type sheets --title \"My React Project\" --rootDir ./dist",
+    "clasp:setup": "rimraf .clasp.json && clasp create --type sheets --title \"CLASP Demo\" --rootDir ./dist",
     "clasp:setup:use-id": "clasp setting rootDir dist && clasp setting scriptId",
     "clasp:setup:https": "mkdirp certs && mkcert -key-file ./certs/key.pem -cert-file ./certs/cert.pem localhost 127.0.0.1",
     "clasp:build:dev": "cross-env NODE_ENV=development webpack",
