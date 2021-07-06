@@ -1,5 +1,5 @@
 /**
- * Find existing playlist with same name
+ * Searches a list of playlists for existing playlist with given title
  */
 const searchPlaylistResults = (result, title) => {
   Logger.log(`in searchPlaylistResults, result.items = ${result.items}`)
@@ -11,9 +11,12 @@ const searchPlaylistResults = (result, title) => {
   return null
 }
 
+/**
+ * Finds my playlist with given title
+ */
 const findMyPlaylist = (title, nextPageToken = '') => {
   const MAX_RESULTS = 50
-  const part = ['snippet,contentDetails']
+  const part = ['snippet', 'contentDetails']
   const optionalArgs = {
     maxResults: MAX_RESULTS,
     mine: true,
@@ -34,4 +37,22 @@ const findMyPlaylist = (title, nextPageToken = '') => {
   return null
 }
 
-export { findMyPlaylist }
+/**
+ * Inserts (creates) a new playlist
+ */
+
+function insertPlaylist(title, description) {
+  const resource = {
+    snippet: {
+      title: title,
+      description: description,
+    },
+    status: {
+      privacyStatus: 'unlisted',
+    },
+  }
+  const part = ['snippet', 'contentDetails', 'status']
+  return YouTube.Playlists.insert(resource, part)
+}
+
+export { findMyPlaylist, insertPlaylist }

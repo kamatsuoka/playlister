@@ -6,8 +6,6 @@ import RehearsalData from './RehearsalData'
 import PlaylistTitle from './PlaylistTitle'
 import { KIND, Notification } from 'baseui/notification'
 import { BaseCard } from './BaseCard'
-import { StyledLink } from 'baseui/link'
-import { gapi, isAuthenticated } from '../util/auth'
 
 const PlaylistPage = ({
                         rehearsalData, setRehearsalData,
@@ -16,7 +14,6 @@ const PlaylistPage = ({
                         value, setValue,
                       }) => {
   const [playlistStatus, setPlaylistStatus] = useState({ message: '' })
-  const MAX_RESULTS = 50
 
   const suggestedTitle = () => {
     const date = inferredDate.date || ''
@@ -39,7 +36,8 @@ const PlaylistPage = ({
     }
   }
 
-  function searchPlaylists() {
+  function findOrCreatePlaylist() {
+    setPlaylistStatus({}) // clear message, if any, first
     const searchTitle = playlistTitle.titleChoice === 'custom' ? playlistTitle.customTitle : suggestedTitle()
     const failureHandler = error => setPlaylistStatus({
       ...playlistStatus,
@@ -48,7 +46,6 @@ const PlaylistPage = ({
     })
 
     const successHandler = playlist => {
-      console.log(`in searchPlaylists, playlist = ${playlist}`)
       if (playlist) {
         storePlaylist(playlist)
         setPlaylistStatus({
@@ -57,7 +54,7 @@ const PlaylistPage = ({
           isError: false,
         })
       } else {
-        // insertPlaylist(searchTitle)
+        insertPlaylist(searchTitle)
       }
     }
 
@@ -68,29 +65,16 @@ const PlaylistPage = ({
   }
 
   function insertPlaylist(title) {
-    const playlistProps = {
-      'part': [
-        'snippet,contentDetails,status',
-      ],
-      'resource': {
-        'snippet': {
-          'title': title,
-          'description': `created by playlister on ${dayjs()}`,
-        },
-        'status': {
-          'privacyStatus': 'unlisted',
-        },
-      },
-    }
-    return gapi.client.youtube.playlists.insert(playlistProps).then(response => {
-      const playlist = response.result
+    const description = `created by playlister on ${dayjs().format()}`
+    const successHandler = playlist => {
       storePlaylist(playlist)
       setPlaylistStatus({
         ...playlistStatus,
-        message: `Created playlist "${response.result.snippet.title}"`,
+        message: `Created playlist "${playlist.snippet.title}"`,
         isError: false,
       })
-    }, err => {
+    }
+    const failureHandler = err => {
       console.error('Execute error', err)
       storePlaylist({})
       setPlaylistStatus({
@@ -98,7 +82,11 @@ const PlaylistPage = ({
         message: `Error creating playlist: ${JSON.stringify(err)}`,
         isError: true,
       })
-    })
+    }
+    google.script.run
+      .withSuccessHandler(successHandler)
+      .withFailureHandler(failureHandler)
+      .insertPlaylist(title, description)
   }
 
   const showPlaylist = () => {
@@ -120,24 +108,9 @@ const PlaylistPage = ({
   }
 
   const showNotification = () => {
-    if (!isAuthenticated()) {
-      return <Notification kind={KIND.negative}
-                           overrides={{
-                             Body: { style: { width: 'auto' } },
-                           }}
-      >
-        Please &nbsp;
-        <StyledLink onClick={() => setActiveKey(1)}>authenticate</StyledLink>
-        &nbsp; first
-      </Notification>
-    } else if (playlistStatus.message) {
+    if (playlistStatus.message) {
       const kind = playlistStatus.isError ? KIND.negative : KIND.positive
-      return <Notification kind={kind}
-                           overrides={{
-                             Body: { style: { width: 'auto' } },
-                           }}
-                           closeable
-      >
+      return <Notification kind={kind} overrides={{ Body: { style: { width: 'auto' } } }} closeable>
         {playlistStatus.message}
       </Notification>
     } else {
@@ -150,8 +123,8 @@ const PlaylistPage = ({
       <RehearsalData inferredDate={inferredDate} value={rehearsalData} setValue={setRehearsalData} />
       <PlaylistTitle inferredDate={inferredDate} rehearsalData={rehearsalData}
                      value={playlistTitle} setValue={setPlaylistTitle} />
-      <Button onClick={() => searchPlaylists()} kind={value.id ? BKind.secondary : BKind.primary}>
-        Find Playlist
+      <Button onClick={() => findOrCreatePlaylist()} kind={value.id ? BKind.secondary : BKind.primary}>
+        Find or Create Playlist
       </Button>
       {showNotification()}
       {showPlaylist()}
