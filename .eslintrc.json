@@ -9,7 +9,8 @@
 //    "prettier"
   ],
   "rules": {
-//    "prettier/prettier": "error",
+    //    "prettier/prettier": "error",
+    "arrow-parens": "off",
     "camelcase": "warn",
     "import/prefer-default-export": "warn",
     "import/no-extraneous-dependencies": "warn",

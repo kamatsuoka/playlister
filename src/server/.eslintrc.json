@@ -17,6 +17,7 @@
     "camelcase": "warn",
     "import/prefer-default-export": "warn",
     "import/no-extraneous-dependencies": "warn",
+    "arrow-parens": "off",
     "prefer-object-spread": "warn",
     "semi": [
       2,

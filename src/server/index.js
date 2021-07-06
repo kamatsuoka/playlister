@@ -1,13 +1,5 @@
-import * as publicUiFunctions from './ui'
-import * as publicSheetFunctions from './sheets'
+import { findMyPlaylist } from './findMyPlaylist'
+import { openPlaylister } from './ui'
 
-// Expose public functions by attaching to `global`
-global.onOpen = publicUiFunctions.onOpen
-global.openDialog = publicUiFunctions.openDialog
-global.openDialogBootstrap = publicUiFunctions.openDialogBootstrap
-global.openAboutSidebar = publicUiFunctions.openAboutSidebar
-global.openPlaylister = publicUiFunctions.openPlaylister
-global.getSheetsData = publicSheetFunctions.getSheetsData
-global.addSheet = publicSheetFunctions.addSheet
-global.deleteSheet = publicSheetFunctions.deleteSheet
-global.setActiveSheet = publicSheetFunctions.setActiveSheet
+global.doGet = openPlaylister
+global.findMyPlaylist = findMyPlaylist

@@ -50,24 +50,6 @@ const devDialogEntry = './dev/index.js'
 // define client entry points and output names
 const clientEntrypoints = [
   {
-    name: 'CLIENT - Dialog Demo',
-    entry: './src/client/dialog-demo/index.js',
-    filename: 'dialog-demo', // we'll add the .html suffix to these
-    template: './src/client/dialog-demo/index.html',
-  },
-  {
-    name: 'CLIENT - Dialog Demo Bootstrap',
-    entry: './src/client/dialog-demo-bootstrap/index.js',
-    filename: 'dialog-demo-bootstrap',
-    template: './src/client/dialog-demo-bootstrap/index.html',
-  },
-  {
-    name: 'CLIENT - Sidebar About Page',
-    entry: './src/client/sidebar-about-page/index.js',
-    filename: 'sidebar-about-page',
-    template: './src/client/sidebar-about-page/index.html',
-  },
-  {
     name: 'CLIENT - playlister',
     entry: './src/client/playlister/index.js',
     filename: 'playlister',
@@ -175,12 +157,12 @@ const DynamicCdnWebpackPluginConfig = {
           version: packageVersion,
           url: `https://unpkg.com/react-transition-group@${packageVersion}/dist/react-transition-group${packageSuffix}`,
         }
-      case 'react-bootstrap':
+      case 'baseui':
         return {
           name: packageName,
-          var: 'ReactBootstrap',
+          var: 'BaseUI',
           version: packageVersion,
-          url: `https://unpkg.com/react-bootstrap@${packageVersion}/dist/react-bootstrap${packageSuffix}`,
+          url: `https://unpkg.com/baseui@${packageVersion}/dist/baseui${packageSuffix}`,
         }
       default:
         return null
@@ -350,87 +332,3 @@ module.exports = [
   // 5. Create a development dialog bundle for each client entrypoint during development.
   ...(isProd ? [] : devClientConfigs),
 ]
-
-/*
-module.exports = {
-  mode: devMode ? 'development' : 'production',
-  entry: { app: resolve(srcPath, 'index.js') },
-  plugins: [
-    new HtmlWebpackPlugin({
-      filename: resolve(distPath, 'index.html'),
-      // favicon: resolve(srcPath, 'static', 'favicon.png'),
-      meta: {
-        description: pkginfo.description,
-        author: pkginfo.author,
-        keywords: pkginfo.keywords.join(' '),
-        viewport: 'width=device-width,initial-scale=1',
-      },
-      minify: false,
-      title: 'mediainfo.js',
-    }),
-    new CopyPlugin({
-      patterns: [
-        { from: wasmFile, to: '.' },
-        { from: 'CNAME', to: '.' },
-      ],
-    }),
-    new HtmlWebpackPartialsPlugin({ path: bodyPartialFile }),
-    ...(devMode
-      ? [new webpack.HotModuleReplacementPlugin()]
-      : [
-          new CleanWebpackPlugin([distPath]), // clean dist folder before build
-          new MiniCssExtractPlugin({ filename: '[name].css' }),
-        ]),
-  ],
-  output: {
-    path: distPath,
-    filename: 'mediainfo-demo.js',
-  },
-  module: {
-    rules: [
-      {
-        test: /\.js$/,
-        exclude: /node_modules/,
-        use: ['babel-loader'],
-      },
-      {
-        test: /\.sass$/,
-        use: [
-          devMode ? 'style-loader' : MiniCssExtractPlugin.loader,
-          'css-loader',
-          'sass-loader',
-        ],
-      },
-      {
-        test: /\.(png|woff2)$/,
-        use: [
-          {
-            loader: 'url-loader',
-            options: {
-              limit: 8192,
-              name: '[name].[ext]',
-              outputPath: '.',
-            },
-          },
-        ],
-      },
-      {
-        test: /favicon\.png$/,
-        use: [
-          {
-            loader: 'file-loader',
-            options: { name: '[name].[ext]' },
-          },
-        ],
-      },
-    ],
-  },
-  node: {
-    fs: 'empty',
-  },
-  resolve: {
-    extensions: ['*', '.js'],
-  },
-  ...(devMode ? { devtool: 'inline-source-map' } : {}),
-}
-*/

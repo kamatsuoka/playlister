@@ -24,17 +24,6 @@ const PlaylistPage = ({
     return (date && eventType) ? date.replaceAll('-', '') + ' ' + eventType : ''
   }
 
-  /**
-   * Find existing playlist with same name
-   */
-  const findMatchingPlaylist = (result, searchTitle) => {
-    const matchingPlaylists = result.items.filter(i => i.snippet.title === searchTitle)
-    if (matchingPlaylists && matchingPlaylists[0]) {
-      return matchingPlaylists[0]
-    }
-    return null
-  }
-
   const storePlaylist = (playlist) => {
     if (playlist.hasOwnProperty(['id'])) {
       return setValue({
@@ -43,60 +32,55 @@ const PlaylistPage = ({
         title: playlist.snippet.title,
         itemCount: playlist.contentDetails.itemCount,
         publishedAt: playlist.snippet.publishedAt,
-        description: playlist.snippet.description
+        description: playlist.snippet.description,
       })
     } else {
       return setValue({})
     }
   }
 
-
-  function searchPlaylists(nextPageToken = '') {
-    const request = {
-      "part": [
-        "snippet,contentDetails"
-      ],
-      "maxResults": MAX_RESULTS,
-      "mine": true
-    }
+  function searchPlaylists() {
     const searchTitle = playlistTitle.titleChoice === 'custom' ? playlistTitle.customTitle : suggestedTitle()
+    const failureHandler = error => setPlaylistStatus({
+      ...playlistStatus,
+      message: `Error calling findMyPlaylist: ${error}`,
+      isError: true,
+    })
 
-    if (nextPageToken !== '')
-      request.pageToken = nextPageToken
-    return gapi.client.youtube.playlists.list(request).then(
-      response => {
-        const playlist = findMatchingPlaylist(response.result, searchTitle)
-        if (playlist) {
-          storePlaylist(playlist)
-          setPlaylistStatus({
-            ...playlistStatus,
-            message: `Found existing playlist "${playlist.snippet.title}"`,
-            isError: false
-          })
-        } else if (response.result.nextPageToken) {
-          searchPlaylists(response.result.nextPageToken)
-        } else {
-          insertPlaylist(searchTitle)
-        }
-      },
-      err => console.error("Execute error", err)
-    )
+    const successHandler = playlist => {
+      console.log(`in searchPlaylists, playlist = ${playlist}`)
+      if (playlist) {
+        storePlaylist(playlist)
+        setPlaylistStatus({
+          ...playlistStatus,
+          message: `Found existing playlist "${playlist.snippet.title}"`,
+          isError: false,
+        })
+      } else {
+        // insertPlaylist(searchTitle)
+      }
+    }
+
+    google.script.run
+      .withSuccessHandler(successHandler)
+      .withFailureHandler(failureHandler)
+      .findMyPlaylist(searchTitle)
   }
 
   function insertPlaylist(title) {
     const playlistProps = {
-      "part": [
-        "snippet,contentDetails,status"
+      'part': [
+        'snippet,contentDetails,status',
       ],
-      "resource": {
-        "snippet": {
-          "title": title,
-          "description": `created by playlister on ${dayjs()}`,
+      'resource': {
+        'snippet': {
+          'title': title,
+          'description': `created by playlister on ${dayjs()}`,
         },
-        "status": {
-          "privacyStatus": "unlisted"
-        }
-      }
+        'status': {
+          'privacyStatus': 'unlisted',
+        },
+      },
     }
     return gapi.client.youtube.playlists.insert(playlistProps).then(response => {
       const playlist = response.result
@@ -104,15 +88,15 @@ const PlaylistPage = ({
       setPlaylistStatus({
         ...playlistStatus,
         message: `Created playlist "${response.result.snippet.title}"`,
-        isError: false
+        isError: false,
       })
     }, err => {
-      console.error("Execute error", err)
+      console.error('Execute error', err)
       storePlaylist({})
       setPlaylistStatus({
         ...playlistStatus,
         message: `Error creating playlist: ${JSON.stringify(err)}`,
-        isError: true
+        isError: true,
       })
     })
   }
@@ -124,11 +108,11 @@ const PlaylistPage = ({
         ['description', value.description],
         ['id', value.id],
         ['item count', value.itemCount],
-        ['published at', value.publishedAt]
+        ['published at', value.publishedAt],
       ]
       return (
-        <BaseCard title="Playlist">
-          <Table data={DATA} columns={['Field', 'Value']}/>
+        <BaseCard title='Playlist'>
+          <Table data={DATA} columns={['Field', 'Value']} />
         </BaseCard>
       )
     }
@@ -139,7 +123,7 @@ const PlaylistPage = ({
     if (!isAuthenticated()) {
       return <Notification kind={KIND.negative}
                            overrides={{
-                             Body: {style: {width: 'auto'}}
+                             Body: { style: { width: 'auto' } },
                            }}
       >
         Please &nbsp;
@@ -150,7 +134,7 @@ const PlaylistPage = ({
       const kind = playlistStatus.isError ? KIND.negative : KIND.positive
       return <Notification kind={kind}
                            overrides={{
-                             Body: {style: {width: 'auto'}},
+                             Body: { style: { width: 'auto' } },
                            }}
                            closeable
       >
@@ -163,13 +147,11 @@ const PlaylistPage = ({
 
   return (
     <React.Fragment>
-      <RehearsalData inferredDate={inferredDate} value={rehearsalData} setValue={setRehearsalData}/>
+      <RehearsalData inferredDate={inferredDate} value={rehearsalData} setValue={setRehearsalData} />
       <PlaylistTitle inferredDate={inferredDate} rehearsalData={rehearsalData}
-                     value={playlistTitle} setValue={setPlaylistTitle}/>
-      <Button onClick={() => searchPlaylists()} kind={value.id ? BKind.secondary : BKind.primary}
-              disabled={!isAuthenticated()}
-      >
-        Find or Create Playlist
+                     value={playlistTitle} setValue={setPlaylistTitle} />
+      <Button onClick={() => searchPlaylists()} kind={value.id ? BKind.secondary : BKind.primary}>
+        Find Playlist
       </Button>
       {showNotification()}
       {showPlaylist()}

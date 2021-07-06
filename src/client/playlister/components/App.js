@@ -11,6 +11,7 @@ import AuthPage from './AuthPage'
 import PlaylistPage from './PlaylistPage'
 import VideoPage from './VideoPage'
 import { HeadingLevel } from 'baseui/heading'
+import { StyledLink } from 'baseui/link'
 
 const engine = new Styletron()
 
@@ -58,12 +59,10 @@ function App() {
             </Tabs>
           </HeadingLevel>
           <footer>
-            <p>
-              <a href="https://github.com/kamatsuoka/playlister">
-                <FontAwesomeIcon className="fa-padded" icon={faGithub} size="lg"/>
-                GitHub
-              </a>
-            </p>
+            <StyledLink href='https://github.com/kamatsuoka/playlister'>
+              <FontAwesomeIcon className='fa-padded' icon={faGithub} size='lg' />
+              GitHub
+            </StyledLink>
           </footer>
         </ThemeProvider>
       </BaseProvider>

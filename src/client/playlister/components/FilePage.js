@@ -25,16 +25,17 @@ const FilePage = ({
       <HeadingLevel>
         <BaseCard title="File Metadata">
           <MetadataList values={fileInfo} setValues={setFileInfo}/>
-          <div style={{textAlign: 'right', marginTop: '10px'}}>
+          <div style={{ textAlign: 'right', marginTop: '10px' }}>
             <StyledLink onClick={() => setFileInfo({})}>Clear All</StyledLink>
           </div>
         </BaseCard>
-        <BaseCard title="Start and End Times">
-          <TimezoneOverride value={overrideTimeZone} setValue={setOverrideTimeZone}/>
+        <BaseCard title='Start and End Times'>
+          <TimezoneOverride value={overrideTimeZone} setValue={setOverrideTimeZone} />
           <StartEndList fileInfo={fileInfo} overrideTimeZone={overrideTimeZone}
-                        startEndList={startEndList} setStartEndList={setStartEndList}/>
+                        startEndList={startEndList} setStartEndList={setStartEndList} />
         </BaseCard>
-        <InferredDate startEndList={startEndList} value={inferredDate} setValue={setInferredDate}/>
+        <InferredDate startEndList={startEndList} value={inferredDate} setValue={setInferredDate} />
+        Some text goes here
       </HeadingLevel>
     </div>
   )
