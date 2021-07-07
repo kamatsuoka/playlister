@@ -4,7 +4,6 @@ import VideoList from './VideoList'
 import { Button } from 'baseui/button'
 import { KIND, Notification } from 'baseui/notification'
 import { StyledLink } from 'baseui/link'
-import { isAuthenticated } from '../util/auth'
 
 const VideoPage = ({ inferredDate, startEndList, playlistSettings, setActiveKey }) => {
   const [videoNaming, setVideoNaming] = useState({
@@ -13,20 +12,12 @@ const VideoPage = ({ inferredDate, startEndList, playlistSettings, setActiveKey 
   const [videoResources, setVideoResources] = useState({})
 
   const canUpload = () => {
-    // TODO
-    // return isAuthenticated() && Object.keys(videoResources).length > 0 && playlistSettings.id
-    return false
+    return Object.keys(videoResources).length > 0 && playlistSettings.id
   }
 
   const showNotification = () => {
     const overrides = {Body: {style: {width: 'auto'}}}
-    if (!isAuthenticated()) {
-      return <Notification kind={KIND.negative} overrides={overrides}>
-        Please &nbsp;
-        <StyledLink onClick={() => setActiveKey(1)}>authenticate</StyledLink>
-        &nbsp; first
-      </Notification>
-    } else if (!playlistSettings.id) {
+    if (!playlistSettings.id) {
       return <Notification kind={KIND.negative} overrides={overrides}>
         Please &nbsp;
         <StyledLink onClick={() => setActiveKey(2)}>find or create the playlist</StyledLink>

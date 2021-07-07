@@ -1,0 +1,73 @@
+<html>
+<head>
+  <meta charset='utf-8'>
+  <meta name='viewport' content='width=device-width,initial-scale=1'>
+  <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css'>
+  <link href='https://fonts.googleapis.com/icon?family=Material+Icons' rel='stylesheet'>
+  <title>YouTube Uploader</title>
+  <style>div.error {
+      position: relative;
+      font-size: .9rem;
+      color: #ff4081;
+      -webkit-transform: translateY(0%);
+      -ms-transform: translateY(0%);
+      -o-transform: translateY(0%);
+      transform: translateY(0%)
+  }
+
+  .container {
+      max-width: 600px
+  }</style>
+</head>
+<body>
+<div class='container'>
+  <div class='section'>
+    <div class='row'>
+      <div class='col s12'><h4 class='center light-blue-text'>Video Uploader</h4>
+      </div>
+    </div>
+    <div class='row' id='upload'>
+      <form class='col s12' id='youtubeForm'>
+        <div class='row'>
+          <div class='input-field col s12'>
+            <input id='video_title' name='Video Title' type='text' class='validate'
+                   data-error='#e1' required>
+            <label for='video_title'>Video Title</label>
+            <div id='e1'>Enter the title of the YouTube video (required)</div>
+          </div>
+        </div>
+        <div class='row'>
+          <div class='file-field input-field col s12'>
+            <div class='btn'>
+              <input id='file' name='Video File' type='file' data-error='#e5'
+                     accept='video/mp4,video/quicktime,video/*' required>
+              <span>Browse</span>
+            </div>
+            <div class='file-path-wrapper'>
+              <input class='file-path validate' type='text'
+                     placeholder='Click to select a video file'>
+            </div>
+            <div id='e5'></div>
+          </div>
+        </div>
+        <div class='row'>
+          <div class='input-field col m4 s12'><a href='#' id='btnUpload' onclick='run(1); return false;'
+                                                 class='waves-effect waves-light btn-large'>Upload Video</a>
+            <button class='reset' style='display:none' type='reset'>Reset</button>
+          </div>
+          <div class='input-field col m8 s12'><p class='left-align'><span id='message'></span> <span id='progress'
+                                                                                                     style='display:none'><span
+            id='percent-transferred'></span>% uploaded (<span id='bytes-transferred'></span>/<span
+            id='total-bytes'></span> MB)</span></p></div>
+        </div>
+      </form>
+      <br>
+    </div>
+  </div>
+</div>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.min.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/additional-methods.min.js'></script>
+
+<script>

@@ -20,25 +20,30 @@ const MetadataList = ({ values, setValues }) => {
       name: result.name,
       format: result.format,
       startTime: result.startTime,
-      duration: result.duration
+      duration: result.duration,
+      file: result.file,
     }))
 
   const durationOverrides = {
     TableHeadCell: {
-      style: ({$theme, $rowIndex}) => ({
+      style: ({ $theme, $rowIndex }) => ({
         textAlign: 'right',
-        paddingRight: tablePadding
-      })
-    }
+        paddingRight: tablePadding,
+      }),
+    },
+  }
+
+  const uploadFile = file => {
+
   }
 
   return (
-    <div id="results">
+    <div id='results'>
       <TableBuilder data={DATA} overrides={tableOverrides}>
-        <TableBuilderColumn header="Name">
+        <TableBuilderColumn header='Name'>
           {row => row.name}
         </TableBuilderColumn>
-        <TableBuilderColumn header="Format">
+        <TableBuilderColumn header='Format'>
           {row => row.format}
         </TableBuilderColumn>
         <TableBuilderColumn header="Start Time">
@@ -55,10 +60,25 @@ const MetadataList = ({ values, setValues }) => {
               onRemove(row.id)
             }}
             tabIndex={0}
-            title="Remove from list"
-            type="button"
+            title='Remove from list'
+            type='button'
           >
-            <FontAwesomeIcon icon={faTimes} size="lg"/>
+            <FontAwesomeIcon icon={faTimes} size='lg' />
+          </button>
+          }
+        </TableBuilderColumn>
+        <TableBuilderColumn header=''>
+          {row => <button
+            className='upload'
+            onClick={(event) => {
+              event.stopPropagation()
+              onRemove(row.id)
+            }}
+            tabIndex={0}
+            title='Upload'
+            type='button'
+          >
+            ⇧
           </button>
           }
         </TableBuilderColumn>

@@ -21,10 +21,10 @@ const FilePage = ({
 
   return (
     <div>
-      <MediaInfoJs results={fileInfo} setResults={setFileInfo}/>
+      <MediaInfoJs setResults={setFileInfo} />
       <HeadingLevel>
-        <BaseCard title="File Metadata">
-          <MetadataList values={fileInfo} setValues={setFileInfo}/>
+        <BaseCard title='File Metadata'>
+          <MetadataList values={fileInfo} setValues={setFileInfo} />
           <div style={{ textAlign: 'right', marginTop: '10px' }}>
             <StyledLink onClick={() => setFileInfo({})}>Clear All</StyledLink>
           </div>

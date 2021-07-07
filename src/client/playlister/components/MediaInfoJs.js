@@ -1,6 +1,5 @@
 import React, { useCallback, useState } from 'react'
 
-import { copyData, usePersist } from '../hooks/usePersist'
 import DropZone from './DropZone'
 
 // import MediaInfo from 'mediainfo.js'
@@ -26,22 +25,15 @@ const getRandomId = () => Math.random().toString(36).substr(2, 9)
 /**
  * Renders DropZone (and file picker) for one or more media files
  */
-const MediaInfoJs = ({results, setResults}) => {
+const MediaInfoJs = ({ setResults }) => {
   const [analyzing, setAnalyzing] = useState(false)
 
-  usePersist({
-    key: 'results',
-    onRestore: copyData,
-    setState: setResults,
-    state: results,
-  })
-
   function filterResult(result) {
-    const general = result.media.track.filter(track => track["@type"] === "General")[0]
+    const general = result.media.track.filter(track => track['@type'] === 'General')[0]
     return {
       format: general.Format,
       duration: general.Duration,
-      startTime: general.Encoded_Date
+      startTime: general.Encoded_Date,
     }
   }
 
@@ -61,6 +53,7 @@ const MediaInfoJs = ({results, setResults}) => {
               [getRandomId()]: {
                 ...(filterResult(result)),
                 name: file.name,
+                file: file,
               },
               ...prevResults,
             }))
