@@ -42,8 +42,58 @@ class ResumableUploader {
     this.contentType = contentType || file.type || 'application/octet-stream'
     this.retryHandler = new RetryHandler
     params.uploadType = 'resumable'
-    this.url = this.buildUrl_(fileId, params, baseUrl)
+    this.url = this.buildUrl(fileId, params, baseUrl)
     this.httpMethod = fileId ? 'PUT' : 'POST'
+    this.onContentUploadSuccess = e => {
+      if (200 === e.target.status || 201 === e.target.status) {
+        this.onComplete && this.onComplete(e.target.response)
+      } else {
+        if (308 === e.target.status) {
+          this.extractRange(e.target)
+          this.retryHandler.reset()
+          this.sendFile()
+        } else {
+          this.onContentUploadError(e)
+        }
+      }
+    }
+    this.onContentUploadError = e => {
+      if (e.target.status && e.target.status < 500) {
+        this.onError(e.target.response)
+      } else {
+        this.retryHandler.retry(this.resume)
+      }
+    }
+    this.onUploadError = e => {
+      this.onError(e.target.response)
+    }
+    this.resume = () => {
+      const xhr = new XMLHttpRequest
+      xhr.open('PUT', this.url, true)
+      xhr.setRequestHeader('Content-Range', 'bytes */' + this.file.size)
+      xhr.setRequestHeader('X-Upload-Content-Type', this.file.type)
+      xhr.upload && xhr.upload.addEventListener('progress', this.onProgress)
+      xhr.onload = this.onContentUploadSuccess
+      xhr.onerror = this.onContentUploadError
+      xhr.send()
+    }
+    this.sendFile = () => {
+      let e = this.file
+      const size = this.chunkSize
+        ? Math.min(this.offset + this.chunkSize, this.file.size)
+        : this.file.size
+      e = e.slice(this.offset, size)
+      const xhr = new XMLHttpRequest
+      xhr.open('PUT', this.url, true)
+      xhr.setRequestHeader('Content-Type', this.contentType)
+      xhr.setRequestHeader('Content-Range', 'bytes ' + this.offset + '-' + (size - 1) + '/' + this.file.size)
+      xhr.setRequestHeader('X-Upload-Content-Type', this.file.type)
+      xhr.upload && xhr.upload.addEventListener('progress', this.onProgress)
+      xhr.onload = this.onContentUploadSuccess
+      xhr.onerror = this.onContentUploadError
+      xhr.send(e)
+    }
+
   }
 
   upload() {
@@ -53,87 +103,36 @@ class ResumableUploader {
     xhr.setRequestHeader('Content-Type', 'application/json')
     xhr.setRequestHeader('X-Upload-Content-Length', this.file.size)
     xhr.setRequestHeader('X-Upload-Content-Type', this.contentType)
-    xhr.onload = function(e) {
+    xhr.onload = e => {
       if (e.target.status < 400) {
         const t = e.target.getResponseHeader('Location')
-        this.url = t, this.sendFile_()
+        this.url = t, this.sendFile()
       } else {
-        this.onUploadError_(e)
+        this.onUploadError(e)
       }
-    }.bind(this)
-    xhr.onerror = this.onUploadError_.bind(this)
+    }
+    xhr.onerror = this.onUploadError
     xhr.send(JSON.stringify(this.videoResource))
   }
 
-  sendFile_() {
-    let e = this.file
-    const size = this.chunkSize
-      ? Math.min(this.offset + this.chunkSize, this.file.size)
-      : this.file.size
-    e = e.slice(this.offset, size)
-    const xhr = new XMLHttpRequest
-    xhr.open('PUT', this.url, true)
-    xhr.setRequestHeader('Content-Type', this.contentType)
-    xhr.setRequestHeader('Content-Range', 'bytes ' + this.offset + '-' + (size - 1) + '/' + this.file.size)
-    xhr.setRequestHeader('X-Upload-Content-Type', this.file.type)
-    xhr.upload && xhr.upload.addEventListener('progress', this.onProgress)
-    xhr.onload = this.onContentUploadSuccess_.bind(this)
-    xhr.onerror = this.onContentUploadError_.bind(this)
-    xhr.send(e)
-  }
-
-  resume_() {
-    const xhr = new XMLHttpRequest
-    xhr.open('PUT', this.url, true)
-    xhr.setRequestHeader('Content-Range', 'bytes */' + this.file.size)
-    xhr.setRequestHeader('X-Upload-Content-Type', this.file.type)
-    xhr.upload && xhr.upload.addEventListener('progress', this.onProgress)
-    xhr.onload = this.onContentUploadSuccess_.bind(this)
-    xhr.onerror = this.onContentUploadError_.bind(this)
-    xhr.send()
-  }
-
-  extractRange_(e) {
+  extractRange(e) {
     const range = e.getResponseHeader('Range')
     if (range) {
       this.offset = parseInt(range.match(/\d+/g).pop(), 10) + 1
     }
   }
 
-  onContentUploadSuccess_(e) {
-    if (200 === e.target.status || 201 === e.target.status) {
-      this.onComplete && this.onComplete(e.target.response)
-    } else {
-      if (308 === e.target.status) {
-        this.extractRange_(e.target), this.retryHandler.reset(), this.sendFile_()
-      } else {
-        this.onContentUploadError_(e)
-      }
-    }
-  }
-
-  onContentUploadError_(e) {
-    if (e.target.status && e.target.status < 500) {
-      this.onError(e.target.response)
-    } else {
-      this.retryHandler.retry(this.resume_.bind(this))
-    }
-  }
-
-  onUploadError_(e) {
-    this.onError(e.target.response)
-  }
-
-  buildQuery_(e) {
-    return e = e || {}, Object.keys(e).map(function(t) {
+  buildQuery(e) {
+    e = e || {}
+    return Object.keys(e).map(function(t) {
       return encodeURIComponent(t) + '=' + encodeURIComponent(e[t])
     }).join('&')
   }
 
-  buildUrl_(e, t, o) {
+  buildUrl(e, t, o) {
     let n = o
     e && (n += e)
-    const r = this.buildQuery_(t)
+    const r = this.buildQuery(t)
     return r && (n += '?' + r), n
   }
 }
@@ -144,8 +143,8 @@ function getTitle() {
 
 let message, progress, validator, uploadButton, form
 
-function p(e, message) {
-  message.html(message || '')
+function p(e, msg) {
+  message.html(msg || '')
   if (e) {
     $('button.reset').click()
     uploadButton.removeClass('disabled')
