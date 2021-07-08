@@ -28,29 +28,21 @@ class ResumableUploader {
                 baseUrl,
                 file,
                 contentType,
-                metadata,
+                videoResource,
                 token,
                 onComplete,
                 onProgress,
                 onError,
                 offset = 0,
                 chunkSize = 0,
-                url,
-                params,
+                params = {},
                 fileId,
               }) {
-    Object.assign(this, { file, token, onComplete, onProgress, onError, offset, chunkSize, url })
+    Object.assign(this, { file, videoResource, token, onComplete, onProgress, onError, offset, chunkSize })
     this.contentType = contentType || file.type || 'application/octet-stream'
-    this.metadata = metadata || {
-      title: file.name,
-      mimeType: this.contentType,
-    }
     this.retryHandler = new RetryHandler
-    if (!this.url) {
-      const o = params || {}
-      o.uploadType = 'resumable'
-      this.url = this.buildUrl_(fileId, o, baseUrl)
-    }
+    params.uploadType = 'resumable'
+    this.url = this.buildUrl_(fileId, params, baseUrl)
     this.httpMethod = fileId ? 'PUT' : 'POST'
   }
 
@@ -70,7 +62,7 @@ class ResumableUploader {
       }
     }.bind(this)
     xhr.onerror = this.onUploadError_.bind(this)
-    xhr.send(JSON.stringify(this.metadata))
+    xhr.send(JSON.stringify(this.videoResource))
   }
 
   sendFile_() {
@@ -146,7 +138,7 @@ class ResumableUploader {
   }
 }
 
-function s() {
+function getTitle() {
   return $('#video_title').val()
 }
 
@@ -172,16 +164,19 @@ class UploadWatcher {
 
   uploadFile(file, token) {
     let o = false
-    const n = {
-      snippet: { title: s(), categoryId: 10 },
+    const videoResource = {
+      snippet: { title: getTitle(), categoryId: 10 },
       status: { privacyStatus: 'private' },
     }
     const uploader = new ResumableUploader({
       baseUrl: 'https://www.googleapis.com/upload/youtube/v3/videos',
       file: file,
       token: token,
-      metadata: n,
-      params: { part: Object.keys(n).join(','), notifySubscribers: false },
+      videoResource: videoResource,
+      params: {
+        part: Object.keys(videoResource).join(','),
+        notifySubscribers: false,
+      },
       onError: err => {
         let t = err
         try {
