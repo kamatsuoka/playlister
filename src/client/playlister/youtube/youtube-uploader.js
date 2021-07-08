@@ -151,6 +151,18 @@ function s() {
 
 let l, u, t, o, i
 
+function p(e, t) {
+  l.html(t || '')
+  if (e) {
+    $('button.reset').click()
+    o.removeClass('disabled')
+    u.hide()
+  } else {
+    o.addClass('disabled')
+  }
+}
+
+
 class UploadWatcher {
   constructor() {
     this.videoId = ''
@@ -209,11 +221,21 @@ function run(e) {
 }
 
 $(document).ready(function() {
-  $.validator.setDefaults({ ignore: [] }), $('select').formSelect(), l = $('#message'), u = $('#progress'), o = $('#btnUpload'), i = $('form'), t = i.validate({
+  $.validator.setDefaults({ ignore: [] })
+  $('select').formSelect()
+  l = $('#message')
+  u = $('#progress')
+  o = $('#btnUpload')
+  i = $('form')
+  t = i.validate({
     errorElement: 'div',
     errorPlacement: function(e, t) {
       const o = $(t).data('error')
-      o ? $(o).append(e) : e.insertAfter(t)
+      if (o) {
+        $(o).append(e)
+      } else {
+        e.insertAfter(t)
+      }
     },
   })
 })
