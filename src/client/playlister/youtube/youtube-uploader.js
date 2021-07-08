@@ -75,15 +75,14 @@ class ResumableUploader {
 
   sendFile_() {
     let e = this.file
-    let t = this.file.size
-    if (this.chunkSize) {
-      t = Math.min(this.offset + this.chunkSize, this.file.size)
-    }
-    e = e.slice(this.offset, t)
+    const size = this.chunkSize
+      ? Math.min(this.offset + this.chunkSize, this.file.size)
+      : this.file.size
+    e = e.slice(this.offset, size)
     const xhr = new XMLHttpRequest
     xhr.open('PUT', this.url, !0)
     xhr.setRequestHeader('Content-Type', this.contentType)
-    xhr.setRequestHeader('Content-Range', 'bytes ' + this.offset + '-' + (t - 1) + '/' + this.file.size)
+    xhr.setRequestHeader('Content-Range', 'bytes ' + this.offset + '-' + (size - 1) + '/' + this.file.size)
     xhr.setRequestHeader('X-Upload-Content-Type', this.file.type)
     xhr.upload && xhr.upload.addEventListener('progress', this.onProgress)
     xhr.onload = this.onContentUploadSuccess_.bind(this)
@@ -103,8 +102,10 @@ class ResumableUploader {
   }
 
   extractRange_(e) {
-    const t = e.getResponseHeader('Range')
-    t && (this.offset = parseInt(t.match(/\d+/g).pop(), 10) + 1)
+    const range = e.getResponseHeader('Range')
+    if (range) {
+      this.offset = parseInt(range.match(/\d+/g).pop(), 10) + 1
+    }
   }
 
   onContentUploadSuccess_(e) {
