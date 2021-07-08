@@ -56,7 +56,7 @@ class ResumableUploader {
 
   upload() {
     const xhr = new XMLHttpRequest
-    xhr.open(this.httpMethod, this.url, !0)
+    xhr.open(this.httpMethod, this.url, true)
     xhr.setRequestHeader('Authorization', 'Bearer ' + this.token)
     xhr.setRequestHeader('Content-Type', 'application/json')
     xhr.setRequestHeader('X-Upload-Content-Length', this.file.size)
@@ -80,7 +80,7 @@ class ResumableUploader {
       : this.file.size
     e = e.slice(this.offset, size)
     const xhr = new XMLHttpRequest
-    xhr.open('PUT', this.url, !0)
+    xhr.open('PUT', this.url, true)
     xhr.setRequestHeader('Content-Type', this.contentType)
     xhr.setRequestHeader('Content-Range', 'bytes ' + this.offset + '-' + (size - 1) + '/' + this.file.size)
     xhr.setRequestHeader('X-Upload-Content-Type', this.file.type)
@@ -92,7 +92,7 @@ class ResumableUploader {
 
   resume_() {
     const xhr = new XMLHttpRequest
-    xhr.open('PUT', this.url, !0)
+    xhr.open('PUT', this.url, true)
     xhr.setRequestHeader('Content-Range', 'bytes */' + this.file.size)
     xhr.setRequestHeader('X-Upload-Content-Type', this.file.type)
     xhr.upload && xhr.upload.addEventListener('progress', this.onProgress)
@@ -150,16 +150,16 @@ function s() {
   return $('#video_title').val()
 }
 
-let l, u, t, o, i
+let message, progress, validator, uploadButton, form
 
-function p(e, t) {
-  l.html(t || '')
+function p(e, message) {
+  message.html(message || '')
   if (e) {
     $('button.reset').click()
-    o.removeClass('disabled')
-    u.hide()
+    uploadButton.removeClass('disabled')
+    progress.hide()
   } else {
-    o.addClass('disabled')
+    uploadButton.addClass('disabled')
   }
 }
 
@@ -170,24 +170,24 @@ class UploadWatcher {
     this.uploadStartTime = 0
   }
 
-  uploadFile(e, t) {
-    let o = !1
+  uploadFile(file, token) {
+    let o = false
     const n = {
       snippet: { title: s(), categoryId: 10 },
       status: { privacyStatus: 'private' },
     }
     const uploader = new ResumableUploader({
       baseUrl: 'https://www.googleapis.com/upload/youtube/v3/videos',
-      file: e,
-      token: t,
+      file: file,
+      token: token,
       metadata: n,
-      params: { part: Object.keys(n).join(','), notifySubscribers: !1 },
-      onError: e => {
-        let t = e
+      params: { part: Object.keys(n).join(','), notifySubscribers: false },
+      onError: err => {
+        let t = err
         try {
-          t = JSON.parse(e).error.message
+          t = JSON.parse(err).error.message
         } finally {
-          p(!0, t)
+          p(true, t)
         }
       },
       onProgress: e => {
@@ -195,12 +195,15 @@ class UploadWatcher {
         $('#percent-transferred').text(r.toFixed(2))
         $('#bytes-transferred').text((t / 1048576).toFixed(3))
         $('#total-bytes').text((n / 1048576).toFixed(3))
-        o || (o = !0, u.show())
+        o || (o = true, progress.show())
         if (100 === r) {
-          u.hide()
-          l.html('Video uploaded, processing..')
+          progress.hide()
+          message.html('Video uploaded, processing..')
           $('#terms').hide()
         }
+      },
+      onComplete: _ => {
+        message.html('Done')
       },
     })
     this.uploadStartTime = Date.now()
@@ -210,13 +213,13 @@ class UploadWatcher {
 
 
 function run(e) {
-  if (i.valid()) {
-    return google.script.run.withSuccessHandler(e => {
-      (new UploadWatcher).uploadFile($('#file').get(0).files[0], e)
-    }).getToken()
+  if (form.valid()) {
+    return google.script.run.withSuccessHandler(token =>
+      (new UploadWatcher).uploadFile($('#file').get(0).files[0], token),
+    ).getToken()
   } else {
     return void window.setTimeout(function() {
-      t.resetForm()
+      validator.resetForm()
     }, 5e3)
   }
 }
@@ -224,11 +227,11 @@ function run(e) {
 $(document).ready(function() {
   $.validator.setDefaults({ ignore: [] })
   $('select').formSelect()
-  l = $('#message')
-  u = $('#progress')
-  o = $('#btnUpload')
-  i = $('form')
-  t = i.validate({
+  message = $('#message')
+  progress = $('#progress')
+  uploadButton = $('#btnUpload')
+  form = $('form')
+  validator = form.validate({
     errorElement: 'div',
     errorPlacement: function(e, t) {
       const o = $(t).data('error')
