@@ -44,9 +44,6 @@ const serverEntry = './src/server/index.js'
 // define appsscript.json file path
 const copyAppscriptEntry = './appsscript.json'
 
-// define live development dialog paths
-const devDialogEntry = './dev/index.js'
-
 // define client entry points and output names
 const clientEntrypoints = [
   {
@@ -56,11 +53,6 @@ const clientEntrypoints = [
     template: './src/client/playlister/public/index.html',
   },
 ]
-
-// define certificate locations
-// see "npm run setup:https" script in package.json
-const keyPath = path.resolve(__dirname, './certs/key.pem')
-const certPath = path.resolve(__dirname, './certs/cert.pem')
 
 /*********************************
  *    Declare settings
@@ -150,13 +142,6 @@ const DynamicCdnWebpackPluginConfig = {
     // "name" should match the package being imported
     // "var" is important to get right -- this should be the exposed global. Look up "webpack externals" for info.
     switch (packageName) {
-      case 'react-transition-group':
-        return {
-          name: packageName,
-          var: 'ReactTransitionGroup',
-          version: packageVersion,
-          url: `https://unpkg.com/react-transition-group@${packageVersion}/dist/react-transition-group${packageSuffix}`,
-        }
       case 'baseui':
         return {
           name: packageName,
@@ -193,54 +178,11 @@ const clientConfigs = clientEntrypoints.map(clientEntrypoint => {
   }
 })
 
-const gasWebpackDevServerPath = require.resolve(
-  'google-apps-script-webpack-dev-server',
-)
-
 // webpack settings for devServer https://webpack.js.org/configuration/dev-server/
 const devServer = {
   port: PORT,
-  https: true,
-  // run our own route to serve the package google-apps-script-webpack-dev-server
-  before: app => {
-    // this '/gas/' path needs to match the path loaded in the iframe in dev/index.js
-    app.get('/gas/*', (req, res) => {
-      res.setHeader('Content-Type', 'text/html')
-      fs.createReadStream(gasWebpackDevServerPath).pipe(res)
-    })
-  },
+  contentBase: path.join(__dirname, 'dist'),
 }
-
-if (fs.existsSync(keyPath) && fs.existsSync(certPath)) {
-  // use key and cert settings only if they are found
-  devServer.https = {
-    key: fs.readFileSync(keyPath),
-    cert: fs.readFileSync(certPath),
-  }
-}
-
-// webpack settings for the development client wrapper
-const devClientConfigs = clientEntrypoints.map(clientEntrypoint => {
-  envVars.FILENAME = clientEntrypoint.filename
-  return {
-    ...clientConfig,
-    name: `DEVELOPMENT: ${clientEntrypoint.name}`,
-    entry: devDialogEntry,
-    plugins: [
-      new webpack.DefinePlugin({
-        'process.env': JSON.stringify(envVars),
-      }),
-      new HtmlWebpackPlugin({
-        template: './dev/index.html',
-        // this should match the html files we load in src/server/ui.js
-        filename: `${clientEntrypoint.filename}.html`,
-        inlineSource: '^[^(//)]+.(js|css)$', // embed all js and css inline, exclude packages with '//' for dynamic cdn insertion
-      }),
-      new HtmlWebpackInlineSourcePlugin(),
-      new DynamicCdnWebpackPlugin({}),
-    ],
-  }
-})
 
 // webpack settings used by the server-side code
 const serverConfig = {
@@ -329,6 +271,4 @@ module.exports = [
   serverConfig,
   // 4. Create one client bundle for each client entrypoint.
   ...clientConfigs,
-  // 5. Create a development dialog bundle for each client entrypoint during development.
-  ...(isProd ? [] : devClientConfigs),
 ]
