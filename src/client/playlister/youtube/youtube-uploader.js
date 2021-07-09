@@ -131,7 +131,7 @@ class ResumableUploader {
 
   buildUrl(baseUrl, params) {
     const url = new URL(baseUrl)
-    Object.entries(params).foreach((key, value) => url.searchParams.append(key, value))
+    Object.entries(params).forEach((key, value) => url.searchParams.append(key, value))
     return url.href
   }
 }
