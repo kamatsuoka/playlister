@@ -4,22 +4,22 @@ class RetryHandler {
     this.maxInterval = 6e4
   }
 
-  retry(e) {
-    setTimeout(e, this.interval)
-    this.interval = this.nextInterval_()
+  retry(f) {
+    setTimeout(f, this.interval)
+    this.interval = this.nextInterval()
   }
 
   reset() {
     this.interval = 1e3
   }
 
-  nextInterval_() {
-    const e = 2 * this.interval + this.getRandomInt_(0, 1e3)
-    return Math.min(e, this.maxInterval)
+  nextInterval() {
+    const interval = 2 * this.interval + this.getRandomInt(1e3)
+    return Math.min(interval, this.maxInterval)
   }
 
-  getRandomInt_(e, t) {
-    return Math.floor(Math.random() * (t - e + 1) + e)
+  getRandomInt(maxVal) {
+    return Math.floor(Math.random() * (maxVal + 1))
   }
 }
 
@@ -36,104 +36,103 @@ class ResumableUploader {
                 offset = 0,
                 chunkSize = 0,
                 params = {},
-                fileId,
               }) {
     Object.assign(this, { file, videoResource, token, onComplete, onProgress, onError, offset, chunkSize })
     this.contentType = contentType || file.type || 'application/octet-stream'
     this.retryHandler = new RetryHandler
     params.uploadType = 'resumable'
-    this.url = this.buildUrl(fileId, params, baseUrl)
-    this.httpMethod = fileId ? 'PUT' : 'POST'
-    this.onContentUploadSuccess = e => {
-      if (200 === e.target.status || 201 === e.target.status) {
-        this.onComplete && this.onComplete(e.target.response)
-      } else {
-        if (308 === e.target.status) {
-          this.extractRange(e.target)
-          this.retryHandler.reset()
-          this.sendFile()
+    this.url = this.buildUrl(baseUrl, params)
+    this.httpMethod = 'POST'
+    this.onContentUploadSuccess = response => this.onComplete && this.onComplete(response)
+    this.onContentUploadError = error => {
+      if (error.response && error.response.status) {
+        status = error.response.status
+        if (error.response.status === 308) {
+          // google uses 308 to mean "Resume Incomplete",
+          // see https://cloud.google.com/storage/docs/performing-resumable-uploads
+          this.onResumeIncomplete(error.response)
+        } else if (error.response.status < 500) {
+          this.onUploadError(error.response)
         } else {
-          this.onContentUploadError(e)
+          this.retryHandler.retry(this.resume)
         }
-      }
-    }
-    this.onContentUploadError = e => {
-      if (e.target.status && e.target.status < 500) {
-        this.onError(e.target.response)
       } else {
-        this.retryHandler.retry(this.resume)
+        this.onError(error.message)
       }
     }
-    this.onUploadError = e => {
-      this.onError(e.target.response)
+    this.onUploadError = response => {
+      console.log(`onUploadError: response data = ${response.data},` +
+        ` status = ${response.status}, headers = ${response.headers}`)
+      this.onError(response.data)
     }
     this.resume = () => {
-      const xhr = new XMLHttpRequest
-      xhr.open('PUT', this.url, true)
-      xhr.setRequestHeader('Content-Range', 'bytes */' + this.file.size)
-      xhr.setRequestHeader('X-Upload-Content-Type', this.file.type)
-      xhr.upload && xhr.upload.addEventListener('progress', this.onProgress)
-      xhr.onload = this.onContentUploadSuccess
-      xhr.onerror = this.onContentUploadError
-      xhr.send()
+      axios.put(this.url, slice, {
+        headers: {
+          'Content-Range': 'bytes */' + this.file.size,
+          'X-Upload-Content-Type': this.file.type,
+        },
+        onUploadProgress: this.onProgress,
+      })
+        .then(this.onContentUploadSuccess)
+        .catch(this.onContentUploadError)
     }
     this.sendFile = () => {
-      let e = this.file
       const size = this.chunkSize
         ? Math.min(this.offset + this.chunkSize, this.file.size)
         : this.file.size
-      e = e.slice(this.offset, size)
-      const xhr = new XMLHttpRequest
-      xhr.open('PUT', this.url, true)
-      xhr.setRequestHeader('Content-Type', this.contentType)
-      xhr.setRequestHeader('Content-Range', 'bytes ' + this.offset + '-' + (size - 1) + '/' + this.file.size)
-      xhr.setRequestHeader('X-Upload-Content-Type', this.file.type)
-      xhr.upload && xhr.upload.addEventListener('progress', this.onProgress)
-      xhr.onload = this.onContentUploadSuccess
-      xhr.onerror = this.onContentUploadError
-      xhr.send(e)
+      const slice = this.file.slice(this.offset, size)
+      axios.put(this.url, slice, {
+        headers: {
+          'Content-Type': this.contentType,
+          'Content-Range': 'bytes ' + this.offset + '-' + (size - 1) + '/' + this.file.size,
+          'X-Upload-Content-Type': this.file.type,
+        },
+        onUploadProgress: this.onProgress,
+      })
+        .then(this.onContentUploadSuccess)
+        .catch(this.onContentUploadError)
     }
-
-  }
-
-  upload() {
-    const xhr = new XMLHttpRequest
-    xhr.open(this.httpMethod, this.url, true)
-    xhr.setRequestHeader('Authorization', 'Bearer ' + this.token)
-    xhr.setRequestHeader('Content-Type', 'application/json')
-    xhr.setRequestHeader('X-Upload-Content-Length', this.file.size)
-    xhr.setRequestHeader('X-Upload-Content-Type', this.contentType)
-    xhr.onload = e => {
-      if (e.target.status < 400) {
-        const t = e.target.getResponseHeader('Location')
-        this.url = t, this.sendFile()
-      } else {
-        this.onUploadError(e)
+    this.onResumeIncomplete = response => {
+      this.extractRange(response)
+      this.retryHandler.reset()
+      this.sendFile()
+    }
+    this.extractRange = response => {
+      const range = response.headers['range']
+      if (range) {
+        this.offset = parseInt(range.match(/\d+/g).pop(), 10) + 1
       }
     }
-    xhr.onerror = this.onUploadError
-    xhr.send(JSON.stringify(this.videoResource))
   }
 
-  extractRange(e) {
-    const range = e.getResponseHeader('Range')
-    if (range) {
-      this.offset = parseInt(range.match(/\d+/g).pop(), 10) + 1
-    }
+  axios = window.axios
+
+  upload() {
+    axios(this.url, {
+      method: this.httpMethod,
+      headers: {
+        'Authorization': 'Bearer ' + this.token,
+        'Content-Type': 'application/json',
+        'X-Upload-Content-Length': this.file.size,
+        'X-Upload-Content-Type': this.contentType,
+      },
+    }).then(response => {
+      // would prefer creating a new object to mutating this object's variables
+      this.url = response.headers['location']
+      this.sendFile()
+    }).catch(error => {
+      if (error.response) {
+        this.onUploadError(error.response)
+      } else if (error.message) {
+        this.onError(error.message)
+      }
+    })
   }
 
-  buildQuery(e) {
-    e = e || {}
-    return Object.keys(e).map(function(t) {
-      return encodeURIComponent(t) + '=' + encodeURIComponent(e[t])
-    }).join('&')
-  }
-
-  buildUrl(e, t, o) {
-    let n = o
-    e && (n += e)
-    const r = this.buildQuery(t)
-    return r && (n += '?' + r), n
+  buildUrl(baseUrl, params) {
+    const url = new URL(baseUrl)
+    Object.entries(params).foreach((key, value) => url.searchParams.append(key, value))
+    return url.href
   }
 }
 
@@ -143,9 +142,9 @@ function getTitle() {
 
 let message, progress, validator, uploadButton, form
 
-function p(e, msg) {
+function p(finished, msg) {
   message.html(msg || '')
-  if (e) {
+  if (finished) {
     $('button.reset').click()
     uploadButton.removeClass('disabled')
     progress.hide()
@@ -177,26 +176,29 @@ class UploadWatcher {
         notifySubscribers: false,
       },
       onError: err => {
-        let t = err
+        let message = err
         try {
-          t = JSON.parse(err).error.message
+          message = JSON.parse(err).error.message
         } finally {
-          p(true, t)
+          p(true, message)
         }
       },
-      onProgress: e => {
-        const t = e.loaded, n = e.total, r = 100 * t / n
-        $('#percent-transferred').text(r.toFixed(2))
-        $('#bytes-transferred').text((t / 1048576).toFixed(3))
-        $('#total-bytes').text((n / 1048576).toFixed(3))
+      onProgress: progressEvent => {
+        const loaded = progressEvent.loaded
+        const total = progressEvent.total
+        const percent = 100 * loaded / total
+        $('#percent-transferred').text(percent.toFixed(2))
+        $('#bytes-transferred').text((loaded / 1048576).toFixed(3))
+        $('#total-bytes').text((total / 1048576).toFixed(3))
         o || (o = true, progress.show())
-        if (100 === r) {
+        if (100 === percent) {
           progress.hide()
           message.html('Video uploaded, processing..')
           $('#terms').hide()
         }
       },
-      onComplete: _ => {
+      onComplete: response => {
+        console.log(`uploaded video with id ${response.id}`)
         message.html('Done')
       },
     })
@@ -205,8 +207,7 @@ class UploadWatcher {
   }
 }
 
-
-function run(e) {
+function run() {
   if (form.valid()) {
     return google.script.run.withSuccessHandler(token =>
       (new UploadWatcher).uploadFile($('#file').get(0).files[0], token),
@@ -227,12 +228,12 @@ $(document).ready(function() {
   form = $('form')
   validator = form.validate({
     errorElement: 'div',
-    errorPlacement: function(e, t) {
+    errorPlacement: function(err, t) {
       const o = $(t).data('error')
       if (o) {
-        $(o).append(e)
+        $(o).append(err)
       } else {
-        e.insertAfter(t)
+        err.insertAfter(t)
       }
     },
   })
