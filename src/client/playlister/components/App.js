@@ -4,12 +4,14 @@ import { faGithub } from '@fortawesome/free-brands-svg-icons'
 import { BaseProvider, LightTheme } from 'baseui'
 import { Provider as StyletronProvider } from 'styletron-react'
 import { Client as Styletron } from 'styletron-engine-atomic'
-import { Tab, Tabs } from 'baseui/tabs-motion'
 
 import FilePage from './FilePage'
 import AuthPage from './AuthPage'
 import VideoPage from './VideoPage'
 import { StyledLink } from 'baseui/link'
+import { ProgressSteps, Step } from 'baseui/progress-steps'
+import { Button } from 'baseui/button'
+import PlaylistPage from './PlaylistPage'
 
 const engine = new Styletron()
 
@@ -21,33 +23,55 @@ function App () {
   const [playlistSettings, setPlaylistSettings] = useState({})
   const [playlistTitle, setPlaylistTitle] = useState({ titleChoice: 'suggested' })
 
+  const prevButton = current =>
+    current > 0 ? <Button size="compact" onClick={() => setActiveKey(current - 1)}>Prev</Button> : null
+
+  const nextButton = (current, last) =>
+    last ? null : <Button size="compact" onClick={() => setActiveKey(current + 1)}>Next</Button>
+
+  const prevNextButtons = (current, last = false) =>
+    (
+      <div align="right">
+        {prevButton(current)}
+        &nbsp;
+        {nextButton(current, last)}
+      </div>
+    )
+
   return (
     <StyletronProvider value={engine}>
       <BaseProvider theme={LightTheme}>
-        <Tabs
-          activeKey={activeKey}
-          onChange={({ activeKey }) => setActiveKey(activeKey)}
-        >
-          <Tab title="Auth">
+        <ProgressSteps current={activeKey}>
+          <Step title="Auth">
             <AuthPage/>
-          </Tab>
-          <Tab title="Files">
+            {prevNextButtons(0)}
+          </Step>
+          <Step title="Files">
             <FilePage
               fileInfo={fileInfo} setFileInfo={setFileInfo}
               startEndList={startEndList} setStartEndList={setStartEndList}
-              eventData={eventData} setEventData={setEventData}
-              playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
-              playlistSettings={playlistSettings} setPlaylistSettings={setPlaylistSettings}
               setActiveKey={setActiveKey}
             />
-          </Tab>
-          <Tab title="Videos">
+            {prevNextButtons(1)}
+          </Step>
+          <Step title="Playlist">
+            <PlaylistPage
+              startEndList={startEndList}
+              eventData={eventData} setEventData={setEventData}
+              playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
+              value={playlistSettings} setValue={setPlaylistSettings}
+              setActiveKey={setActiveKey}
+            />
+            {prevNextButtons(2)}
+          </Step>
+          <Step title="Videos">
             <VideoPage
               eventData={eventData} startEndList={startEndList}
               playlistSettings={playlistSettings} setActiveKey={setActiveKey}
             />
-          </Tab>
-        </Tabs>
+            {prevNextButtons(3, true)}
+          </Step>
+        </ProgressSteps>
         <footer>
           <StyledLink
             href="https://github.com/kamatsuoka/playlister"

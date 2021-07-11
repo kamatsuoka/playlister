@@ -40,7 +40,7 @@ const MetadataList = ({ values, setValues }) => {
   return (
     <div id='results'>
       <TableBuilder data={DATA} overrides={tableOverrides}>
-        <TableBuilderColumn header='Name'>
+        <TableBuilderColumn header="Name">
           {row => row.name}
         </TableBuilderColumn>
         <TableBuilderColumn header="Format">

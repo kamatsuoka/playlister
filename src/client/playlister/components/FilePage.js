@@ -5,7 +5,6 @@ import TimezoneOverride from './TimezoneOverride'
 import StartEndList from './StartEndList'
 import { StyledLink } from 'baseui/link'
 import { BaseCard } from './BaseCard'
-import PlaylistPage from './PlaylistPage'
 
 /**
  * Page that holds files' MediaInfo data and rehearsal info
@@ -13,9 +12,7 @@ import PlaylistPage from './PlaylistPage'
 const FilePage = ({
   fileInfo, setFileInfo,
   startEndList, setStartEndList,
-  eventData, setEventData,
-  playlistTitle, setPlaylistTitle,
-  playlistSettings, setPlaylistSettings, setActiveKey
+  setActiveKey
 }) => {
   const [overrideTimeZone, setOverrideTimeZone] = useState(true)
 
@@ -24,8 +21,8 @@ const FilePage = ({
       <MediaInfoJs setResults={setFileInfo}/>
       <BaseCard title="File Metadata">
         <MetadataList values={fileInfo} setValues={setFileInfo}/>
-        <div style={{ textAlign: 'right', marginTop: '10px' }}>
-          <StyledLink onClick={() => setFileInfo({})}>Clear All</StyledLink>
+        <div align="right" style={{ marginTop: '10px' }}>
+          {startEndList.length === 0 ? null : <StyledLink onClick={() => setFileInfo({})}>Clear All</StyledLink>}
         </div>
       </BaseCard>
       <BaseCard title="Start and End Times">
@@ -35,13 +32,6 @@ const FilePage = ({
           startEndList={startEndList} setStartEndList={setStartEndList}
         />
       </BaseCard>
-      <PlaylistPage
-        startEndList={startEndList}
-        eventData={eventData} setEventData={setEventData}
-        playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
-        value={playlistSettings} setValue={setPlaylistSettings}
-        setActiveKey={setActiveKey}
-      />
     </>
   )
 }
