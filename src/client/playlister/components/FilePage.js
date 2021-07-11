@@ -4,39 +4,45 @@ import MetadataList from './MetadataList'
 import TimezoneOverride from './TimezoneOverride'
 import StartEndList from './StartEndList'
 import { StyledLink } from 'baseui/link'
-import { HeadingLevel } from 'baseui/heading'
-import InferredDate from './InferredDate'
 import { BaseCard } from './BaseCard'
+import PlaylistPage from './PlaylistPage'
 
 /**
  * Page that holds files' MediaInfo data and rehearsal info
  */
 const FilePage = ({
-                    startEndList, setStartEndList, rehearsalData, setRehearsalData,
-                    inferredDate, setInferredDate,
-                  }) => {
-
-  const [fileInfo, setFileInfo] = useState({})
+  fileInfo, setFileInfo,
+  startEndList, setStartEndList, eventData, setEventData,
+  inferredDate, setInferredDate, playlistTitle, setPlaylistTitle,
+  playlistSettings, setPlaylistSettings, setActiveKey
+}) => {
   const [overrideTimeZone, setOverrideTimeZone] = useState(true)
 
   return (
-    <div>
-      <MediaInfoJs setResults={setFileInfo} />
-      <HeadingLevel>
-        <BaseCard title='File Metadata'>
-          <MetadataList values={fileInfo} setValues={setFileInfo} />
-          <div style={{ textAlign: 'right', marginTop: '10px' }}>
-            <StyledLink onClick={() => setFileInfo({})}>Clear All</StyledLink>
-          </div>
-        </BaseCard>
-        <BaseCard title='Start and End Times'>
-          <TimezoneOverride value={overrideTimeZone} setValue={setOverrideTimeZone} />
-          <StartEndList fileInfo={fileInfo} overrideTimeZone={overrideTimeZone}
-                        startEndList={startEndList} setStartEndList={setStartEndList} />
-        </BaseCard>
-        <InferredDate startEndList={startEndList} value={inferredDate} setValue={setInferredDate} />
-      </HeadingLevel>
-    </div>
+    <>
+      <MediaInfoJs setResults={setFileInfo}/>
+      <BaseCard title="File Metadata">
+        <MetadataList values={fileInfo} setValues={setFileInfo}/>
+        <div style={{ textAlign: 'right', marginTop: '10px' }}>
+          <StyledLink onClick={() => setFileInfo({})}>Clear All</StyledLink>
+        </div>
+      </BaseCard>
+      <BaseCard title="Start and End Times">
+        <TimezoneOverride fileInfo={fileInfo} value={overrideTimeZone} setValue={setOverrideTimeZone}/>
+        <StartEndList
+          fileInfo={fileInfo} overrideTimeZone={overrideTimeZone}
+          startEndList={startEndList} setStartEndList={setStartEndList}
+        />
+      </BaseCard>
+      <PlaylistPage
+        startEndList={startEndList}
+        eventData={eventData} setEventData={setEventData}
+        inferredDate={inferredDate} setInferredDate={setInferredDate}
+        playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
+        value={playlistSettings} setValue={setPlaylistSettings}
+        setActiveKey={setActiveKey}
+      />
+    </>
   )
 }
 

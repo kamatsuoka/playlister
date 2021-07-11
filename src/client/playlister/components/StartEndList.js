@@ -7,7 +7,6 @@ import timezone from 'dayjs/plugin/timezone' // dependent on utc plugin
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { tableOverrides } from './TableOverrides'
 import { Table } from 'baseui/table-semantic'
-// import {TableBuilderColumn} from "baseui/table-semantic"
 
 dayjs.extend(localizedFormat)
 dayjs.extend(advancedFormat)
@@ -18,8 +17,7 @@ dayjs.extend(utc)
 /**
  * List of calculated file properties
  */
-const StartEndList = ({fileInfo, overrideTimeZone, startEndList, setStartEndList}) => {
-
+const StartEndList = ({ fileInfo, overrideTimeZone, startEndList, setStartEndList }) => {
   /**
    * Calculate start and end time from file info
    */
@@ -29,9 +27,9 @@ const StartEndList = ({fileInfo, overrideTimeZone, startEndList, setStartEndList
         const time = timestamp.replace('UTC ', '')
         return dayjs(time).local()
       } else {
-        if (timestamp.match("^UTC ")) {
+        if (timestamp.match('^UTC ')) {
           const time = timestamp.replace('UTC ', '') + ' +00:00'
-          return dayjs(time, 'YYYY-MM-DD HH:mm:ss Z').tz("UTC")
+          return dayjs(time, 'YYYY-MM-DD HH:mm:ss Z').tz('UTC')
         } else {
           return dayjs(timestamp)
         }
@@ -40,7 +38,7 @@ const StartEndList = ({fileInfo, overrideTimeZone, startEndList, setStartEndList
 
     const calculateStartEnd = (resultId, result) => {
       const startTime = parseTimestamp(result.startTime)
-      const endTime = startTime.add(result.duration, "second")
+      const endTime = startTime.add(result.duration, 'second')
       return {
         id: resultId,
         name: result.name,
@@ -63,12 +61,14 @@ const StartEndList = ({fileInfo, overrideTimeZone, startEndList, setStartEndList
 
   return (
     <div id="start-end">
-      <Table columns={COLUMNS} overrides={tableOverrides}
-             data={startEndList.map(startEnd => [
-               startEnd.name,
-               dayjs(startEnd.startTime).format(displayTemplate),
-               dayjs(startEnd.endTime).format(displayTemplate)
-             ])}/>
+      <Table
+        columns={COLUMNS} overrides={tableOverrides}
+        data={startEndList.map(startEnd => [
+          startEnd.name,
+          dayjs(startEnd.startTime).format(displayTemplate),
+          dayjs(startEnd.endTime).format(displayTemplate)
+        ])}
+      />
     </div>
   )
 }

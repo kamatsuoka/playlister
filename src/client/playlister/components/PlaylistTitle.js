@@ -1,40 +1,57 @@
 import { ALIGN, Radio, RadioGroup } from 'baseui/radio'
-import React, { useEffect } from 'react'
+import React from 'react'
 import { Input } from 'baseui/input'
 import { BaseCard } from './BaseCard'
+import { createTheme, lightThemePrimitives, ThemeProvider } from 'baseui'
 
-const PlaylistTitle = ({ inferredDate, rehearsalData, value, setValue }) => {
+const PlaylistTitle = ({ eventData, value, setValue }) => {
+  const suggestedTitle = () => eventData.inferredDate ? `${eventData.inferredDate} ${eventData.eventType}` : ''
 
-  useEffect(() => {
+  const handleChange = (evt) => {
+    const value = evt.target.value
     setValue({
       ...value,
-      suggestedTitle: `${inferredDate.date} ${rehearsalData.eventType}`,
+      [evt.target.name]: value
     })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rehearsalData])
+  }
+
+  const themeOverrides = () => {
+    const overrides = value.titleChoice === 'suggested' && eventData.inferredDate
+      ? ({
+        colors: { inputTextDisabled: 'black' }
+      })
+      : {}
+    return overrides
+  }
 
   return (
-    <BaseCard title="Playlist Title">
-      <RadioGroup
-        value={value.titleChoice}
-        onChange={e => setValue({...value, titleChoice: e.currentTarget.value})}
-        name="titleChoice"
-        align={ALIGN.horizontal}
-      >
-        <Radio value="suggested">Suggested &nbsp;</Radio>
-        <Radio value="custom">Custom</Radio>
-      </RadioGroup>
-      <Input
-        value={value.titleChoice === 'suggested' ? (value.suggestedTitle || '') : value.customTitle || ''}
-        onChange={e => {
-          if (value.titleChoice === 'custom')
-            return setValue({...value, customTitle: e.target.value})
-          else
-            return null
-        }}
-        disabled={value.titleChoice !== 'custom'}
-      />
-    </BaseCard>
+    <ThemeProvider
+      theme={createTheme(lightThemePrimitives, themeOverrides())}
+    >
+      <BaseCard title="Playlist Title">
+        <RadioGroup
+          value={value.titleChoice}
+          name="titleChoice"
+          onChange={handleChange}
+          align={ALIGN.horizontal}
+        >
+          <Radio value="suggested">Suggested &nbsp;</Radio>
+          <Radio value="custom">Custom</Radio>
+        </RadioGroup>
+        {value.titleChoice === 'custom'
+          ? <Input
+            value={value.customTitle || ''}
+            placeholder="enter custom title"
+            name="customTitle"
+            onChange={handleChange}
+          />
+          : <Input
+            value={suggestedTitle()}
+            placeholder="[date] + [event type]"
+            disabled
+          />}
+      </BaseCard>
+    </ThemeProvider>
   )
 }
 export default PlaylistTitle

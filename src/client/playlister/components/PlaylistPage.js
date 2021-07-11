@@ -1,23 +1,36 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button, KIND as BKind } from 'baseui/button'
 import { Table } from 'baseui/table-semantic'
-import RehearsalData from './RehearsalData'
+import EventData from './EventData'
 import PlaylistTitle from './PlaylistTitle'
 import { KIND, Notification } from 'baseui/notification'
 import { BaseCard } from './BaseCard'
 import { findPlaylist, insertPlaylist } from '../youtube/api'
+import dayjs from 'dayjs'
+
+const inferDate = (startEndList) => {
+  const dateSet = new Set()
+  startEndList.map(f => dayjs(f.startTime)
+    .format('YYYYMMDD'))
+    .forEach(d => dateSet.add(d))
+  return dateSet.size > 0 ? dateSet.values().next().value : ''
+}
 
 const PlaylistPage = ({
-  rehearsalData, setRehearsalData,
-  inferredDate, setActiveKey,
+  startEndList,
+  eventData, setEventData,
   playlistTitle, setPlaylistTitle,
-  value, setValue
+  setActiveKey, value, setValue
 }) => {
   const [playlistStatus, setPlaylistStatus] = useState({ message: '' })
 
+  useEffect(() => {
+    setEventData({ ...eventData, inferredDate: inferDate(startEndList) })
+  }, [startEndList])
+
   const suggestedTitle = () => {
-    const date = inferredDate.date || ''
-    const eventType = rehearsalData.eventType
+    const date = eventData.inferredDate || ''
+    const eventType = eventData.eventType
     return (date && eventType) ? date.replaceAll('-', '') + ' ' + eventType : ''
   }
 
@@ -115,9 +128,9 @@ const PlaylistPage = ({
 
   return (
     <>
-      <RehearsalData inferredDate={inferredDate} value={rehearsalData} setValue={setRehearsalData}/>
+      <EventData value={eventData} setValue={setEventData}/>
       <PlaylistTitle
-        inferredDate={inferredDate} rehearsalData={rehearsalData}
+        eventData={eventData}
         value={playlistTitle} setValue={setPlaylistTitle}
       />
       <Button onClick={() => findOrCreatePlaylist()} kind={value.id ? BKind.secondary : BKind.primary}>

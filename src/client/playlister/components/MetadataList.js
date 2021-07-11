@@ -8,10 +8,9 @@ import { tableOverrides, tablePadding } from './TableOverrides'
  * List of file info from MediaInfo
  */
 const MetadataList = ({ values, setValues }) => {
-
   const onRemove = useCallback(
     (resultId) => setValues(({ [resultId]: _, ...rest }) => rest),
-    [setValues],
+    [setValues]
   )
 
   const DATA = Object.entries(values).map(([resultId, result]) => (
@@ -21,18 +20,19 @@ const MetadataList = ({ values, setValues }) => {
       format: result.format,
       startTime: result.startTime,
       duration: result.duration,
-      file: result.file,
+      file: result.file
     }))
 
   const durationOverrides = {
     TableHeadCell: {
-      style: ({ $theme, $rowIndex }) => ({
+      style: {
         textAlign: 'right',
-        paddingRight: tablePadding,
-      }),
-    },
+        paddingRight: tablePadding
+      }
+    }
   }
 
+  // eslint-disable-next-line no-unused-vars
   const uploadFile = file => {
 
   }
@@ -43,7 +43,7 @@ const MetadataList = ({ values, setValues }) => {
         <TableBuilderColumn header='Name'>
           {row => row.name}
         </TableBuilderColumn>
-        <TableBuilderColumn header='Format'>
+        <TableBuilderColumn header="Format">
           {row => row.format}
         </TableBuilderColumn>
         <TableBuilderColumn header="Start Time">
@@ -53,34 +53,34 @@ const MetadataList = ({ values, setValues }) => {
           {row => parseFloat(row.duration).toFixed(1).toString() + 's'}
         </TableBuilderColumn>
         <TableBuilderColumn header="">
-          {row => <button
-            className="remove"
-            onClick={(event) => {
-              event.stopPropagation()
-              onRemove(row.id)
-            }}
-            tabIndex={0}
-            title='Remove from list'
-            type='button'
-          >
-            <FontAwesomeIcon icon={faTimes} size='lg' />
-          </button>
-          }
+          {row =>
+            <button
+              className="remove"
+              onClick={(event) => {
+                event.stopPropagation()
+                onRemove(row.id)
+              }}
+              tabIndex={0}
+              title="Remove from list"
+              type="button"
+            >
+              <FontAwesomeIcon icon={faTimes} size="lg"/>
+            </button>}
         </TableBuilderColumn>
-        <TableBuilderColumn header=''>
-          {row => <button
-            className='upload'
-            onClick={(event) => {
-              event.stopPropagation()
-              onRemove(row.id)
-            }}
-            tabIndex={0}
-            title='Upload'
-            type='button'
-          >
-            ⇧
-          </button>
-          }
+        <TableBuilderColumn header="">
+          {row =>
+            <button
+              className="upload"
+              onClick={(event) => {
+                event.stopPropagation()
+                onRemove(row.id)
+              }}
+              tabIndex={0}
+              title="Upload"
+              type="button"
+            >
+              ⇧
+            </button>}
         </TableBuilderColumn>
       </TableBuilder>
     </div>

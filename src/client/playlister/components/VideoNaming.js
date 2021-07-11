@@ -5,9 +5,7 @@ import { Cell, Grid } from 'baseui/layout-grid'
 import { Combobox } from 'baseui/combobox'
 import { BaseCard } from './BaseCard'
 
-
 const VideoNaming = ({ playlistSettings, value, setValue }) => {
-
   return (
     <BaseCard title='Video Naming'>
       <Grid>
@@ -15,7 +13,7 @@ const VideoNaming = ({ playlistSettings, value, setValue }) => {
           <FormControl label='prefix'>
             <Input
               value={value.prefix}
-              onChange={e => setValue({...value, prefix: e.target.value})}
+              onChange={e => setValue({ ...value, prefix: e.target.value })}
             />
           </FormControl>
         </Cell>
@@ -23,8 +21,8 @@ const VideoNaming = ({ playlistSettings, value, setValue }) => {
           <FormControl label="camera view">
             <Combobox
               value={value.cameraView}
-              onChange={e => setValue({...value, cameraView: e})}
-              options={["chorus", "director", "corner", "elevated"]}
+              onChange={e => setValue({ ...value, cameraView: e })}
+              options={['chorus', 'director', 'corner', 'elevated']}
               mapOptionToString={option => option}
             />
           </FormControl>
@@ -44,7 +42,7 @@ const VideoNaming = ({ playlistSettings, value, setValue }) => {
               value={value.indexOffset}
               type="number"
               min={-(playlistSettings.itemCount || 0)}
-              onChange={e => setValue({...value, indexOffset: e.target.value})}
+              onChange={e => setValue({ ...value, indexOffset: e.target.value })}
             />
           </FormControl>
         </Cell>
