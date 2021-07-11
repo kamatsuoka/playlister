@@ -1,18 +1,18 @@
 import React, { useState } from 'react'
 import { Button, KIND as BKind } from 'baseui/button'
-import dayjs from 'dayjs'
 import { Table } from 'baseui/table-semantic'
 import RehearsalData from './RehearsalData'
 import PlaylistTitle from './PlaylistTitle'
 import { KIND, Notification } from 'baseui/notification'
 import { BaseCard } from './BaseCard'
+import { findPlaylist, insertPlaylist } from '../youtube/api'
 
 const PlaylistPage = ({
-                        rehearsalData, setRehearsalData,
-                        inferredDate, setActiveKey,
-                        playlistTitle, setPlaylistTitle,
-                        value, setValue,
-                      }) => {
+  rehearsalData, setRehearsalData,
+  inferredDate, setActiveKey,
+  playlistTitle, setPlaylistTitle,
+  value, setValue
+}) => {
   const [playlistStatus, setPlaylistStatus] = useState({ message: '' })
 
   const suggestedTitle = () => {
@@ -22,6 +22,7 @@ const PlaylistPage = ({
   }
 
   const storePlaylist = (playlist) => {
+    // eslint-disable-next-line no-prototype-builtins
     if (playlist.hasOwnProperty(['id'])) {
       return setValue({
         ...value,
@@ -29,49 +30,44 @@ const PlaylistPage = ({
         title: playlist.snippet.title,
         itemCount: playlist.contentDetails.itemCount,
         publishedAt: playlist.snippet.publishedAt,
-        description: playlist.snippet.description,
+        description: playlist.snippet.description
       })
     } else {
       return setValue({})
     }
   }
 
-  function findOrCreatePlaylist() {
+  function findOrCreatePlaylist () {
     setPlaylistStatus({}) // clear message, if any, first
-    const searchTitle = playlistTitle.titleChoice === 'custom' ? playlistTitle.customTitle : suggestedTitle()
-    const failureHandler = error => setPlaylistStatus({
-      ...playlistStatus,
-      message: `Error calling findMyPlaylist: ${error}`,
-      isError: true,
-    })
-
+    const title = playlistTitle.titleChoice === 'custom' ? playlistTitle.customTitle : suggestedTitle()
     const successHandler = playlist => {
       if (playlist) {
         storePlaylist(playlist)
         setPlaylistStatus({
           ...playlistStatus,
           message: `Found existing playlist "${playlist.snippet.title}"`,
-          isError: false,
+          isError: false
         })
       } else {
-        insertPlaylist(searchTitle)
+        return createPlaylist(title)
       }
     }
+    const failureHandler = error => setPlaylistStatus({
+      ...playlistStatus,
+      message: `Error calling findPlaylist: ${error}`,
+      isError: true
+    })
 
-    google.script.run
-      .withSuccessHandler(successHandler)
-      .withFailureHandler(failureHandler)
-      .findMyPlaylist(searchTitle)
+    return findPlaylist(title, successHandler, failureHandler)
   }
 
-  function insertPlaylist(title) {
-    const description = `created by playlister on ${dayjs().format()}`
+  function createPlaylist (title) {
     const successHandler = playlist => {
       storePlaylist(playlist)
       setPlaylistStatus({
         ...playlistStatus,
         message: `Created playlist "${playlist.snippet.title}"`,
-        isError: false,
+        isError: false
       })
     }
     const failureHandler = err => {
@@ -80,13 +76,10 @@ const PlaylistPage = ({
       setPlaylistStatus({
         ...playlistStatus,
         message: `Error creating playlist: ${JSON.stringify(err)}`,
-        isError: true,
+        isError: true
       })
     }
-    google.script.run
-      .withSuccessHandler(successHandler)
-      .withFailureHandler(failureHandler)
-      .insertPlaylist(title, description)
+    insertPlaylist(title, successHandler, failureHandler)
   }
 
   const showPlaylist = () => {
@@ -96,7 +89,7 @@ const PlaylistPage = ({
         ['description', value.description],
         ['id', value.id],
         ['item count', value.itemCount],
-        ['published at', value.publishedAt],
+        ['published at', value.publishedAt]
       ]
       return (
         <BaseCard title='Playlist'>
@@ -110,25 +103,29 @@ const PlaylistPage = ({
   const showNotification = () => {
     if (playlistStatus.message) {
       const kind = playlistStatus.isError ? KIND.negative : KIND.positive
-      return <Notification kind={kind} overrides={{ Body: { style: { width: 'auto' } } }} closeable>
-        {playlistStatus.message}
-      </Notification>
+      return (
+        <Notification kind={kind} overrides={{ Body: { style: { width: 'auto' } } }} closeable>
+          {playlistStatus.message}
+        </Notification>
+      )
     } else {
       return null
     }
   }
 
   return (
-    <React.Fragment>
-      <RehearsalData inferredDate={inferredDate} value={rehearsalData} setValue={setRehearsalData} />
-      <PlaylistTitle inferredDate={inferredDate} rehearsalData={rehearsalData}
-                     value={playlistTitle} setValue={setPlaylistTitle} />
+    <>
+      <RehearsalData inferredDate={inferredDate} value={rehearsalData} setValue={setRehearsalData}/>
+      <PlaylistTitle
+        inferredDate={inferredDate} rehearsalData={rehearsalData}
+        value={playlistTitle} setValue={setPlaylistTitle}
+      />
       <Button onClick={() => findOrCreatePlaylist()} kind={value.id ? BKind.secondary : BKind.primary}>
         Find or Create Playlist
       </Button>
       {showNotification()}
       {showPlaylist()}
-    </React.Fragment>
+    </>
   )
 }
 

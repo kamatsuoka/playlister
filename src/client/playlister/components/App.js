@@ -15,8 +15,7 @@ import { StyledLink } from 'baseui/link'
 
 const engine = new Styletron()
 
-function App() {
-
+function App () {
   const [activeKey, setActiveKey] = useState(0)
   const [startEndList, setStartEndList] = useState([])
   const [rehearsalData, setRehearsalData] = useState({ eventType: 'rehearsal' })
@@ -29,38 +28,45 @@ function App() {
       <BaseProvider theme={LightTheme}>
         <ThemeProvider
           theme={createTheme(lightThemePrimitives, {
-            colors: {inputTextDisabled: 'black'}
+            colors: { inputTextDisabled: 'black' }
           })}
         >
           <HeadingLevel>
             <Tabs
               activeKey={activeKey}
-              onChange={({activeKey}) => setActiveKey(activeKey)}
+              onChange={({ activeKey }) => setActiveKey(activeKey)}
             >
-              <Tab title="Files">
-                <FilePage startEndList={startEndList} setStartEndList={setStartEndList}
-                          rehearsalData={rehearsalData} setRehearsalData={setRehearsalData}
-                          inferredDate={inferredDate} setInferredDate={setInferredDate}/>
-              </Tab>
               <Tab title="Auth">
                 <AuthPage/>
               </Tab>
+              <Tab title="Files">
+                <FilePage
+                  startEndList={startEndList} setStartEndList={setStartEndList}
+                  rehearsalData={rehearsalData} setRehearsalData={setRehearsalData}
+                  inferredDate={inferredDate} setInferredDate={setInferredDate}
+                />
+              </Tab>
               <Tab title="Playlist">
-                <PlaylistPage startEndList={startEndList}
-                              rehearsalData={rehearsalData} setRehearsalData={setRehearsalData}
-                              inferredDate={inferredDate} setActiveKey={setActiveKey}
-                              playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
-                              value={playlistSettings} setValue={setPlaylistSettings}/>
+                <PlaylistPage
+                  startEndList={startEndList}
+                  rehearsalData={rehearsalData} setRehearsalData={setRehearsalData}
+                  inferredDate={inferredDate} setActiveKey={setActiveKey}
+                  playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
+                  value={playlistSettings} setValue={setPlaylistSettings}
+                />
               </Tab>
               <Tab title="Videos">
-                <VideoPage inferredDate={inferredDate} startEndList={startEndList}
-                           playlistSettings={playlistSettings} setActiveKey={setActiveKey}/>
+                <VideoPage
+                  inferredDate={inferredDate} startEndList={startEndList}
+                  playlistSettings={playlistSettings} setActiveKey={setActiveKey}
+                />
               </Tab>
             </Tabs>
           </HeadingLevel>
           <footer>
-            <StyledLink href='https://github.com/kamatsuoka/playlister'>
-              <FontAwesomeIcon className='fa-padded' icon={faGithub} size='lg' />
+            <StyledLink href="https://github.com/kamatsuoka/playlister"
+                        style={{ textDecoration: 'none', paddingLeft: '16px' }}>
+              <FontAwesomeIcon className="fa-padded" icon={faGithub} size="sm" style={{ paddingRight: '5px' }}/>
               GitHub
             </StyledLink>
           </footer>

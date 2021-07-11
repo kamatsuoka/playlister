@@ -2,8 +2,10 @@
   "root": true,
   "parser": "babel-eslint",
   "extends": [
-    "airbnb-base"
-//    "plugin:prettier/recommended"
+    "standard",
+    "standard-jsx"
+    //    "airbnb-base"
+    //    "plugin:prettier/recommended"
   ],
   "plugins": [
 //    "prettier"

@@ -35,7 +35,6 @@ const FilePage = ({
                         startEndList={startEndList} setStartEndList={setStartEndList} />
         </BaseCard>
         <InferredDate startEndList={startEndList} value={inferredDate} setValue={setInferredDate} />
-        Some text goes here
       </HeadingLevel>
     </div>
   )

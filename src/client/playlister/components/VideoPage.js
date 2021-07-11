@@ -20,7 +20,7 @@ const VideoPage = ({ inferredDate, startEndList, playlistSettings, setActiveKey 
     if (!playlistSettings.id) {
       return <Notification kind={KIND.negative} overrides={overrides}>
         Please &nbsp;
-        <StyledLink onClick={() => setActiveKey(2)}>find or create the playlist</StyledLink>
+        <StyledLink onClick={() => setActiveKey(1)}>find or create the playlist</StyledLink>
         &nbsp; first
       </Notification>
     } else {

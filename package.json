@@ -39,7 +39,6 @@
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-jest": "^24.1.0",
     "eslint-plugin-jsx-a11y": "^6.3.1",
-    "eslint-plugin-react": "^7.21.5",
     "eslint-plugin-react-hooks": "^4.2.0",
     "eslint-plugin-testing-library": "^3.9.2",
     "eslint-webpack-plugin": "^2.5.2",
@@ -94,8 +93,8 @@
     "clasp:push:dev": "rimraf dist && yarn run clasp:build:dev && npx clasp push",
     "clasp:push": "rimraf dist && yarn run clasp:build && npx clasp push",
     "clasp:deploy": "yarn run clasp:push && npx clasp deploy -d 'deployed by clasp:deploy'",
-    "clasp:serve": "cross-env NODE_ENV=development webpack-dev-server --open --hot",
-    "clasp:start": "yarn run clasp:deploy:dev && yarn run clasp:serve"
+    "clasp:serve": "cross-env NODE_ENV=development webpack serve --open",
+    "clasp:start": "yarn run clasp:build:dev && yarn run clasp:serve"
   },
   "eslintConfig": {
     "extends": [
@@ -118,6 +117,7 @@
   "devDependencies": {
     "@babel/plugin-transform-object-assign": "^7.10.4",
     "@google/clasp": "^2.3.0",
+    "@webpack-cli/serve": "^1.5.1",
     "babel-loader": "^8.1.0",
     "babel-plugin-transform-es3-member-expression-literals": "^6.22.0",
     "babel-plugin-transform-es3-property-literals": "^6.22.0",
@@ -128,9 +128,12 @@
     "dynamic-cdn-webpack-plugin": "^5.0.0",
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-config-prettier": "^8.3.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-config-standard-jsx": "^10.0.0",
     "eslint-plugin-babel": "^5.3.1",
     "eslint-plugin-googleappsscript": "^1.0.3",
     "eslint-plugin-prettier": "^3.1.4",
+    "eslint-plugin-promise": "^5.1.0",
     "gas-types-detailed": "^1.0.0",
     "gas-webpack-plugin": "^1.0.4",
     "gh-pages": "^3.2.3",
@@ -142,11 +145,12 @@
     "react-devtools": "^4.13.5",
     "rimraf": "^3.0.2",
     "sass": "^1.35.1",
+    "standard": "^16.0.3",
     "style-loader": "^1.2.1",
     "terser-webpack-plugin": "^2.3.7",
     "ts-loader": "^8.0.2",
     "webpack": "^4.44.1",
-    "webpack-cli": "^3.3.12",
+    "webpack-cli": "^4.7.2",
     "webpack-dev-server": "^3.11.0"
   },
   "jest": {

@@ -3,7 +3,8 @@
   "parser": "babel-eslint",
   //  "extends": ["airbnb-base", "plugin:prettier/recommended"],
   "extends": [
-    "airbnb-base"
+    "standard",
+    "standard-jsx"
   ],
   //  "plugins": ["prettier", "googleappsscript"],
   "plugins": [

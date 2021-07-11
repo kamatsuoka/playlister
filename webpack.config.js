@@ -182,6 +182,7 @@ const clientConfigs = clientEntrypoints.map(clientEntrypoint => {
 const devServer = {
   port: PORT,
   contentBase: path.join(__dirname, 'dist'),
+  watchContentBase: true,
 }
 
 // webpack settings used by the server-side code
