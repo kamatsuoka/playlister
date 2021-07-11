@@ -12,8 +12,9 @@ import PlaylistPage from './PlaylistPage'
  */
 const FilePage = ({
   fileInfo, setFileInfo,
-  startEndList, setStartEndList, eventData, setEventData,
-  inferredDate, setInferredDate, playlistTitle, setPlaylistTitle,
+  startEndList, setStartEndList,
+  eventData, setEventData,
+  playlistTitle, setPlaylistTitle,
   playlistSettings, setPlaylistSettings, setActiveKey
 }) => {
   const [overrideTimeZone, setOverrideTimeZone] = useState(true)
@@ -37,7 +38,6 @@ const FilePage = ({
       <PlaylistPage
         startEndList={startEndList}
         eventData={eventData} setEventData={setEventData}
-        inferredDate={inferredDate} setInferredDate={setInferredDate}
         playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
         value={playlistSettings} setValue={setPlaylistSettings}
         setActiveKey={setActiveKey}

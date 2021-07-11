@@ -18,20 +18,20 @@ dayjs.extend(utc)
  * List of calculated file properties
  */
 const VideoList = ({
-                     inferredDate,
-                     startEndList,
-                     playlistSettings,
-                     videoNaming,
-                     setVideoResources
-                   }) => {
+  eventData,
+  startEndList,
+  playlistSettings,
+  videoNaming,
+  setVideoResources
+}) => {
   const [tableData, setTableData] = useState([])
 
   useEffect(() => {
-    const date = inferredDate.date
+    const date = eventData.inferredDate
     const startIndex = parseInt(playlistSettings.itemCount || 0) + 1 + parseInt(videoNaming.indexOffset)
     const pad = (n) => n < 10 ? `0${n}` : `${n}`
     const resources = startEndList.map((startEnd, index) => ({
-      kind: "youtube#video",
+      kind: 'youtube#video',
       snippet: {
         title: `${videoNaming.prefix} ${date} ${videoNaming.cameraView} ${pad(startIndex + index)}`,
         categoryId: 10 // Music
@@ -44,7 +44,6 @@ const VideoList = ({
     setTableData(startEndList.map(s => s.name).map((n, i) =>
       [n, resources[i].snippet.title, resources[i].recordingDetails.recordingDate])
     )
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [startEndList, playlistSettings, videoNaming])
 
   const COLUMNS = ['File name', 'Video Name', 'Recording Date']

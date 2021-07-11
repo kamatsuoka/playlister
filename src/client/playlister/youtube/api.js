@@ -6,7 +6,7 @@
  */
 
 import { getPreferences } from '../components/PreferencePage'
-import { gapi, getAppsScriptRun } from '../util/auth'
+import { gapi, getAppsScriptRun, isAuthenticated } from '../util/auth'
 import dayjs from 'dayjs'
 
 /**
@@ -25,6 +25,9 @@ const findPlaylist = (title, onSuccess, onFailure) => {
       .withFailureHandler(onFailure)
       .findMyPlaylist(title)
   } else {
+    if (!isAuthenticated()) {
+
+    }
     const channelId = getPreferences().channelId
     return searchPlaylists(channelId, title)
       .then(onSuccess)

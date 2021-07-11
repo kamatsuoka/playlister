@@ -20,7 +20,6 @@ function App () {
   const [eventData, setEventData] = useState({ eventType: 'rehearsal' })
   const [playlistSettings, setPlaylistSettings] = useState({})
   const [playlistTitle, setPlaylistTitle] = useState({ titleChoice: 'suggested' })
-  const [inferredDate, setInferredDate] = useState({})
 
   return (
     <StyletronProvider value={engine}>
@@ -37,7 +36,6 @@ function App () {
               fileInfo={fileInfo} setFileInfo={setFileInfo}
               startEndList={startEndList} setStartEndList={setStartEndList}
               eventData={eventData} setEventData={setEventData}
-              inferredDate={inferredDate} setInferredDate={setInferredDate}
               playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
               playlistSettings={playlistSettings} setPlaylistSettings={setPlaylistSettings}
               setActiveKey={setActiveKey}
@@ -45,7 +43,7 @@ function App () {
           </Tab>
           <Tab title="Videos">
             <VideoPage
-              inferredDate={inferredDate} startEndList={startEndList}
+              eventData={eventData} startEndList={startEndList}
               playlistSettings={playlistSettings} setActiveKey={setActiveKey}
             />
           </Tab>
