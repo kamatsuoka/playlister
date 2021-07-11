@@ -18,8 +18,8 @@ const PlaylistTitle = ({ eventData, value, setValue }) => {
   const themeOverrides = () => {
     const overrides = value.titleChoice === 'suggested' && eventData.inferredDate
       ? ({
-        colors: { inputTextDisabled: 'black' }
-      })
+          colors: { inputTextDisabled: 'black' }
+        })
       : {}
     return overrides
   }
@@ -28,28 +28,28 @@ const PlaylistTitle = ({ eventData, value, setValue }) => {
     <ThemeProvider
       theme={createTheme(lightThemePrimitives, themeOverrides())}
     >
-      <BaseCard title="Playlist Title">
+      <BaseCard title='Playlist Title'>
         <RadioGroup
           value={value.titleChoice}
-          name="titleChoice"
+          name='titleChoice'
           onChange={handleChange}
           align={ALIGN.horizontal}
         >
-          <Radio value="suggested">Suggested &nbsp;</Radio>
-          <Radio value="custom">Custom</Radio>
+          <Radio value='suggested'>Suggested &nbsp;</Radio>
+          <Radio value='custom'>Custom</Radio>
         </RadioGroup>
         {value.titleChoice === 'custom'
           ? <Input
-            value={value.customTitle || ''}
-            placeholder="enter custom title"
-            name="customTitle"
-            onChange={handleChange}
-          />
+              value={value.customTitle || ''}
+              placeholder='enter custom title'
+              name='customTitle'
+              onChange={handleChange}
+            />
           : <Input
-            value={suggestedTitle()}
-            placeholder="[date] + [event type]"
-            disabled
-          />}
+              value={suggestedTitle()}
+              placeholder='[date] + [event type]'
+              disabled
+            />}
       </BaseCard>
     </ThemeProvider>
   )

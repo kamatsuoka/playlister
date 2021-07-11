@@ -40,44 +40,44 @@ const MetadataList = ({ values, setValues }) => {
   return (
     <div id='results'>
       <TableBuilder data={DATA} overrides={tableOverrides}>
-        <TableBuilderColumn header="Name">
+        <TableBuilderColumn header='Name'>
           {row => row.name}
         </TableBuilderColumn>
-        <TableBuilderColumn header="Format">
+        <TableBuilderColumn header='Format'>
           {row => row.format}
         </TableBuilderColumn>
-        <TableBuilderColumn header="Start Time">
+        <TableBuilderColumn header='Start Time'>
           {row => row.startTime}
         </TableBuilderColumn>
-        <TableBuilderColumn header="Duration" numeric overrides={durationOverrides}>
+        <TableBuilderColumn header='Duration' numeric overrides={durationOverrides}>
           {row => parseFloat(row.duration).toFixed(1).toString() + 's'}
         </TableBuilderColumn>
-        <TableBuilderColumn header="">
+        <TableBuilderColumn header=''>
           {row =>
             <button
-              className="remove"
+              className='remove'
               onClick={(event) => {
                 event.stopPropagation()
                 onRemove(row.id)
               }}
               tabIndex={0}
-              title="Remove from list"
-              type="button"
+              title='Remove from list'
+              type='button'
             >
-              <FontAwesomeIcon icon={faTimes} size="lg"/>
+              <FontAwesomeIcon icon={faTimes} size='lg' />
             </button>}
         </TableBuilderColumn>
-        <TableBuilderColumn header="">
+        <TableBuilderColumn header=''>
           {row =>
             <button
-              className="upload"
+              className='upload'
               onClick={(event) => {
                 event.stopPropagation()
                 onRemove(row.id)
               }}
               tabIndex={0}
-              title="Upload"
-              type="button"
+              title='Upload'
+              type='button'
             >
               ⇧
             </button>}

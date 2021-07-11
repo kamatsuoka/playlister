@@ -24,14 +24,14 @@ function App () {
   const [playlistTitle, setPlaylistTitle] = useState({ titleChoice: 'suggested' })
 
   const prevButton = current =>
-    current > 0 ? <Button size="compact" onClick={() => setActiveKey(current - 1)}>Prev</Button> : null
+    current > 0 ? <Button size='compact' onClick={() => setActiveKey(current - 1)}>Prev</Button> : null
 
   const nextButton = (current, last) =>
-    last ? null : <Button size="compact" onClick={() => setActiveKey(current + 1)}>Next</Button>
+    last ? null : <Button size='compact' onClick={() => setActiveKey(current + 1)}>Next</Button>
 
   const prevNextButtons = (current, last = false) =>
     (
-      <div align="right">
+      <div align='right'>
         {prevButton(current)}
         &nbsp;
         {nextButton(current, last)}
@@ -42,11 +42,11 @@ function App () {
     <StyletronProvider value={engine}>
       <BaseProvider theme={LightTheme}>
         <ProgressSteps current={activeKey}>
-          <Step title="Auth">
-            <AuthPage/>
+          <Step title='Auth'>
+            <AuthPage />
             {prevNextButtons(0)}
           </Step>
-          <Step title="Files">
+          <Step title='Files'>
             <FilePage
               fileInfo={fileInfo} setFileInfo={setFileInfo}
               startEndList={startEndList} setStartEndList={setStartEndList}
@@ -54,7 +54,7 @@ function App () {
             />
             {prevNextButtons(1)}
           </Step>
-          <Step title="Playlist">
+          <Step title='Playlist'>
             <PlaylistPage
               startEndList={startEndList}
               eventData={eventData} setEventData={setEventData}
@@ -64,7 +64,7 @@ function App () {
             />
             {prevNextButtons(2)}
           </Step>
-          <Step title="Videos">
+          <Step title='Videos'>
             <VideoPage
               eventData={eventData} startEndList={startEndList}
               playlistSettings={playlistSettings} setActiveKey={setActiveKey}
@@ -74,10 +74,10 @@ function App () {
         </ProgressSteps>
         <footer>
           <StyledLink
-            href="https://github.com/kamatsuoka/playlister"
+            href='https://github.com/kamatsuoka/playlister'
             style={{ textDecoration: 'none', paddingLeft: '16px' }}
           >
-            <FontAwesomeIcon className="fa-padded" icon={faGithub} size="sm" style={{ paddingRight: '5px' }}/>
+            <FontAwesomeIcon className='fa-padded' icon={faGithub} size='sm' style={{ paddingRight: '5px' }} />
             GitHub
           </StyledLink>
         </footer>

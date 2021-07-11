@@ -1,17 +1,17 @@
 import { Card } from 'baseui/card'
 
-export const BaseCard = ({children, title}) => {
+export const BaseCard = ({ children, title }) => {
   return (
     <Card
       overrides={{
         Root: {
-          style: ({$theme}) => ({
+          style: ({ $theme }) => ({
             marginTop: '20px',
-            marginBottom: '20px',
+            marginBottom: '20px'
           })
         },
         Title: {
-          style: ({$theme}) => ({
+          style: ({ $theme }) => ({
             ...$theme.typography.HeadingXSmall
           })
         }

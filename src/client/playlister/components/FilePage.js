@@ -18,15 +18,15 @@ const FilePage = ({
 
   return (
     <>
-      <MediaInfoJs setResults={setFileInfo}/>
-      <BaseCard title="File Metadata">
-        <MetadataList values={fileInfo} setValues={setFileInfo}/>
-        <div align="right" style={{ marginTop: '10px' }}>
+      <MediaInfoJs setResults={setFileInfo} />
+      <BaseCard title='File Metadata'>
+        <MetadataList values={fileInfo} setValues={setFileInfo} />
+        <div align='right' style={{ marginTop: '10px' }}>
           {startEndList.length === 0 ? null : <StyledLink onClick={() => setFileInfo({})}>Clear All</StyledLink>}
         </div>
       </BaseCard>
-      <BaseCard title="Start and End Times">
-        <TimezoneOverride fileInfo={fileInfo} value={overrideTimeZone} setValue={setOverrideTimeZone}/>
+      <BaseCard title='Start and End Times'>
+        <TimezoneOverride fileInfo={fileInfo} value={overrideTimeZone} setValue={setOverrideTimeZone} />
         <StartEndList
           fileInfo={fileInfo} overrideTimeZone={overrideTimeZone}
           startEndList={startEndList} setStartEndList={setStartEndList}

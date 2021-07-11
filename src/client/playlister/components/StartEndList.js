@@ -60,7 +60,7 @@ const StartEndList = ({ fileInfo, overrideTimeZone, startEndList, setStartEndLis
   const COLUMNS = ['Name', 'Start Time', 'End Time']
 
   return (
-    <div id="start-end">
+    <div id='start-end'>
       <Table
         columns={COLUMNS} overrides={tableOverrides}
         data={startEndList.map(startEnd => [

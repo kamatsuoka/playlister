@@ -26,26 +26,26 @@ const VideoNaming = ({ playlistSettings, value, setValue }) => {
   }
 
   return (
-    <BaseCard title="Video Naming">
+    <BaseCard title='Video Naming'>
       <FlexGrid
         flexGridColumnCount={4}
-        flexGridColumnGap="scale800"
-        flexGridRowGap="scale800"
+        flexGridColumnGap='scale800'
+        flexGridRowGap='scale800'
       >
         <FlexGridItem {...itemProps}>
-          <FormControl label="prefix">
+          <FormControl label='prefix'>
             <Input
               value={value.prefix}
-              name="prefix"
+              name='prefix'
               onChange={handleChange}
             />
           </FormControl>
         </FlexGridItem>
         <FlexGridItem {...itemProps}>
-          <FormControl label="camera view">
+          <FormControl label='camera view'>
             <Combobox
               value={value.cameraView}
-              name="cameraView"
+              name='cameraView'
               options={['chorus', 'director', 'corner', 'elevated']}
               mapOptionToString={option => option}
               onChange={handleChange}
@@ -53,20 +53,20 @@ const VideoNaming = ({ playlistSettings, value, setValue }) => {
           </FormControl>
         </FlexGridItem>
         <FlexGridItem {...itemProps}>
-          <FormControl label="next index">
+          <FormControl label='next index'>
             <Input
               value={(playlistSettings.itemCount || 0) + 1}
-              type="number"
+              type='number'
               disabled
             />
           </FormControl>
         </FlexGridItem>
         <FlexGridItem {...itemProps}>
-          <FormControl label="index offset">
+          <FormControl label='index offset'>
             <Input
               value={value.indexOffset}
-              type="number"
-              name="indexOffset"
+              type='number'
+              name='indexOffset'
               min={-(playlistSettings.itemCount || 0)}
               onChange={handleChange}
             />

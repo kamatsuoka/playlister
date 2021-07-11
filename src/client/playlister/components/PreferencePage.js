@@ -32,16 +32,16 @@ const PreferencePage = () => {
   })
 
   return (
-    <BaseCard title="Preferences">
+    <BaseCard title='Preferences'>
       <FlexGrid
         flexGridColumnCount={2}
-        flexGridColumnGap="scale800"
-        flexGridRowGap="scale800"
+        flexGridColumnGap='scale800'
+        flexGridRowGap='scale800'
       >
         {getAppsScriptRun()
           ? null
           : <FlexGridItem>
-            <FormControl label="youtube channel id">
+            <FormControl label='youtube channel id'>
               <Input
                 value={preferences.channelId || ''}
                 onChange={e => setPreferences({ ...preferences, channelId: e.target.value })}
@@ -49,7 +49,7 @@ const PreferencePage = () => {
             </FormControl>
           </FlexGridItem>}
         <FlexGridItem>
-          <FormControl label="video prefix">
+          <FormControl label='video prefix'>
             <Input
               value={preferences.videoPrefix || ''}
               onChange={e => setPreferences({ ...preferences, videoPrefix: e.target.value })}

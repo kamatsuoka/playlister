@@ -49,8 +49,8 @@ const VideoList = ({
   const COLUMNS = ['File name', 'Video Name', 'Recording Date']
 
   return (
-    <BaseCard title="Video List">
-      <Table columns={COLUMNS} data={tableData}/>
+    <BaseCard title='Video List'>
+      <Table columns={COLUMNS} data={tableData} />
     </BaseCard>
   )
 }

@@ -13,19 +13,19 @@ const EventData = ({ value, setValue }) => {
         colors: { inputTextDisabled: 'black' }
       })}
     >
-      <BaseCard title="Event Data">
+      <BaseCard title='Event Data'>
         <FlexGrid
           flexGridColumnCount={2}
-          flexGridColumnGap="scale800"
-          flexGridRowGap="scale800"
+          flexGridColumnGap='scale800'
+          flexGridRowGap='scale800'
         >
           <FlexGridItem>
-            <FormControl label="inferred date">
-              <Input disabled value={value.inferredDate || ''}/>
+            <FormControl label='inferred date'>
+              <Input disabled value={value.inferredDate || ''} />
             </FormControl>
           </FlexGridItem>
           <FlexGridItem>
-            <FormControl label="event type">
+            <FormControl label='event type'>
               <Combobox
                 value={value.eventType}
                 onChange={eventType => setValue({ ...value, eventType: eventType })}

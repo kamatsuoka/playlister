@@ -11,14 +11,13 @@ const inferredDate = (startEndList) => {
 }
 
 const InferredDate = ({ startEndList, value, setValue }) => {
-
   useEffect(() => {
-    setValue({...value, date: inferredDate(startEndList)})
+    setValue({ ...value, date: inferredDate(startEndList) })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [startEndList])
 
   return (
-    <BaseCard title="Inferred Date">
+    <BaseCard title='Inferred Date'>
       <label>{value.date}</label>
     </BaseCard>
   )

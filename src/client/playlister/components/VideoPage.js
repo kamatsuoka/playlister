@@ -10,7 +10,7 @@ const VideoPage = ({ eventData, startEndList, playlistSettings, setActiveKey }) 
 
   return (
     <>
-      <VideoNaming playlistSettings={playlistSettings} value={videoNaming} setValue={setVideoNaming}/>
+      <VideoNaming playlistSettings={playlistSettings} value={videoNaming} setValue={setVideoNaming} />
       <VideoList
         eventData={eventData} startEndList={startEndList} playlistSettings={playlistSettings}
         videoNaming={videoNaming} setVideoResources={setVideoResources}

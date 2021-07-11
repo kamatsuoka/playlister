@@ -94,34 +94,34 @@ const AuthPage = () => {
 
   return (
     <>
-      <BaseCard title="Preferences">
-        <FormControl label="youtube channel id">
+      <BaseCard title='Preferences'>
+        <FormControl label='youtube channel id'>
           <Input
-            name="channelId"
+            name='channelId'
             value={apiData.channelId || ''}
             onChange={handleChange}
           />
         </FormControl>
       </BaseCard>
-      <BaseCard title="Authorization">
+      <BaseCard title='Authorization'>
         <FlexGrid
           flexGridColumnCount={2}
-          flexGridColumnGap="scale800"
-          flexGridRowGap="scale800"
+          flexGridColumnGap='scale800'
+          flexGridRowGap='scale800'
         >
           <FlexGridItem>
-            <FormControl label="API Key">
+            <FormControl label='API Key'>
               <Input
-                name="apiKey"
+                name='apiKey'
                 value={apiData.apiKey}
                 onChange={handleChange}
               />
             </FormControl>
           </FlexGridItem>
           <FlexGridItem>
-            <FormControl label="Client ID">
+            <FormControl label='Client ID'>
               <Input
-                name="clientId"
+                name='clientId'
                 value={apiData.clientId}
                 onChange={handleChange}
               />

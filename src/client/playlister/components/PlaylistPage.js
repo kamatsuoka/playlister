@@ -128,7 +128,7 @@ const PlaylistPage = ({
 
   return (
     <>
-      <EventData value={eventData} setValue={setEventData}/>
+      <EventData value={eventData} setValue={setEventData} />
       <PlaylistTitle
         eventData={eventData}
         value={playlistTitle} setValue={setPlaylistTitle}

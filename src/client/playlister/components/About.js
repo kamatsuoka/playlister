@@ -4,7 +4,7 @@ import { faAddressCard } from '@fortawesome/free-regular-svg-icons'
 import { faEnvelope, faTrophy } from '@fortawesome/free-solid-svg-icons'
 
 const About = ({ className }) => (
-  <div className={className} id="about">
+  <div className={className} id='about'>
     <h1>
       <FontAwesomeIcon icon={faAddressCard} /> about
     </h1>
@@ -18,9 +18,9 @@ const About = ({ className }) => (
     </h2>
 
     <p>
-      - <a href="https://mediaarea.net/en/MediaInfo">mediainfo</a> -{' '}
-      <a href="https://react-dropzone.js.org/">react-dropzone</a> -{' '}
-      <a href="https://fontawesome.com/">font awesome</a>
+      - <a href='https://mediaarea.net/en/MediaInfo'>mediainfo</a> -{' '}
+      <a href='https://react-dropzone.js.org/'>react-dropzone</a> -{' '}
+      <a href='https://fontawesome.com/'>font awesome</a>
     </p>
 
     <h2>
@@ -28,7 +28,7 @@ const About = ({ className }) => (
     </h2>
 
     <p>
-      Get in touch on <a href="https://github.com/buzz/mediainfo.js">GitHub</a>.
+      Get in touch on <a href='https://github.com/buzz/mediainfo.js'>GitHub</a>.
     </p>
   </div>
 )
