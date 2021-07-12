@@ -3,10 +3,9 @@ import React, { useCallback, useState } from 'react'
 import MetadataList from './MetadataList'
 import TimezoneOverride from './TimezoneOverride'
 import StartEndList from './StartEndList'
-import { StyledLink } from 'baseui/link'
 import { BaseCard } from './BaseCard'
-import { Button, KIND, SIZE } from 'baseui/button'
-import { findRecentVideos } from '../youtube/api'
+import { Button, SIZE } from 'baseui/button'
+import { findUploads } from '../youtube/api'
 import dayjs from 'dayjs'
 
 /**
@@ -21,21 +20,22 @@ const FilePage = ({
   const [overrideTimeZone, setOverrideTimeZone] = useState(true)
 
   const checkUploadStatus = useCallback(() => {
-    const onSuccess = videos => {
+    const onSuccess = uploads => {
       const dateNow = dayjs()
-      const items = videos.items.filter(item =>
-        dateNow.diff(dayjs(item.snippet.publishedAt), 'days') < 30
+      const items = uploads.filter(upload =>
+        dateNow.diff(dayjs(upload.publishedAt), 'days') < 30
       )
-      const uploadedTitles = new Set(items.map(item => item.snippet.title))
+      const uploaded = new Set(items.map(item => item.filename))
       setUploadStatus(
         Object.fromEntries(
           Object.entries(fileInfo)
-            .map(([id, metadata]) => [id, uploadedTitles.has(metadata.name)])
+            .map(([id, metadata]) => [id, uploaded.has(metadata.name)])
         )
       )
     }
+    const filenames = Object.values(fileInfo).map(meta => meta.name)
     // TODO: show error in UI
-    return findRecentVideos(onSuccess, err => console.log(err))
+    return findUploads(filenames, onSuccess, err => console.log(err))
   })
 
   return (
@@ -43,9 +43,6 @@ const FilePage = ({
       <MediaInfoJs setResults={setFileInfo} />
       <BaseCard title='File Metadata'>
         <MetadataList uploadStatus={uploadStatus} values={fileInfo} setValues={setFileInfo} />
-        <div align='right' style={{ marginTop: '10px' }}>
-          {startEndList.length === 0 ? null : <StyledLink onClick={() => setFileInfo({})}>Clear All</StyledLink>}
-        </div>
         <Button
           size={SIZE.compact} disabled={Object.keys(fileInfo).length === 0}
           onClick={checkUploadStatus}
