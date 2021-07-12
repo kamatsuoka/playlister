@@ -1,9 +1,9 @@
-import { findMyPlaylist, insertPlaylist, findRecentVideos } from './youtube'
+import { findMyPlaylist, findUploads, insertPlaylist } from './youtube'
 import { insertVideo } from './videos'
 import { openPlaylister } from './ui'
 
 global.doGet = openPlaylister
 global.findMyPlaylist = findMyPlaylist
-global.findRecentVideos = findRecentVideos
+global.findUploads = findUploads
 global.insertPlaylist = insertPlaylist
 global.insertVideo = insertVideo

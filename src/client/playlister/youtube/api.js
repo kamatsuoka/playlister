@@ -106,19 +106,31 @@ function insertPlaylist (title, onSuccess, onFailure) {
 }
 
 /**
- * Finds recent videos
+ * Finds uploads given filenames
  *
+ * @param filenames local filenames
  * @param onSuccess success handler: (video) => {}
  * @param onFailure failure handler: (error) => {}
  * @returns {Promise<*>}
  */
-const findRecentVideos = (onSuccess, onFailure) => {
+const findUploads = (filenames, onSuccess, onFailure) => {
+  // titles as they have likely been munged from filenames:
+  // extension removed, any non-alnum character replaced with space
+  const titles = Object.fromEntries(
+    filenames.map(filename => {
+      const parts = filename.split('.')
+      const noExt = parts.length > 1 ? (parts.pop(), parts.join('.')) : filename
+      const title = noExt.replace(/[^a-z0-9]/gi, ' ')
+      return [title, filename]
+    })
+  )
+
   const run = getAppsScriptRun()
   if (run) {
     return run
       .withSuccessHandler(onSuccess)
       .withFailureHandler(onFailure)
-      .findRecentVideos()
+      .findUploads(titles)
   } else {
     return searchVideos()
       .then(onSuccess)
@@ -127,25 +139,44 @@ const findRecentVideos = (onSuccess, onFailure) => {
 }
 
 /**
- * Searches my channel for recent videos
- *
- * @returns Promise
+ * Gets the upload playlist id(s)
+ * @returns Promise<String>
  */
-const searchVideos = () => {
-  const request = {
-    part: [
-      'snippet'
-    ],
-    forMine: true,
-    maxResults: 50,
-    order: 'date',
-    type: [
-      'video'
-    ]
+const getUploadPlaylists = () => {
+  const channelRequest = {
+    part: "contentDetails",
+    mine: true,
+    fields: "items(contentDetails(relatedPlaylists(uploads)))"
   }
-  return gapi.client.youtube.search.list(request).then(
-    response => response.result
+  return gapi.client.youtube.channels.list(channelRequest).then(response =>
+    response.items.map(item => item.contentDetails.relatedPlaylists.uploads)
   )
 }
 
-export { findPlaylist, insertPlaylist, findRecentVideos }
+/**
+ * Finds recent uploads given filenames
+ *
+ * @returns Promise
+ */
+const findUploadsJs = async (filenames) => {
+
+
+  const uploadPlaylistIds = await getUploadPlaylists()
+    .then(playlistIds => {
+
+  })
+}
+
+/*const findInPlaylist(playlistId)
+  const request = {
+    part: "snippet",
+    playlistId: playlistId,
+    fields: 'items(snippet(publishedAt,title,thumbnails(default(url)),resourceId(videoId)))'
+    maxResults: 50,
+  }
+  return gapi.client.youtube.playlistItems.list(request).then(
+    response => response.result
+  )
+}*/
+
+export { findPlaylist, insertPlaylist, findUploads }

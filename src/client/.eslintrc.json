@@ -2,6 +2,8 @@
   "root": true,
   "parser": "babel-eslint",
   "extends": [
+    "standard",
+    "standard-jsx",
     "plugin:react/recommended",
     "plugin:react-hooks/recommended"
   ],

@@ -4,14 +4,8 @@
   "extends": [
     "standard",
     "standard-jsx"
-    //    "airbnb-base"
-    //    "plugin:prettier/recommended"
-  ],
-  "plugins": [
-//    "prettier"
   ],
   "rules": {
-    //    "prettier/prettier": "error",
     "arrow-parens": "off",
     "camelcase": "warn",
     "import/prefer-default-export": "warn",

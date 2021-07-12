@@ -167,7 +167,7 @@ const clientConfigs = clientEntrypoints.map(clientEntrypoint => {
       }),
       new HtmlWebpackPlugin({
         template: clientEntrypoint.template,
-        filename: `${clientEntrypoint.filename}${isProd ? '' : '-impl'}.html`,
+        filename: `${clientEntrypoint.filename}.html`,
         inlineSource: '^[^(//)]+.(js|css)$', // embed all js and css inline, exclude packages with '//' for dynamic cdn insertion
       }),
       // add the generated js code to the html file inline
