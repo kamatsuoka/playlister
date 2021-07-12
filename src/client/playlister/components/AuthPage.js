@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Input } from 'baseui/input'
 import { copyData, usePersist } from '../hooks/usePersist'
-import { Button, KIND as BKind } from 'baseui/button'
+import { Button, KIND as BKind, SIZE } from 'baseui/button'
 import { KIND, Notification } from 'baseui/notification'
 import { gapi, isAuthenticated } from '../util/auth'
 import { BaseCard } from './BaseCard'
@@ -9,17 +9,6 @@ import { FlexGrid, FlexGridItem } from 'baseui/flex-grid'
 import { FormControl } from 'baseui/form-control'
 
 const API_DATA_KEY = 'apiData'
-const getPreferences = () => {
-  const restoredJson = window.localStorage.getItem(API_DATA_KEY)
-  if (restoredJson) {
-    try {
-      return JSON.parse(restoredJson)
-    } catch {
-      // no-op
-    }
-  }
-  return {}
-}
 
 const AuthPage = () => {
   const [apiData, setApiData] = useState({ apiKey: '', clientId: '' })
@@ -32,7 +21,7 @@ const AuthPage = () => {
   })
 
   function authenticate () {
-    // noinspection JSUnresolvedFunction
+    // noinspection JSUnresolvedFunction,JSUnresolvedVariable
     return gapi.auth2.getAuthInstance()
       .signIn({ scope: 'https://www.googleapis.com/auth/youtube.force-ssl' })
       .then(
@@ -129,7 +118,10 @@ const AuthPage = () => {
           </FlexGridItem>
           <FlexGridItem>
             <div style={{ marginTop: '20px' }}>
-              <Button onClick={initThenAuthenticate} kind={isAuthenticated() ? BKind.secondary : BKind.primary}>
+              <Button
+                onClick={initThenAuthenticate} size={SIZE.compact}
+                kind={isAuthenticated() ? BKind.secondary : BKind.primary}
+              >
                 Authenticate
               </Button>
               {showAuthStatus()}

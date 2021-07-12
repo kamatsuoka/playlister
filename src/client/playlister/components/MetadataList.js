@@ -1,13 +1,14 @@
 import React, { useCallback } from 'react'
 import { TableBuilder, TableBuilderColumn } from 'baseui/table-semantic'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faTimes } from '@fortawesome/free-solid-svg-icons'
+import { faTimes, faVideo, faVideoSlash } from '@fortawesome/free-solid-svg-icons'
 import { tableOverrides, tablePadding } from './TableOverrides'
+import { Button, KIND, SIZE } from 'baseui/button'
 
 /**
  * List of file info from MediaInfo
  */
-const MetadataList = ({ values, setValues }) => {
+const MetadataList = ({ uploadStatus, values, setValues }) => {
   const onRemove = useCallback(
     (resultId) => setValues(({ [resultId]: _, ...rest }) => rest),
     [setValues]
@@ -37,9 +38,43 @@ const MetadataList = ({ values, setValues }) => {
 
   }
 
+  const isUploaded = row => uploadStatus[row.id] === true
+
+  const isUndefined = row => typeof uploadStatus[row.id] === 'undefined'
+
+  const statusIcon = row => {
+    if (isUndefined(row)) {
+      return null
+    }
+    if (isUploaded(row)) {
+      return <FontAwesomeIcon icon={faVideo} size='sm' color='green' />
+    }
+    return <FontAwesomeIcon icon={faVideoSlash} size='sm' color='red' />
+  }
+
   return (
     <div id='results'>
       <TableBuilder data={DATA} overrides={tableOverrides}>
+        <TableBuilderColumn header={
+          Object.keys(values).length === 0
+            ? null
+            : <Button
+                onClick={() => setValues({})} kind={KIND.tertiary} size={SIZE.mini} title='Remove all'
+              >
+              <FontAwesomeIcon icon={faTimes} />
+            </Button>
+        }
+        >
+          {row =>
+            <Button
+              onClick={() => onRemove(row.id)}
+              title='Remove from list'
+              kind={KIND.tertiary}
+              size={SIZE.mini}
+            >
+              <FontAwesomeIcon icon={faTimes} size='sm' />
+            </Button>}
+        </TableBuilderColumn>
         <TableBuilderColumn header='Name'>
           {row => row.name}
         </TableBuilderColumn>
@@ -52,35 +87,22 @@ const MetadataList = ({ values, setValues }) => {
         <TableBuilderColumn header='Duration' numeric overrides={durationOverrides}>
           {row => parseFloat(row.duration).toFixed(1).toString() + 's'}
         </TableBuilderColumn>
-        <TableBuilderColumn header=''>
-          {row =>
-            <button
-              className='remove'
-              onClick={(event) => {
-                event.stopPropagation()
-                onRemove(row.id)
-              }}
-              tabIndex={0}
-              title='Remove from list'
-              type='button'
-            >
-              <FontAwesomeIcon icon={faTimes} size='lg' />
-            </button>}
+        <TableBuilderColumn header='Uploaded'>
+          {row => statusIcon(row)}
         </TableBuilderColumn>
         <TableBuilderColumn header=''>
           {row =>
-            <button
-              className='upload'
-              onClick={(event) => {
-                event.stopPropagation()
-                onRemove(row.id)
+            <Button
+              onClick={() => {
+                uploadFile(row.file)
               }}
-              tabIndex={0}
               title='Upload'
-              type='button'
+              kind={KIND.tertiary}
+              size={SIZE.mini}
+              disabled={isUndefined(row)}
             >
               ⇧
-            </button>}
+            </Button>}
         </TableBuilderColumn>
       </TableBuilder>
     </div>

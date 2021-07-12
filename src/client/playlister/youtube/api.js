@@ -5,8 +5,7 @@
  * gapi.client.youtube.* functions if we're running as a regular web app.
  */
 
-import { getPreferences } from '../components/PreferencePage'
-import { gapi, getAppsScriptRun, isAuthenticated } from '../util/auth'
+import { gapi, getAppsScriptRun } from '../util/auth'
 import dayjs from 'dayjs'
 
 /**
@@ -25,20 +24,17 @@ const findPlaylist = (title, onSuccess, onFailure) => {
       .withFailureHandler(onFailure)
       .findMyPlaylist(title)
   } else {
-    if (!isAuthenticated()) {
-
-    }
-    const channelId = getPreferences().channelId
-    return searchPlaylists(channelId, title)
+    return searchPlaylists(title)
       .then(onSuccess)
       .catch(onFailure)
   }
 }
 
 /**
- * Finds existing playlist with same name
+ * Finds existing item with same name
  */
-const findMatchingPlaylist = (response, title) => {
+const findMatchingItem = (response, title) => {
+  console.log('findMatchingItem: response', response)
   const items = response && response.result ? response.result.items : []
   const matchingPlaylists = items.filter(i => i.snippet.title === title)
   if (matchingPlaylists && matchingPlaylists[0]) {
@@ -48,26 +44,26 @@ const findMatchingPlaylist = (response, title) => {
 }
 
 /**
- * Searches a channel for a playlist with a given title,
+ * Searches my channel playlist with a given title,
  * optionally using a page token to continue an earlier search.
  *
- * @returns Promise of
+ * @returns Promise
  */
-const searchPlaylists = (channelId, title, pageToken = '') => {
+const searchPlaylists = (title, pageToken = '') => {
   const request = {
     part: 'snippet,contentDetails',
-    channelId: channelId,
+    mine: true,
     maxResults: 50
   }
   if (pageToken !== '') { request.pageToken = pageToken }
 
   return gapi.client.youtube.playlists.list(request).then(
     response => {
-      const playlist = findMatchingPlaylist(response, title)
+      const playlist = findMatchingItem(response, title)
       if (playlist) {
         return playlist
       } else if (response.result.nextPageToken) {
-        searchPlaylists(channelId, title, response.result.nextPageToken)
+        return searchPlaylists(title, response.result.nextPageToken)
       } else {
         return null
       }
@@ -109,4 +105,47 @@ function insertPlaylist (title, onSuccess, onFailure) {
   }
 }
 
-export { findPlaylist, insertPlaylist }
+/**
+ * Finds recent videos
+ *
+ * @param onSuccess success handler: (video) => {}
+ * @param onFailure failure handler: (error) => {}
+ * @returns {Promise<*>}
+ */
+const findRecentVideos = (onSuccess, onFailure) => {
+  const run = getAppsScriptRun()
+  if (run) {
+    return run
+      .withSuccessHandler(onSuccess)
+      .withFailureHandler(onFailure)
+      .findRecentVideos()
+  } else {
+    return searchVideos()
+      .then(onSuccess)
+      .catch(onFailure)
+  }
+}
+
+/**
+ * Searches my channel for recent videos
+ *
+ * @returns Promise
+ */
+const searchVideos = () => {
+  const request = {
+    part: [
+      'snippet'
+    ],
+    forMine: true,
+    maxResults: 50,
+    order: 'date',
+    type: [
+      'video'
+    ]
+  }
+  return gapi.client.youtube.search.list(request).then(
+    response => response.result
+  )
+}
+
+export { findPlaylist, insertPlaylist, findRecentVideos }

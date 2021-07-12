@@ -16,18 +16,39 @@ import PlaylistPage from './PlaylistPage'
 const engine = new Styletron()
 
 function App () {
-  const [activeKey, setActiveKey] = useState(1)
+  const [current, setCurrent] = useState(1)
   const [fileInfo, setFileInfo] = useState({})
+  const [uploadStatus, setUploadStatus] = useState({})
   const [startEndList, setStartEndList] = useState([])
   const [eventData, setEventData] = useState({ eventType: 'rehearsal' })
   const [playlistSettings, setPlaylistSettings] = useState({})
   const [playlistTitle, setPlaylistTitle] = useState({ titleChoice: 'suggested' })
 
-  const prevButton = current =>
-    current > 0 ? <Button size='compact' onClick={() => setActiveKey(current - 1)}>Prev</Button> : null
+  const prevButton = (current, disabled = false) => {
+    if (current > 0) {
+      return (
+        <Button
+          size='compact' disabled={disabled}
+          onClick={() => setCurrent(current - 1)}
+        >Prev
+        </Button>
+      )
+    } else { return null }
+  }
 
-  const nextButton = (current, last) =>
-    last ? null : <Button size='compact' onClick={() => setActiveKey(current + 1)}>Next</Button>
+  const nextButton = (current, last, disabled = false) => {
+    if (last) {
+      return null
+    } else {
+      return (
+        <Button
+          size='compact' disabled={disabled}
+          onClick={() => setCurrent(current + 1)}
+        >Next
+        </Button>
+      )
+    }
+  }
 
   const prevNextButtons = (current, last = false) =>
     (
@@ -41,7 +62,7 @@ function App () {
   return (
     <StyletronProvider value={engine}>
       <BaseProvider theme={LightTheme}>
-        <ProgressSteps current={activeKey}>
+        <ProgressSteps current={current}>
           <Step title='Auth'>
             <AuthPage />
             {prevNextButtons(0)}
@@ -49,10 +70,10 @@ function App () {
           <Step title='Files'>
             <FilePage
               fileInfo={fileInfo} setFileInfo={setFileInfo}
+              uploadStatus={uploadStatus} setUploadStatus={setUploadStatus}
               startEndList={startEndList} setStartEndList={setStartEndList}
-              setActiveKey={setActiveKey}
+              current={1} nextButton={nextButton} prevButton={prevButton}
             />
-            {prevNextButtons(1)}
           </Step>
           <Step title='Playlist'>
             <PlaylistPage
@@ -60,14 +81,14 @@ function App () {
               eventData={eventData} setEventData={setEventData}
               playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
               value={playlistSettings} setValue={setPlaylistSettings}
-              setActiveKey={setActiveKey}
+              setActiveKey={setCurrent}
             />
             {prevNextButtons(2)}
           </Step>
           <Step title='Videos'>
             <VideoPage
               eventData={eventData} startEndList={startEndList}
-              playlistSettings={playlistSettings} setActiveKey={setActiveKey}
+              playlistSettings={playlistSettings} setActiveKey={setCurrent}
             />
             {prevNextButtons(3, true)}
           </Step>
