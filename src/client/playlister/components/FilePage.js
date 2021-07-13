@@ -1,8 +1,6 @@
 import MediaInfoJs from './MediaInfoJs'
 import React, { useCallback, useState } from 'react'
 import MetadataList from './MetadataList'
-import TimezoneOverride from './TimezoneOverride'
-import StartEndList from './StartEndList'
 import { BaseCard } from './BaseCard'
 import { Button, SIZE } from 'baseui/button'
 import { findUploads } from '../youtube/api'
@@ -25,13 +23,7 @@ const FilePage = ({
       const items = uploads.filter(upload =>
         dateNow.diff(dayjs(upload.publishedAt), 'days') < 30
       )
-      const uploaded = new Set(items.map(item => item.filename))
-      setUploadStatus(
-        Object.fromEntries(
-          Object.entries(fileInfo)
-            .map(([id, metadata]) => [id, uploaded.has(metadata.name)])
-        )
-      )
+      setUploadStatus(items)
     }
     const filenames = Object.values(fileInfo).map(meta => meta.name)
     // TODO: show error in UI
@@ -49,13 +41,6 @@ const FilePage = ({
         >
           Check Upload Status
         </Button>
-      </BaseCard>
-      <BaseCard title='Start and End Times'>
-        <TimezoneOverride fileInfo={fileInfo} value={overrideTimeZone} setValue={setOverrideTimeZone} />
-        <StartEndList
-          fileInfo={fileInfo} overrideTimeZone={overrideTimeZone}
-          startEndList={startEndList} setStartEndList={setStartEndList}
-        />
       </BaseCard>
       <div align='right'>
         {prevButton(current)}

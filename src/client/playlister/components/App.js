@@ -12,6 +12,7 @@ import { StyledLink } from 'baseui/link'
 import { ProgressSteps, Step } from 'baseui/progress-steps'
 import { Button } from 'baseui/button'
 import PlaylistPage from './PlaylistPage'
+import AdjustTimePage from './AdjustTime'
 
 const engine = new Styletron()
 
@@ -75,6 +76,13 @@ function App () {
               current={1} nextButton={nextButton} prevButton={prevButton}
             />
           </Step>
+          <Step title='Adjust Time'>
+            <AdjustTimePage
+              fileInfo={fileInfo}
+              startEndList={startEndList} setStartEndList={setStartEndList}
+              current={2} nextButton={nextButton} prevButton={prevButton}
+            />
+          </Step>
           <Step title='Playlist'>
             <PlaylistPage
               startEndList={startEndList}
@@ -83,14 +91,14 @@ function App () {
               value={playlistSettings} setValue={setPlaylistSettings}
               setActiveKey={setCurrent}
             />
-            {prevNextButtons(2)}
+            {prevNextButtons(3)}
           </Step>
           <Step title='Videos'>
             <VideoPage
               eventData={eventData} startEndList={startEndList}
               playlistSettings={playlistSettings} setActiveKey={setCurrent}
             />
-            {prevNextButtons(3, true)}
+            {prevNextButtons(4, true)}
           </Step>
         </ProgressSteps>
         <footer>

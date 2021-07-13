@@ -126,7 +126,14 @@ function findUploads(titles) {
         return []
       })
       for (const match of matches) {
-        Logger.log(`title matches: ${JSON.stringify(matches)}`)
+        const matchingVideos = YouTube.Videos.list('snippet', {
+          id: match.videoId, part: 'contentDetails', fields: 'items(contentDetails(duration))'
+        })
+        if (matchingVideos && matchingVideos.items && matchingVideos.items[0]) {
+          Logger.log(`matchingVideos: ${JSON.stringify(matchingVideos)}`)
+          match.duration = matchingVideos.items[0].contentDetails.duration
+        }
+        Logger.log(`title match: ${JSON.stringify(match)}`)
       }
       return matches
     }
