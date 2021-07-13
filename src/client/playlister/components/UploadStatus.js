@@ -1,30 +1,46 @@
 import React, { useCallback } from 'react'
 import { TableBuilder, TableBuilderColumn } from 'baseui/table-semantic'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faTimes, faVideo, faVideoSlash } from '@fortawesome/free-solid-svg-icons'
+import { faTimes } from '@fortawesome/free-solid-svg-icons'
 import { tableOverrides, tablePadding } from './TableOverrides'
 import { Button, KIND, SIZE } from 'baseui/button'
+import { prettyDuration } from '../util/dates'
+import dayjs from 'dayjs'
 
 /**
  * List of files and their upload status
  */
-const UploadStatus = ({ fileInfo, value, setValue }) => {
+const UploadStatus = ({ fileInfo, values, setValues }) => {
   const onRemove = useCallback(
-    (resultId) => setValues(({ [resultId]: _, ...rest }) => rest),
+    id => setValues(vs => vs.filter(value => value.id !== id)),
     [setValues]
   )
 
-  const DATA = Object.values(fileInfo).map(metadata => {
-
-    return (
-      {
-        id: resultId,
-        name: result.name,
-        format: result.format,
-        startTime: result.startTime,
-        duration: result.duration,
-        file: result.file
-      })
+  console.log('values (uploadStatus)', values)
+  const DATA = Object.values(fileInfo).flatMap(metadata => {
+    const filename = metadata.name
+    const matchingUploads = values.filter(match => match.filename === filename)
+    // console.log('matchingUploads', matchingUploads)
+    if (matchingUploads.length > 0) {
+      return matchingUploads.map((upload, index) => (
+        {
+          id: upload.id,
+          filename: metadata.name,
+          video_title: upload.title,
+          video_duration: prettyDuration(dayjs.duration(upload.duration)),
+          publishedAt: upload.publishedAt,
+          thumbnail: upload.thumbnail,
+          file: metadata.file
+        }
+      ))
+    } else {
+      return [{
+        id: metadata.id,
+        filename: metadata.name,
+        file_duration: metadata.duration,
+        file: metadata.file
+      }]
+    }
   })
 
   const durationOverrides = {
@@ -41,6 +57,7 @@ const UploadStatus = ({ fileInfo, value, setValue }) => {
 
   }
 
+/*
   const isUploaded = row => uploadStatus[row.id] === true
 
   const isUndefined = row => typeof uploadStatus[row.id] === 'undefined'
@@ -54,20 +71,12 @@ const UploadStatus = ({ fileInfo, value, setValue }) => {
     }
     return <FontAwesomeIcon icon={faVideoSlash} size='sm' color='red' />
   }
+*/
 
   return (
     <div id='results'>
       <TableBuilder data={DATA} overrides={tableOverrides}>
-        <TableBuilderColumn header={
-          Object.keys(values).length === 0
-            ? null
-            : <Button
-                onClick={() => setValues({})} kind={KIND.tertiary} size={SIZE.mini} title='Remove all'
-              >
-              <FontAwesomeIcon icon={faTimes} />
-            </Button>
-        }
-        >
+        <TableBuilderColumn header=''>
           {row =>
             <Button
               onClick={() => onRemove(row.id)}
@@ -79,17 +88,21 @@ const UploadStatus = ({ fileInfo, value, setValue }) => {
             </Button>}
         </TableBuilderColumn>
         <TableBuilderColumn header='File Name'>
-          {row => row.name}
+          {row => row.filename}
         </TableBuilderColumn>
         <TableBuilderColumn header='Video Title'>
-          {row => row.format}
+          {row => row.video_title}
         </TableBuilderColumn>
-        <TableBuilderColumn header='Start Time'>
-          {row => row.startTime}
+        <TableBuilderColumn header='Video Duration'>
+          {row => row.video_duration}
         </TableBuilderColumn>
-        <TableBuilderColumn header='Duration' numeric overrides={durationOverrides}>
-          {row => parseFloat(row.duration).toFixed(1).toString() + 's'}
+        <TableBuilderColumn header='Published At'>
+          {row => row.publishedAt}
         </TableBuilderColumn>
+        <TableBuilderColumn header='Thumbnail'>
+          {row => <img src={row.thumbnail}/>}
+        </TableBuilderColumn>
+{/*
         <TableBuilderColumn header='Uploaded'>
           {row => statusIcon(row)}
         </TableBuilderColumn>
@@ -107,6 +120,7 @@ const UploadStatus = ({ fileInfo, value, setValue }) => {
               ⇧
             </Button>}
         </TableBuilderColumn>
+*/}
       </TableBuilder>
     </div>
   )

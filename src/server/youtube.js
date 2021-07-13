@@ -133,11 +133,14 @@ function findUploads(titles) {
           Logger.log(`matchingVideos: ${JSON.stringify(matchingVideos)}`)
           match.duration = matchingVideos.items[0].contentDetails.duration
         }
+        match.id = getRandomId()
         Logger.log(`title match: ${JSON.stringify(match)}`)
       }
       return matches
     }
   })
 }
+
+const getRandomId = () => Math.random().toString(36).substr(2, 9)
 
 export { findMyPlaylist, insertPlaylist, findUploads }

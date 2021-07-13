@@ -19,7 +19,7 @@ const engine = new Styletron()
 function App () {
   const [current, setCurrent] = useState(1)
   const [fileInfo, setFileInfo] = useState({})
-  const [uploadStatus, setUploadStatus] = useState({})
+  const [uploadStatus, setUploadStatus] = useState([])
   const [startEndList, setStartEndList] = useState([])
   const [eventData, setEventData] = useState({ eventType: 'rehearsal' })
   const [playlistSettings, setPlaylistSettings] = useState({})
@@ -72,11 +72,10 @@ function App () {
             <FilePage
               fileInfo={fileInfo} setFileInfo={setFileInfo}
               uploadStatus={uploadStatus} setUploadStatus={setUploadStatus}
-              startEndList={startEndList} setStartEndList={setStartEndList}
               current={1} nextButton={nextButton} prevButton={prevButton}
             />
           </Step>
-          <Step title='Adjust Time'>
+          <Step title='Time'>
             <AdjustTimePage
               fileInfo={fileInfo}
               startEndList={startEndList} setStartEndList={setStartEndList}

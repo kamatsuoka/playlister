@@ -4,23 +4,24 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTimes } from '@fortawesome/free-solid-svg-icons'
 import { tableOverrides, tablePadding } from './TableOverrides'
 import { Button, KIND, SIZE } from 'baseui/button'
+import { durationSeconds } from '../util/dates'
 
 /**
  * List of file info from MediaInfo
  */
-const MetadataList = ({ uploadStatus, values, setValues }) => {
+const MetadataList = ({ value, setValue }) => {
   const onRemove = useCallback(
-    (resultId) => setValues(({ [resultId]: _, ...rest }) => rest),
-    [setValues]
+    resultId => setValue(({ [resultId]: _, ...rest }) => rest),
+    [setValue]
   )
 
-  const DATA = Object.entries(values).map(([resultId, result]) => (
+  const DATA = Object.entries(value).map(([resultId, result]) => (
     {
       id: resultId,
       name: result.name,
       format: result.format,
       startTime: result.startTime.replace(/^UTC /, ''),
-      duration: result.duration,
+      duration: durationSeconds(result.duration),
       file: result.file
     }))
 
@@ -37,10 +38,10 @@ const MetadataList = ({ uploadStatus, values, setValues }) => {
     <div id='results'>
       <TableBuilder data={DATA} overrides={tableOverrides}>
         <TableBuilderColumn header={
-          Object.keys(values).length === 0
+          Object.keys(value).length === 0
             ? null
             : <Button
-                onClick={() => setValues({})} kind={KIND.tertiary} size={SIZE.mini} title='Remove all'
+              onClick={() => setValue({})} kind={KIND.tertiary} size={SIZE.mini} title='Remove all'
               >
               <FontAwesomeIcon icon={faTimes} />
             </Button>
@@ -66,7 +67,7 @@ const MetadataList = ({ uploadStatus, values, setValues }) => {
           {row => row.startTime}
         </TableBuilderColumn>
         <TableBuilderColumn header='Duration' numeric overrides={durationOverrides}>
-          {row => parseFloat(row.duration).toFixed(1).toString() + 's'}
+          {row => row.duration}
         </TableBuilderColumn>
       </TableBuilder>
     </div>

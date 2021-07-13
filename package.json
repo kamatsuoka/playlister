@@ -79,22 +79,20 @@
     "workbox-webpack-plugin": "5.1.4"
   },
   "scripts": {
-    "start": "node scripts/start.js",
-    "build": "node scripts/build.js",
     "test": "node scripts/test.js",
     "predeploy": "yarn build",
-    "deploy": "gh-pages -d build",
-    "clasp:login": "clasp login",
-    "clasp:setup": "rimraf .clasp.json && clasp create --type standalone --title \"CLASP Playlister\" --rootDir ./dist",
-    "clasp:setup:use-id": "clasp setting rootDir dist && clasp setting scriptId",
-    "clasp:setup:https": "mkdirp certs && mkcert -key-file ./certs/key.pem -cert-file ./certs/cert.pem localhost 127.0.0.1",
-    "clasp:build:dev": "cross-env NODE_ENV=development webpack",
-    "clasp:build": "cross-env NODE_ENV=production webpack",
-    "clasp:push:dev": "rimraf dist && yarn run clasp:build:dev && npx clasp push",
-    "clasp:push": "rimraf dist && yarn run clasp:build && npx clasp push",
-    "clasp:deploy": "yarn run clasp:push && npx clasp deploy -d 'deployed by clasp:deploy'",
-    "clasp:serve": "cross-env NODE_ENV=development webpack serve --open",
-    "clasp:start": "yarn run clasp:build:dev && yarn run clasp:serve"
+    "gh-deploy": "gh-pages -d build",
+    "login": "clasp login",
+    "setup": "rimraf .clasp.json && clasp create --type standalone --title \"CLASP Playlister\" --rootDir ./dist",
+    "setup:use-id": "clasp setting rootDir dist && clasp setting scriptId",
+    "setup:https": "mkdirp certs && mkcert -key-file ./certs/key.pem -cert-file ./certs/cert.pem localhost 127.0.0.1",
+    "build:dev": "cross-env NODE_ENV=development webpack",
+    "build": "cross-env NODE_ENV=production webpack",
+    "push:dev": "rimraf dist && yarn run build:dev && npx clasp push",
+    "push": "rimraf dist && yarn run build && npx clasp push",
+    "deploy": "yarn run push && npx clasp deploy -d 'deployed by deploy'",
+    "serve": "cross-env NODE_ENV=development webpack serve --open",
+    "start": "yarn run build:dev && yarn run serve"
   },
   "eslintConfig": {
     "extends": [
