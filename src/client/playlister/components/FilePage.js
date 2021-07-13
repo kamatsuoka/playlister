@@ -39,7 +39,7 @@ const FilePage = ({
           Check Upload Status
         </Button>
       </BaseCard>
-      <BaseCard title='Uploaded Videos'>
+      <BaseCard title='Upload Status'>
         <UploadStatus fileInfo={fileInfo} values={uploadStatus} setValues={setUploadStatus}/>
       </BaseCard>
       <div align='right'>

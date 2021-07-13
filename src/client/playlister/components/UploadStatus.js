@@ -1,9 +1,8 @@
 import React, { useCallback } from 'react'
 import { TableBuilder, TableBuilderColumn } from 'baseui/table-semantic'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faTimes } from '@fortawesome/free-solid-svg-icons'
+import { faCheck } from '@fortawesome/free-solid-svg-icons'
 import { tableOverrides, tablePadding } from './TableOverrides'
-import { Button, KIND, SIZE } from 'baseui/button'
 import { prettyDuration } from '../util/dates'
 import dayjs from 'dayjs'
 
@@ -26,8 +25,8 @@ const UploadStatus = ({ fileInfo, values, setValues }) => {
         {
           id: upload.id,
           filename: metadata.name,
-          video_title: upload.title,
-          video_duration: prettyDuration(dayjs.duration(upload.duration)),
+          videoTitle: upload.title,
+          videoDuration: prettyDuration(dayjs.duration(upload.duration)),
           publishedAt: upload.publishedAt,
           thumbnail: upload.thumbnail,
           file: metadata.file
@@ -77,24 +76,13 @@ const UploadStatus = ({ fileInfo, values, setValues }) => {
     <div id='results'>
       <TableBuilder data={DATA} overrides={tableOverrides}>
         <TableBuilderColumn header=''>
-          {row =>
-            <Button
-              onClick={() => onRemove(row.id)}
-              title='Remove from list'
-              kind={KIND.tertiary}
-              size={SIZE.mini}
-            >
-              <FontAwesomeIcon icon={faTimes} size='sm' />
-            </Button>}
+          {row => row.videoTitle ? <FontAwesomeIcon icon={faCheck} size='sm' /> : null }
         </TableBuilderColumn>
         <TableBuilderColumn header='File Name'>
           {row => row.filename}
         </TableBuilderColumn>
         <TableBuilderColumn header='Video Title'>
-          {row => row.video_title}
-        </TableBuilderColumn>
-        <TableBuilderColumn header='Video Duration'>
-          {row => row.video_duration}
+          {row => row.videoTitle}
         </TableBuilderColumn>
         <TableBuilderColumn header='Published At'>
           {row => row.publishedAt}
