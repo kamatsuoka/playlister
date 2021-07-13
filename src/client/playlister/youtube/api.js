@@ -106,14 +106,14 @@ function insertPlaylist (title, onSuccess, onFailure) {
 }
 
 /**
- * Finds uploads given filenames
+ * Finds uploads given local file metadata
  *
- * @param fileInfo local file info
+ * @param metadataList local file metadata
  * @param onSuccess success handler: (video) => {}
  * @param onFailure failure handler: (error) => {}
  * @returns {Promise<*>}
  */
-const findUploads = (fileInfo, onSuccess, onFailure) => {
+const findUploads = (metadataList, onSuccess, onFailure) => {
   // title as munged from filename by youtube:
   // extension removed, any non-alnum character replaced with space
   const youtubeTitle = filename => {
@@ -123,9 +123,9 @@ const findUploads = (fileInfo, onSuccess, onFailure) => {
   }
 
   const fileData = Object.fromEntries(
-    Object.values(fileInfo).map(info => [info.name, {
-      title: youtubeTitle(info.name),
-      durationSeconds: Math.round(info.duration)
+      metadataList.map(metadata => [metadata.name, {
+      title: youtubeTitle(metadata.name),
+      durationSeconds: Math.round(metadata.duration)
     }])
   )
 

@@ -1,6 +1,9 @@
 import React, { useCallback, useState } from 'react'
 
-import DropZone from './DropZone'
+import { LocaleProvider } from 'baseui'
+import { FileUploader } from 'baseui/file-uploader'
+// eslint-disable-next-line camelcase
+import en_US from 'baseui/locale/en_US'
 
 // import MediaInfo from 'mediainfo.js'
 // // using MediaInfo through npm/react didn't work,
@@ -24,11 +27,11 @@ const getRandomId = () => Math.random().toString(36).substr(2, 9)
 /**
  * Renders DropZone (and file picker) for one or more media files
  */
-const MediaInfoJs = ({ setResults }) => {
+const MetadataReader = ({ setMetadataList }) => {
   const [analyzing, setAnalyzing] = useState(false)
 
-  function filterResult (result) {
-    const general = result.media.track.filter(track => track['@type'] === 'General')[0]
+  function filterMetadata (data) {
+    const general = data.media.track.filter(track => track['@type'] === 'General')[0]
     return {
       format: general.Format,
       duration: general.Duration,
@@ -41,32 +44,20 @@ const MediaInfoJs = ({ setResults }) => {
    */
   const onDrop = useCallback(files => {
     /**
-     * Gets file info for a single file.
+     * Gets metadata for a single file.
      */
-    const getFileInfo = (mediainfo, file) => {
+    const getMetadata = (mediainfo, file) => {
       return mediainfo
         .analyzeData(() => file.size, readChunk(file))
-        .then(result => {
-          setResults(prevResults => ({
-            [getRandomId()]: {
-              ...(filterResult(result)),
+        .then(result => ({
+              ...filterMetadata(result),
               name: file.name,
               file: file
-            },
-            ...prevResults
-          }))
-        }
-        )
-        .catch(error =>
-          setResults(prevResults => ({
-            [getRandomId()]: {
+            }))
+        .catch(error => ({
               name: file.name,
               error: error.stack
-            },
-            ...prevResults
-          }))
-        )
-        .finally(() => setAnalyzing(false))
+            }))
     }
 
     if (files) {
@@ -74,16 +65,39 @@ const MediaInfoJs = ({ setResults }) => {
       MediaInfo().then(async mediainfo => {
         for (const file of files) {
           if (file) {
-            // need to 'await' each call to getFileInfo,
-            // otherwise the info returned is truncated.
-            await getFileInfo(mediainfo, file)
+            const data = await getMetadata(mediainfo, file)
+            data.id = getRandomId()
+            setMetadataList(metadataList =>
+              metadataList
+                .concat([data])
+                .sort((d1, d2) => d1.name.toLowerCase() > d2.name.toLowerCase() ? 1 : -1)
+            )
           }
         }
-      }
-      )
+      }).finally(() => setAnalyzing(false))
     }
-  }, [setResults])
+  }, [setMetadataList])
 
-  return <DropZone analyzing={analyzing} onDrop={onDrop} />
+  const locale = {
+    // eslint-disable-next-line camelcase
+    ...en_US,
+    fileuploader: {
+      ...en_US.fileuploader,
+      dropFilesToUpload: 'Drop files here ...'
+    }
+  }
+  return (
+    <LocaleProvider locale={locale}>
+      <FileUploader
+        onDrop={onDrop}
+        progressMessage={
+          analyzing
+            ? 'Analyzing ...'
+            : ''
+        }
+      />
+    </LocaleProvider>
+  )
+
 }
-export default MediaInfoJs
+export default MetadataReader

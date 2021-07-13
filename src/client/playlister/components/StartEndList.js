@@ -17,7 +17,7 @@ dayjs.extend(utc)
 /**
  * List of calculated file properties
  */
-const StartEndList = ({ fileInfo, overrideTimeZone, startEndList, setStartEndList }) => {
+const StartEndList = ({ metadata, overrideTimeZone, startEndList, setStartEndList }) => {
   /**
    * Calculate start and end time from file info
    */
@@ -48,12 +48,12 @@ const StartEndList = ({ fileInfo, overrideTimeZone, startEndList, setStartEndLis
     }
 
     // filter out any files that don't have a start time (probably not media files)
-    const startEnds = Object.entries(fileInfo)
+    const startEnds = Object.entries(metadata)
       .flatMap(([resultId, result]) =>
         result.startTime ? [calculateStartEnd(resultId, result)] : []
       ).sort((s1, s2) => s1.startTime > s2.startTime ? 1 : -1)
     setStartEndList(startEnds)
-  }, [fileInfo, overrideTimeZone, setStartEndList])
+  }, [metadata, overrideTimeZone, setStartEndList])
 
   const displayTemplate = 'YYYY-MM-DD HH:mm:ss z'
 

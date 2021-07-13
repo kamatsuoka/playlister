@@ -1,20 +1,20 @@
-import MediaInfoJs from './MediaInfoJs'
-import React, { useCallback } from 'react'
+import MetadataReader from './MetadataReader'
+import React, { useCallback, useState } from 'react'
 import MetadataList from './MetadataList'
 import { BaseCard } from './BaseCard'
 import { Button, SIZE } from 'baseui/button'
 import { findUploads } from '../youtube/api'
 import dayjs from 'dayjs'
 import UploadStatus from './UploadStatus'
+import { KIND, Notification } from 'baseui/notification'
 
 /**
  * Page that holds files' MediaInfo data and rehearsal info
  */
-const FilePage = ({
-  fileInfo, setFileInfo,
-  uploadStatus, setUploadStatus,
-  current, prevButton, nextButton
-}) => {
+const FilePage = ({ metadataList, setMetadataList, uploadStatus, setUploadStatus, current, prevButton, nextButton }) => {
+  console.log('FilePage: metadataList = ', metadataList)
+  const [error, setError] = useState('')
+
   const checkUploadStatus = useCallback(() => {
     const onSuccess = uploads => {
       const dateNow = dayjs()
@@ -23,31 +23,37 @@ const FilePage = ({
       )
       setUploadStatus(items)
     }
-    // TODO: show error in UI
-    return findUploads(fileInfo, onSuccess, err => console.log(err))
+    return findUploads(metadataList,
+      onSuccess,
+      err => {
+        setError(err)
+        console.log(err)
+      })
   })
 
   return (
     <>
-      <MediaInfoJs setResults={setFileInfo} />
+      <MetadataReader setMetadataList={setMetadataList} />
       <BaseCard title='File Metadata'>
-        <MetadataList value={fileInfo} setValue={setFileInfo} />
+        <MetadataList metadataList={metadataList} setMetadataList={setMetadataList} />
         <Button style={{marginTop: '10px'}}
-          size={SIZE.compact} disabled={Object.keys(fileInfo).length === 0}
+          size={SIZE.compact} disabled={metadataList.length === 0}
           onClick={checkUploadStatus}
         >
           Check Upload Status
         </Button>
       </BaseCard>
       <BaseCard title='Upload Status'>
-        <UploadStatus fileInfo={fileInfo} values={uploadStatus} setValues={setUploadStatus}/>
+        <UploadStatus metadataList={metadataList} values={uploadStatus}/>
       </BaseCard>
+      {error
+        ? <Notification kind={KIND.negative} closeable>{error}</Notification>
+        : null}
       <div align='right'>
         {prevButton(current)}
         &nbsp;
         {nextButton(current)}
       </div>
-
     </>
   )
 }

@@ -1,28 +1,22 @@
-import React, { useCallback } from 'react'
+import React from 'react'
 import { TableBuilder, TableBuilderColumn } from 'baseui/table-semantic'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheck } from '@fortawesome/free-solid-svg-icons'
-import { tableOverrides, tablePadding } from './TableOverrides'
+import { tableOverrides } from './TableOverrides'
 import { prettyDuration } from '../util/dates'
 import dayjs from 'dayjs'
 
 /**
  * List of files and their upload status
  */
-const UploadStatus = ({ fileInfo, values, setValues }) => {
-  const onRemove = useCallback(
-    id => setValues(vs => vs.filter(value => value.id !== id)),
-    [setValues]
-  )
-
-  console.log('values (uploadStatus)', values)
-  const DATA = Object.values(fileInfo).flatMap(metadata => {
+const UploadStatus = ({ metadataList, values }) => {
+  console.log('UploadStatus: metadataList = ', metadataList)
+  const DATA = metadataList.flatMap(metadata => {
     const filename = metadata.name
     const matchingUploads = values.filter(match => match.filename === filename)
     // console.log('matchingUploads', matchingUploads)
     if (matchingUploads.length > 0) {
-      return matchingUploads.map((upload, index) => (
-        {
+      return matchingUploads.map(upload => ({
           id: upload.id,
           filename: metadata.name,
           videoTitle: upload.title,
@@ -30,8 +24,7 @@ const UploadStatus = ({ fileInfo, values, setValues }) => {
           publishedAt: upload.publishedAt,
           thumbnail: upload.thumbnail,
           file: metadata.file
-        }
-      ))
+        }))
     } else {
       return [{
         id: metadata.id,
@@ -41,15 +34,6 @@ const UploadStatus = ({ fileInfo, values, setValues }) => {
       }]
     }
   })
-
-  const durationOverrides = {
-    TableHeadCell: {
-      style: {
-        textAlign: 'right',
-        paddingRight: tablePadding
-      }
-    }
-  }
 
   // eslint-disable-next-line no-unused-vars
   const uploadFile = file => {

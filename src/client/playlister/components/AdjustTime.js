@@ -7,19 +7,15 @@ import { BaseCard } from './BaseCard'
  * Adjust time on file metadata in case camera doesn't have time zone
  * or has time set incorrectly
  */
-const AdjustTimePage = ({
-  fileInfo,
-  startEndList, setStartEndList,
-  current, prevButton, nextButton
-}) => {
+const AdjustTimePage = ({ metadataList, startEndList, setStartEndList, current, prevButton, nextButton }) => {
   const [overrideTimeZone, setOverrideTimeZone] = useState(true)
 
   return (
     <>
       <BaseCard title='Start and End Times'>
-        <TimezoneOverride fileInfo={fileInfo} value={overrideTimeZone} setValue={setOverrideTimeZone} />
+        <TimezoneOverride metadata={metadataList} value={overrideTimeZone} setValue={setOverrideTimeZone} />
         <StartEndList
-          fileInfo={fileInfo} overrideTimeZone={overrideTimeZone}
+          metadata={metadataList} overrideTimeZone={overrideTimeZone}
           startEndList={startEndList} setStartEndList={setStartEndList}
         />
       </BaseCard>

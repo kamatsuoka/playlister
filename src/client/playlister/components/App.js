@@ -18,7 +18,7 @@ const engine = new Styletron()
 
 function App () {
   const [current, setCurrent] = useState(1)
-  const [fileInfo, setFileInfo] = useState({})
+  const [metadataList, setMetadataList] = useState([])
   const [uploadStatus, setUploadStatus] = useState([])
   const [startEndList, setStartEndList] = useState([])
   const [eventData, setEventData] = useState({ eventType: 'rehearsal' })
@@ -70,14 +70,14 @@ function App () {
           </Step>
           <Step title='Files'>
             <FilePage
-              fileInfo={fileInfo} setFileInfo={setFileInfo}
+              metadataList={metadataList} setMetadataList={setMetadataList}
               uploadStatus={uploadStatus} setUploadStatus={setUploadStatus}
               current={1} nextButton={nextButton} prevButton={prevButton}
             />
           </Step>
           <Step title='Time'>
             <AdjustTimePage
-              fileInfo={fileInfo}
+              metadataList={metadataList}
               startEndList={startEndList} setStartEndList={setStartEndList}
               current={2} nextButton={nextButton} prevButton={prevButton}
             />
