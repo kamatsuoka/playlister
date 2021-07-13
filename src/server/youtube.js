@@ -1,3 +1,9 @@
+// const dayjs = require('dayjs.min')
+import dayjs from './dayjs/dayjs.min'
+import duration from './dayjs/plugin/duration'
+
+dayjs.extend(duration)
+
 /**
  * Searches a list of items for one with given title
  */
@@ -52,24 +58,6 @@ function insertPlaylist (title, description) {
 }
 
 /**
- * Finds recent videos
- */
-const findRecentVideos = () => {
-  const MAX_RESULTS = 50
-  const part = ['snippet']
-  const optionalArgs = {
-    type: 'video',
-    order: 'date',
-    maxResults: MAX_RESULTS,
-    forMine: true
-  }
-
-  const videos = YouTube.Search.list(part, optionalArgs)
-  Logger.log(`findRecentVideos: videos = ${JSON.stringify(videos)}`)
-  return videos
-}
-
-/**
  * Finds videos in the user's uploaded videos by:
  *
  * 1. Fetching the user's channels
@@ -77,18 +65,23 @@ const findRecentVideos = () => {
  * 3. Listing videos in the uploads playlist
  * 4. Returning videos that match one of the given filenames / titles
  *
- * @param {Object} titles - map of title to filename
+ * @param {Object} fileData - map of filename to title, durationSeconds
  */
-function findUploads(titles) {
+function findUploads(fileData) {
+  Logger.log(`filedata = ${JSON.stringify(fileData)}`)
   // titles as they have likely been munged from filenames:
   // extension removed, any non-alnum character replaced with space
-  const filenameSet = new Set(Object.values(titles))
-  const titleSet = new Set(Object.keys(titles))
+  const filenameSet = new Set(Object.keys(fileData))
+  const titleSet = new Set(Object.values(fileData).map(data => data.title))
+  const titleToFilename = Object.fromEntries(
+    Object.entries(fileData).map(([filename, data]) => [data.title, filename])
+  )
+  Logger.log(`titleToFilename = ${JSON.stringify(titleToFilename)}`)
 
+  const matchingVideos = {}  // map of filename to video data
   const channels = YouTube.Channels.list('contentDetails', { mine: true })
-
   // we *probably* just have one channel, but just in case ...
-  return channels.items.flatMap(channel => {
+  channels.items.forEach(channel => {
     // Channel resource: https://developers.google.com/youtube/v3/docs/channels
     // each channel has a special 'uploads' playlist that's not ordinarily visible
     const playlistId = channel.contentDetails.relatedPlaylists.uploads
@@ -120,25 +113,41 @@ function findUploads(titles) {
           return [upload]
         }
         if (titleSet.has(upload.title)) {
-          upload.filename = titles[upload.title]
+          upload.filename = titleToFilename[upload.title]
           return [upload]
         }
         return []
       })
       for (const match of matches) {
-        const matchingVideos = YouTube.Videos.list('snippet', {
-          id: match.videoId, part: 'contentDetails', fields: 'items(contentDetails(duration))'
+        const videos = YouTube.Videos.list('snippet,contentDetails', {
+          id: match.videoId, fields: 'items(id,snippet(title),contentDetails(duration))'
         })
-        if (matchingVideos && matchingVideos.items && matchingVideos.items[0]) {
-          Logger.log(`matchingVideos: ${JSON.stringify(matchingVideos)}`)
-          match.duration = matchingVideos.items[0].contentDetails.duration
+        const video = videos.items[0]
+        if (!video) {
+          Logger.log(`Error: didn't find video with id ${match.videoId}`)
+          continue
         }
-        match.id = getRandomId()
-        Logger.log(`title match: ${JSON.stringify(match)}`)
+        Logger.log(`matching video: ${JSON.stringify(video)}`)
+        const videoSeconds = dayjs.duration(video.contentDetails.duration).asSeconds()
+        if (videoSeconds !== fileData[match.filename].durationSeconds) {
+          Logger.log(`duration of video ${video.id}, "${video.snippet.title}" at ${videoSeconds} seconds ` +
+            `doesn't match file ${match.filename} at ${fileData[match.filename].durationSeconds} seconds, ignoring`)
+          continue
+        }
+        if (matchingVideos[match.filename] &&
+          video.snippet.publishedAt < matchingVideos[match.filename].publishedAt) {
+            Logger.log(`video ${video.id} ${video.snippet.title} at ${video.snippet.publishedAt} ` +
+              `is older than video ${matchingVideos[match.filename].id} ${matchingVideos[match.filename].title} ` +
+              `at ${matchingVideos[match.filename].publishedAt}, ignoring`)
+          continue
+        }
+        match.duration = video.contentDetails.duration
+        matchingVideos[match.filename] = match
+        Logger.log(`matching video: ${JSON.stringify(match)}`)
       }
-      return matches
     }
   })
+  return Object.values(matchingVideos)
 }
 
 const getRandomId = () => Math.random().toString(36).substr(2, 9)

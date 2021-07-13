@@ -23,9 +23,8 @@ const FilePage = ({
       )
       setUploadStatus(items)
     }
-    const filenames = Object.values(fileInfo).map(meta => meta.name)
     // TODO: show error in UI
-    return findUploads(filenames, onSuccess, err => console.log(err))
+    return findUploads(fileInfo, onSuccess, err => console.log(err))
   })
 
   return (

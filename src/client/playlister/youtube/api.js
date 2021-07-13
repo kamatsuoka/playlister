@@ -108,21 +108,25 @@ function insertPlaylist (title, onSuccess, onFailure) {
 /**
  * Finds uploads given filenames
  *
- * @param filenames local filenames
+ * @param fileInfo local file info
  * @param onSuccess success handler: (video) => {}
  * @param onFailure failure handler: (error) => {}
  * @returns {Promise<*>}
  */
-const findUploads = (filenames, onSuccess, onFailure) => {
-  // titles as they have likely been munged from filenames:
+const findUploads = (fileInfo, onSuccess, onFailure) => {
+  // title as munged from filename by youtube:
   // extension removed, any non-alnum character replaced with space
-  const titles = Object.fromEntries(
-    filenames.map(filename => {
-      const parts = filename.split('.')
-      const noExt = parts.length > 1 ? (parts.pop(), parts.join('.')) : filename
-      const title = noExt.replace(/[^a-z0-9]/gi, ' ')
-      return [title, filename]
-    })
+  const youtubeTitle = filename => {
+    const parts = filename.split('.')
+    const noExt = parts.length > 1 ? (parts.pop(), parts.join('.')) : filename
+    return noExt.replace(/[^a-z0-9]/gi, ' ')
+  }
+
+  const fileData = Object.fromEntries(
+    Object.values(fileInfo).map(info => [info.name, {
+      title: youtubeTitle(info.name),
+      durationSeconds: Math.round(info.duration)
+    }])
   )
 
   const run = getAppsScriptRun()
@@ -130,7 +134,7 @@ const findUploads = (filenames, onSuccess, onFailure) => {
     return run
       .withSuccessHandler(onSuccess)
       .withFailureHandler(onFailure)
-      .findUploads(titles)
+      .findUploads(fileData)
   } else {
     return searchVideos()
       .then(onSuccess)
