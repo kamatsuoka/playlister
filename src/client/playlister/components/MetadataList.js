@@ -5,12 +5,12 @@ import { faTimes } from '@fortawesome/free-solid-svg-icons'
 import { tableOverrides, tablePadding } from './TableOverrides'
 import { Button, KIND, SIZE } from 'baseui/button'
 import { durationSeconds } from '../util/dates'
+import { KIND as NKind, Notification } from 'baseui/notification'
 
 /**
  * List of file info from MediaInfo
  */
-const MetadataList = ({ metadataList, setMetadataList }) => {
-  console.log('MetadataList: metadataList', metadataList)
+const MetadataList = ({ metadataList, setMetadataList, metadataErrors }) => {
   const onRemove = useCallback(
     id => setMetadataList(vs => vs.filter(v => v.id !== id)),
     [setMetadataList]
@@ -36,8 +36,26 @@ const MetadataList = ({ metadataList, setMetadataList }) => {
     }
   }
 
+  const errorTable = () => {
+
+    if (metadataErrors.length > 0) {
+      return (
+        <>
+          <Notification kind={NKind.negative} closeable overrides={{ Body: { style: { width: 'auto' } } }}>
+            <p>Invalid media files:</p>
+            <ul>
+            {metadataErrors.map((e, i) => <li key={i}>{e.name}</li>)}
+          </ul>
+          </Notification>
+        </>
+      )
+    } else {
+      return null
+    }
+  }
+
   return (
-    <div id='results'>
+    <div>
       <TableBuilder data={metadataList} overrides={tableOverrides}>
         <TableBuilderColumn header={removeHeader()}>
           {row =>
@@ -63,6 +81,7 @@ const MetadataList = ({ metadataList, setMetadataList }) => {
           {row => durationSeconds(row.duration)}
         </TableBuilderColumn>
       </TableBuilder>
+      {errorTable()}
     </div>
   )
 }
