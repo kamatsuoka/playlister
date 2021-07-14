@@ -3,17 +3,32 @@ import { TableBuilder, TableBuilderColumn } from 'baseui/table-semantic'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheck } from '@fortawesome/free-solid-svg-icons'
 import { tableOverrides } from './TableOverrides'
-import { prettyDuration } from '../util/dates'
 import dayjs from 'dayjs'
-import { Button, SIZE } from 'baseui/button'
+import { Button, KIND, SIZE } from 'baseui/button'
 import { findUploads } from '../youtube/api'
-import { KIND, Notification } from 'baseui/notification'
+import { KIND as NKind, Notification } from 'baseui/notification'
+import resumableUpload from '../youtube/youtube-uploader'
 
 /**
  * List of files and their upload status
  */
 const UploadStatus = ({ metadataList, uploadStatus, setUploadStatus }) => {
   const [error, setError] = useState('')
+  const [uploadButtonState, setUploadButtonState] = useState({})
+
+  const onUploadComplete = useCallback(
+    uploaded => {
+      const status = {
+        id: uploaded.videoId,
+        videoTitle: uploaded.title,
+        publishedAt: uploaded.publishedAt,
+        thumbnail: uploaded.thumbnail
+      }
+      // TODO: re-sort list
+      return setUploadStatus(uploadStatus.filter(s => s.id !== status.id).concat(status))
+    },
+    [setUploadStatus]
+  )
 
   const DATA = metadataList.flatMap(metadata => {
     const filename = metadata.name
@@ -23,7 +38,6 @@ const UploadStatus = ({ metadataList, uploadStatus, setUploadStatus }) => {
           id: upload.id,
           filename: metadata.name,
           videoTitle: upload.title,
-          videoDuration: prettyDuration(dayjs.duration(upload.duration)),
           publishedAt: upload.publishedAt,
           thumbnail: upload.thumbnail,
           file: metadata.file
@@ -32,7 +46,6 @@ const UploadStatus = ({ metadataList, uploadStatus, setUploadStatus }) => {
       return [{
         id: metadata.id,
         filename: metadata.name,
-        file_duration: metadata.duration,
         file: metadata.file
       }]
     }
@@ -54,34 +67,69 @@ const UploadStatus = ({ metadataList, uploadStatus, setUploadStatus }) => {
       })
   })
 
-
-
-  // eslint-disable-next-line no-unused-vars
-  const uploadFile = file => {
+  const uploadFile = (id, file) => {
+    const progressHandler = percent => {
+      setUploadButtonState({...uploadButtonState, [id]: `progress:${percent}`})
+    }
+    const errorHandler = error => {
+      setUploadButtonState({...uploadButtonState, [id]: 'error'})
+      console.log(error)  // todo: show in UI
+    }
+    const completeHandler = uploaded => {
+      const status = {
+        id: uploaded.videoId,
+        filename: file.name,
+        videoTitle: uploaded.title,
+        publishedAt: uploaded.publishedAt,
+        thumbnail: uploaded.thumbnail,
+        file: file
+      }
+      // TODO: re-sort list
+      return setUploadStatus(uploadStatus.filter(s => s.id !== status.id).concat(status))
+    }
+    resumableUpload(file, progressHandler, onUploadComplete, errorHandler)
 
   }
 
-/*
-  const isUploaded = row => uploadStatus[row.id] === true
-
-  const isUndefined = row => typeof uploadStatus[row.id] === 'undefined'
-
-  const statusIcon = row => {
-    if (isUndefined(row)) {
-      return null
+  const getButtonContent = id => {
+    if (!uploadButtonState[id]) {
+      return '⇧'
     }
-    if (isUploaded(row)) {
-      return <FontAwesomeIcon icon={faVideo} size='sm' color='green' />
+    if (uploadButtonState[id] === 'error') {
+      return '?'
     }
-    return <FontAwesomeIcon icon={faVideoSlash} size='sm' color='red' />
+    if (uploadButtonState[id].startsWith('progress')) {
+      return uploadButtonState[id].split(':')[1] + '%'
+    }
   }
-*/
+
+
+  const uploadButton = row => {
+    if (row.videoTitle) {
+      return <FontAwesomeIcon icon={faCheck} size='sm' />
+    } else {
+      return (<Button
+        onClick={() => {
+          setUploadButtonState({...uploadButtonState, [row.id]: 'uploading'})
+          uploadFile(row.id, row.file)
+        }}
+        title='Upload'
+        kind={KIND.tertiary}
+        size={SIZE.mini}
+        // isLoading={uploadButtonState[row.id] === 'uploading'}
+        disabled={uploadButtonState[row.id] === 'uploading'}
+      >
+        {getButtonContent(row.id)}
+      </Button>)
+    }
+
+  }
 
   return (
     <>
       <TableBuilder data={DATA} overrides={tableOverrides}>
         <TableBuilderColumn header=''>
-          {row => row.videoTitle ? <FontAwesomeIcon icon={faCheck} size='sm' /> : null }
+          {row => uploadButton(row) }
         </TableBuilderColumn>
         <TableBuilderColumn header='File Name'>
           {row => row.filename}
@@ -122,7 +170,7 @@ const UploadStatus = ({ metadataList, uploadStatus, setUploadStatus }) => {
         Check Upload Status
       </Button>
       {error
-        ? <Notification kind={KIND.negative} closeable>{error}</Notification>
+        ? <Notification kind={NKind.negative} closeable>{error}</Notification>
         : null}
     </>
   )

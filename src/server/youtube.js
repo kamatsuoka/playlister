@@ -1,4 +1,3 @@
-// const dayjs = require('dayjs.min')
 import dayjs from './dayjs/dayjs.min'
 import duration from './dayjs/plugin/duration'
 
@@ -105,7 +104,7 @@ function findUploads(fileData) {
         videoId: item.snippet.resourceId.videoId,
         title: item.snippet.title,
         publishedAt: item.snippet.publishedAt,
-        thumbnail: item.snippet.thumbnails.default.url
+        thumbnail: item.snippet.thumbnails.default ? item.snippet.thumbnails.default.url : null
       }))
       const matches = uploads.flatMap(upload => {
         if (filenameSet.has(upload.title)) {
@@ -149,7 +148,5 @@ function findUploads(fileData) {
   })
   return Object.values(matchingVideos)
 }
-
-const getRandomId = () => Math.random().toString(36).substr(2, 9)
 
 export { findMyPlaylist, insertPlaylist, findUploads }

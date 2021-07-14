@@ -1,3 +1,6 @@
+const { youtubeTitle } = require('./api')
+import axios from 'axios'
+
 class RetryHandler {
   constructor() {
     this.interval = 1e3
@@ -23,6 +26,10 @@ class RetryHandler {
   }
 }
 
+/**
+ * Performs resumable videpo uploads to youtube.
+ * See https://cloud.google.com/storage/docs/performing-resumable-uploads
+ */
 class ResumableUploader {
   constructor({
                 baseUrl,
@@ -47,9 +54,7 @@ class ResumableUploader {
     this.onContentUploadError = error => {
       if (error.response && error.response.status) {
         status = error.response.status
-        if (error.response.status === 308) {
-          // google uses 308 to mean "Resume Incomplete",
-          // see https://cloud.google.com/storage/docs/performing-resumable-uploads
+        if (error.response.status === 308) { // google uses 308 to mean "Resume Incomplete"
           this.onResumeIncomplete(error.response)
         } else if (error.response.status < 500) {
           this.onUploadError(error.response)
@@ -65,8 +70,9 @@ class ResumableUploader {
         ` status = ${response.status}, headers = ${response.headers}`)
       this.onError(response.data)
     }
+
     this.resume = () => {
-      axios.put(this.url, slice, {
+      axios.put(this.url, {},  {
         headers: {
           'Content-Range': 'bytes */' + this.file.size,
           'X-Upload-Content-Type': this.file.type,
@@ -129,77 +135,73 @@ class ResumableUploader {
     })
   }
 
+  /**
+   * Builds an url by adding query params to base url
+   */
   buildUrl(baseUrl, params) {
     const url = new URL(baseUrl)
-    Object.entries(params).forEach((key, value) => url.searchParams.append(key, value))
+    Object.entries(params).forEach(([key, value]) => url.searchParams.append(key, value))
     return url.href
   }
 }
 
-function getTitle() {
-  return $('#video_title').val()
-}
-
-let message, progress, validator, uploadButton, form
-
-function p(finished, msg) {
-  message.html(msg || '')
-  if (finished) {
-    $('button.reset').click()
-    uploadButton.removeClass('disabled')
-    progress.hide()
-  } else {
-    uploadButton.addClass('disabled')
-  }
-}
-
-
+/**
+ * Uploads a file and watches for progress, completion, and error
+ */
 class UploadWatcher {
-  constructor() {
+  /**
+   * Constructs an upload watcher.
+   *
+   * @param progressHandler (percent: int) => ...
+   * @param completeHandler ({id, title, ...}) => ...
+   * @param errorHandler (error: str | { error: {message: str}}) => ...
+   */
+  constructor(progressHandler, completeHandler, errorHandler) {
     this.videoId = ''
     this.uploadStartTime = 0
+    this.progressHandler = progressHandler
+    this.completeHandler = completeHandler
+    this.errorHandler = errorHandler
   }
 
   uploadFile(file, token) {
-    let o = false
     const videoResource = {
-      snippet: { title: getTitle(), categoryId: 10 },
-      status: { privacyStatus: 'private' },
+      snippet: { title: youtubeTitle(file.name), categoryId: 10 }
     }
+    console.log(`uploading file with name ${file.name}, videoResource`, videoResource)
     const uploader = new ResumableUploader({
       baseUrl: 'https://www.googleapis.com/upload/youtube/v3/videos',
       file: file,
       token: token,
       videoResource: videoResource,
       params: {
-        part: Object.keys(videoResource).join(','),
+        part: 'snippet',
         notifySubscribers: false,
       },
       onError: err => {
         let message = err
         try {
           message = JSON.parse(err).error.message
+        } catch {
+          // message was not JSON, ignore
         } finally {
-          p(true, message)
+          this.errorHandler(message)
         }
       },
       onProgress: progressEvent => {
-        const loaded = progressEvent.loaded
-        const total = progressEvent.total
-        const percent = 100 * loaded / total
-        $('#percent-transferred').text(percent.toFixed(2))
-        $('#bytes-transferred').text((loaded / 1048576).toFixed(3))
-        $('#total-bytes').text((total / 1048576).toFixed(3))
-        o || (o = true, progress.show())
-        if (100 === percent) {
-          progress.hide()
-          message.html('Video uploaded, processing..')
-          $('#terms').hide()
-        }
+        const percent = Math.round(100 * progressEvent.loaded / progressEvent.total)
+        this.progressHandler(percent)
       },
       onComplete: response => {
         console.log(`uploaded video with id ${response.id}`)
-        message.html('Done')
+        this.completeHandler({
+          id: response.id,
+          filename: file.name,
+          videoTitle: response.snippet.title,
+          publishedAt: response.snippet.publishedAt,
+          thumbnail: response.snippet.thumbnails.default.url,
+          file: file
+        })
       },
     })
     this.uploadStartTime = Date.now()
@@ -207,34 +209,10 @@ class UploadWatcher {
   }
 }
 
-function run() {
-  if (form.valid()) {
-    return google.script.run.withSuccessHandler(token =>
-      (new UploadWatcher).uploadFile($('#file').get(0).files[0], token),
-    ).getToken()
-  } else {
-    return void window.setTimeout(function() {
-      validator.resetForm()
-    }, 5e3)
-  }
+function resumableUpload(file, progressHandler, completeHandler, errorHandler) {
+  return google.script.run.withSuccessHandler(token =>
+    (new UploadWatcher(progressHandler, completeHandler, errorHandler)).uploadFile(file, token),
+  ).getToken()
 }
 
-$(document).ready(function() {
-  $.validator.setDefaults({ ignore: [] })
-  $('select').formSelect()
-  message = $('#message')
-  progress = $('#progress')
-  uploadButton = $('#btnUpload')
-  form = $('form')
-  validator = form.validate({
-    errorElement: 'div',
-    errorPlacement: function(err, t) {
-      const o = $(t).data('error')
-      if (o) {
-        $(o).append(err)
-      } else {
-        err.insertAfter(t)
-      }
-    },
-  })
-})
+export default resumableUpload
