@@ -5,12 +5,11 @@ import { Combobox } from 'baseui/combobox'
 import { BaseCard } from './BaseCard'
 import { FlexGrid, FlexGridItem } from 'baseui/flex-grid'
 
-const VideoNaming = ({ playlistSettings, value, setValue }) => {
+const VideoNaming = ({ playlistSettings, videoNaming, setVideoNaming }) => {
   const handleChange = (evt) => {
-    const value = evt.target.value
-    setValue({
-      ...value,
-      [evt.target.name]: value
+    setVideoNaming({
+      ...videoNaming,
+      [evt.target.name]: evt.target.value
     })
   }
 
@@ -35,7 +34,7 @@ const VideoNaming = ({ playlistSettings, value, setValue }) => {
         <FlexGridItem {...itemProps}>
           <FormControl label='prefix'>
             <Input
-              value={value.prefix}
+              value={videoNaming.prefix}
               name='prefix'
               onChange={handleChange}
             />
@@ -44,7 +43,7 @@ const VideoNaming = ({ playlistSettings, value, setValue }) => {
         <FlexGridItem {...itemProps}>
           <FormControl label='camera view'>
             <Combobox
-              value={value.cameraView}
+              value={videoNaming.cameraView}
               name='cameraView'
               options={['chorus', 'director', 'corner', 'elevated']}
               mapOptionToString={option => option}
@@ -64,7 +63,7 @@ const VideoNaming = ({ playlistSettings, value, setValue }) => {
         <FlexGridItem {...itemProps}>
           <FormControl label='index offset'>
             <Input
-              value={value.indexOffset}
+              value={videoNaming.indexOffset}
               type='number'
               name='indexOffset'
               min={-(playlistSettings.itemCount || 0)}

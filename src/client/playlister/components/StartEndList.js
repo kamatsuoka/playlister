@@ -17,7 +17,7 @@ dayjs.extend(utc)
 /**
  * List of calculated file properties
  */
-const StartEndList = ({ metadata, overrideTimeZone, startEndList, setStartEndList }) => {
+const StartEndList = ({ metadata, overrideTimeZone, timeAdjust, startEndList, setStartEndList }) => {
   /**
    * Calculate start and end time from file info
    */
@@ -36,8 +36,17 @@ const StartEndList = ({ metadata, overrideTimeZone, startEndList, setStartEndLis
       }
     }
 
+    const adjustTime = time => time
+      .add(timeAdjust.year || 0, 'y')
+      .add(timeAdjust.month || 0, 'M')
+      .add(timeAdjust.day || 0, 'd')
+      .add(timeAdjust.hour || 0, 'h')
+      .add(timeAdjust.minute || 0, 'm')
+      .add(timeAdjust.second || 0, 's')
+
     const calculateStartEnd = (resultId, result) => {
-      const startTime = parseTimestamp(result.startTime)
+      const parsedStartTime = parseTimestamp(result.startTime)
+      const startTime = adjustTime(parsedStartTime)
       const endTime = startTime.add(result.duration, 'second')
       return {
         id: resultId,
@@ -53,7 +62,7 @@ const StartEndList = ({ metadata, overrideTimeZone, startEndList, setStartEndLis
         result.startTime ? [calculateStartEnd(resultId, result)] : []
       ).sort((s1, s2) => s1.startTime > s2.startTime ? 1 : -1)
     setStartEndList(startEnds)
-  }, [metadata, overrideTimeZone, setStartEndList])
+  }, [metadata, overrideTimeZone, setStartEndList, timeAdjust])
 
   const displayTemplate = 'YYYY-MM-DD HH:mm:ss z'
 

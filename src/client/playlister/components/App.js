@@ -12,7 +12,7 @@ import { StyledLink } from 'baseui/link'
 import { ProgressSteps, Step } from 'baseui/progress-steps'
 import { Button } from 'baseui/button'
 import PlaylistPage from './PlaylistPage'
-import AdjustTimePage from './AdjustTime'
+import AdjustTimePage from './AdjustTimePage'
 
 const engine = new Styletron()
 
@@ -23,6 +23,9 @@ function App () {
   const [startEndList, setStartEndList] = useState([])
   const [eventData, setEventData] = useState({ eventType: 'rehearsal' })
   const [playlistSettings, setPlaylistSettings] = useState({})
+  const [timeAdjust, setTimeAdjust] = useState({
+    year: 0, month: 0, day: 0, hour: 0, minute: 0, second: 0
+  })
   const [playlistTitle, setPlaylistTitle] = useState({ titleChoice: 'suggested' })
 
   const prevButton = (current, disabled = false) => {
@@ -63,7 +66,17 @@ function App () {
   return (
     <StyletronProvider value={engine}>
       <BaseProvider theme={LightTheme}>
-        <ProgressSteps current={current}>
+        <ProgressSteps
+          current={current}
+           overrides={{
+             Content: {
+               style: () => ({
+                 // avoids jumping widths on desktop ... not sure about mobile
+                 minWidth: '600px'
+               })
+             }
+           }}
+        >
           <Step title='Auth'>
             <AuthPage />
             {prevNextButtons(0)}
@@ -79,6 +92,7 @@ function App () {
             <AdjustTimePage
               metadataList={metadataList}
               startEndList={startEndList} setStartEndList={setStartEndList}
+              timeAdjust={timeAdjust} setTimeAdjust={setTimeAdjust}
               current={2} nextButton={nextButton} prevButton={prevButton}
             />
           </Step>

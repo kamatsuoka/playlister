@@ -2,11 +2,22 @@ import React from 'react'
 import { Checkbox } from 'baseui/checkbox'
 import { SIZE } from 'baseui/input'
 import { useStyletron } from 'baseui'
+import { StatefulTooltip } from 'baseui/tooltip'
 
 const TimezoneOverride = ({ metadata, value, setValue }) => {
   const [css, theme] = useStyletron()
+
+  const SmallSpan = ({children}) => <span className={css({
+      fontSize: theme.typography.LabelSmall.fontSize,
+      fontWeight: theme.typography.ParagraphSmall.fontWeight,
+    })}>{children}</span>
+
+
   return (
-    <div>
+    <div style={{paddingTop: '10px', paddingBottom: '10px'}}>
+      <SmallSpan>
+
+      </SmallSpan>
       <Checkbox
         size={SIZE.small}
         disabled={Object.keys(metadata).length === 0}
@@ -27,12 +38,17 @@ const TimezoneOverride = ({ metadata, value, setValue }) => {
           }
         }}
       >
-        <span className={css({
-          fontSize: theme.typography.LabelSmall.fontSize
-        })}
-        >
-          File metadata times are actually in local time zone
-        </span>
+        <SmallSpan>
+          <StatefulTooltip
+            accessibilityType={'tooltip'}
+            content="Metadata times are interpreted in UTC if camera doesn't record time zone"
+          >
+            <span className={css({ borderBottomWidth: '1px', borderBottomStyle: 'dotted' })}>
+              File metadata times
+            </span>
+          </StatefulTooltip>
+          {' '}are actually in local time zone
+        </SmallSpan>
       </Checkbox>
     </div>
   )
