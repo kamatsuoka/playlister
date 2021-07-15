@@ -12,7 +12,7 @@ import { KIND as NKind, Notification } from 'baseui/notification'
  */
 const MetadataList = ({ metadataList, setMetadataList, metadataErrors }) => {
   const onRemove = useCallback(
-    id => setMetadataList(vs => vs.filter(v => v.id !== id)),
+    fileId => setMetadataList(metadataList.filter(data => data.fileId !== fileId)),
     [setMetadataList]
   )
 
@@ -54,13 +54,37 @@ const MetadataList = ({ metadataList, setMetadataList, metadataErrors }) => {
     }
   }
 
+  const columnOverrides = {
+    TableBodyCell: {
+      style: ({ $theme }) => ({
+        verticalAlign: 'center',
+        paddingLeft: $theme.sizing.scale200,
+        paddingTop: $theme.sizing.scale400,
+        paddingBottom: $theme.sizing.scale400
+      })
+    }
+  }
+
+  const removeColumnOverrides = {
+    TableHeadCell: {
+      style: ({
+        textAlign: 'center',
+      })
+    },
+    TableBodyCell: {
+      style: ({
+        textAlign: 'center',
+      })
+    }
+  }
+
   return (
     <div>
       <TableBuilder data={metadataList} overrides={tableOverrides}>
-        <TableBuilderColumn header={removeHeader()}>
+        <TableBuilderColumn header={removeHeader()} overrides={{...columnOverrides, ...removeColumnOverrides}}>
           {row =>
             <Button
-              onClick={() => onRemove(row.id)}
+              onClick={() => onRemove(row.fileId)}
               title='Remove from list'
               kind={KIND.tertiary}
               size={SIZE.mini}
@@ -68,16 +92,16 @@ const MetadataList = ({ metadataList, setMetadataList, metadataErrors }) => {
               <FontAwesomeIcon icon={faTimes} size='sm' />
             </Button>}
         </TableBuilderColumn>
-        <TableBuilderColumn header='Name'>
+        <TableBuilderColumn overrides={columnOverrides} header='Name'>
           {row => row.name}
         </TableBuilderColumn>
-        <TableBuilderColumn header='Format'>
+        <TableBuilderColumn overrides={columnOverrides} header='Format'>
           {row => row.format}
         </TableBuilderColumn>
-        <TableBuilderColumn header='Start Time'>
+        <TableBuilderColumn overrides={columnOverrides} header='Start Time'>
           {row => row.startTime.replace(/^UTC /, '')}
         </TableBuilderColumn>
-        <TableBuilderColumn header='Duration' numeric overrides={durationOverrides}>
+        <TableBuilderColumn overrides={{...columnOverrides, ...durationOverrides}} header='Duration' numeric>
           {row => durationSeconds(row.duration)}
         </TableBuilderColumn>
       </TableBuilder>

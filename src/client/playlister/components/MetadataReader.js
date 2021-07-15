@@ -56,7 +56,7 @@ const MetadataReader = ({ setMetadataList, setMetadataErrors }) => {
           try {
             return ({
               ...filterMetadata(data),
-              id: getRandomId(),
+              fileId: getRandomId(),
               name: file.name,
               file: file
             })
