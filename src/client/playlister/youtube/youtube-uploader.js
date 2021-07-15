@@ -49,7 +49,6 @@ class ResumableUploader {
     this.retryHandler = new RetryHandler
     params.uploadType = 'resumable'
     this.url = this.buildUrl(baseUrl, params)
-    this.httpMethod = 'POST'
     this.onContentUploadSuccess = response => this.onComplete && this.onComplete(response)
     this.onContentUploadError = error => {
       if (error.response && error.response.status) {
@@ -114,8 +113,7 @@ class ResumableUploader {
   axios = window.axios
 
   upload() {
-    axios(this.url, {
-      method: this.httpMethod,
+    axios.post(this.url, this.videoResource, {
       headers: {
         'Authorization': 'Bearer ' + this.token,
         'Content-Type': 'application/json',
@@ -166,7 +164,14 @@ class UploadWatcher {
 
   uploadFile(file, token) {
     const videoResource = {
-      snippet: { title: youtubeTitle(file.name), categoryId: 10 }
+      snippet: {
+        title: youtubeTitle(file.name),
+        categoryId: 10
+      },
+      status: {
+        privacyStatus: 'unlisted',
+        selfDeclaredMadeForKids: false
+      }
     }
     console.log(`uploading file with name ${file.name}, videoResource`, videoResource)
     const uploader = new ResumableUploader({
@@ -175,7 +180,7 @@ class UploadWatcher {
       token: token,
       videoResource: videoResource,
       params: {
-        part: 'snippet',
+        part: 'snippet,status',
         notifySubscribers: false,
       },
       onError: err => {
@@ -193,13 +198,14 @@ class UploadWatcher {
         this.progressHandler(percent)
       },
       onComplete: response => {
-        console.log(`uploaded video with id ${response.id}`)
+        const video = response.data
+        console.log('uploaded video, response = ', response)
         this.completeHandler({
-          id: response.id,
+          id: video.id,
           filename: file.name,
-          videoTitle: response.snippet.title,
-          publishedAt: response.snippet.publishedAt,
-          thumbnail: response.snippet.thumbnails.default.url,
+          title: video.snippet.title,
+          publishedAt: video.snippet.publishedAt,
+          thumbnail: video.snippet.thumbnails.default.url,
           file: file
         })
       },

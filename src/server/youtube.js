@@ -128,9 +128,10 @@ function findUploads(fileData) {
         }
         Logger.log(`matching video: ${JSON.stringify(video)}`)
         const videoSeconds = dayjs.duration(video.contentDetails.duration).asSeconds()
-        if (videoSeconds !== fileData[match.filename].durationSeconds) {
+        if (Math.abs(videoSeconds - fileData[match.filename].durationSeconds) > 1) {
           Logger.log(`duration of video ${video.id}, "${video.snippet.title}" at ${videoSeconds} seconds ` +
-            `doesn't match file ${match.filename} at ${fileData[match.filename].durationSeconds} seconds, ignoring`)
+            `doesn't match file ${match.filename} at ${fileData[match.filename].durationSeconds} seconds ` +
+            ' (±1), ignoring')
           continue
         }
         if (matchingVideos[match.filename] &&

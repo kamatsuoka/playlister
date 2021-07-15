@@ -15,20 +15,7 @@ import resumableUpload from '../youtube/youtube-uploader'
 const UploadStatus = ({ metadataList, uploadStatus, setUploadStatus }) => {
   const [error, setError] = useState('')
   const [uploadButtonState, setUploadButtonState] = useState({})
-
-  const onUploadComplete = useCallback(
-    uploaded => {
-      const status = {
-        id: uploaded.videoId,
-        videoTitle: uploaded.title,
-        publishedAt: uploaded.publishedAt,
-        thumbnail: uploaded.thumbnail
-      }
-      // TODO: re-sort list
-      return setUploadStatus(uploadStatus.filter(s => s.id !== status.id).concat(status))
-    },
-    [setUploadStatus]
-  )
+  const [uploadChecking, setUploadChecking] = useState('')
 
   const DATA = metadataList.flatMap(metadata => {
     const filename = metadata.name
@@ -37,7 +24,7 @@ const UploadStatus = ({ metadataList, uploadStatus, setUploadStatus }) => {
       return matchingUploads.map(upload => ({
           id: upload.id,
           filename: metadata.name,
-          videoTitle: upload.title,
+          title: upload.title,
           publishedAt: upload.publishedAt,
           thumbnail: upload.thumbnail,
           file: metadata.file
@@ -52,18 +39,21 @@ const UploadStatus = ({ metadataList, uploadStatus, setUploadStatus }) => {
   })
 
   const checkUploadStatus = useCallback(() => {
+    setUploadChecking('checking')
     const onSuccess = uploads => {
       const dateNow = dayjs()
       const items = uploads.filter(upload =>
         dateNow.diff(dayjs(upload.publishedAt), 'days') < 30
       )
       setUploadStatus(items)
+      setUploadChecking('checked')
     }
     return findUploads(metadataList,
       onSuccess,
       err => {
         setError(err)
         console.log(err)
+        setUploadChecking('error')
       })
   })
 
@@ -76,19 +66,15 @@ const UploadStatus = ({ metadataList, uploadStatus, setUploadStatus }) => {
       console.log(error)  // todo: show in UI
     }
     const completeHandler = uploaded => {
-      const status = {
-        id: uploaded.videoId,
-        filename: file.name,
-        videoTitle: uploaded.title,
-        publishedAt: uploaded.publishedAt,
-        thumbnail: uploaded.thumbnail,
-        file: file
-      }
-      // TODO: re-sort list
-      return setUploadStatus(uploadStatus.filter(s => s.id !== status.id).concat(status))
+      console.log('completeHandler: uploaded = ', uploaded)
+      return setUploadStatus(
+        uploadStatus
+          .filter(s => s.id !== uploaded.id)
+          .concat(uploaded)
+          .sort((a, b) => a.filename > b.filename ? 1 : -1)
+      )
     }
-    resumableUpload(file, progressHandler, onUploadComplete, errorHandler)
-
+    resumableUpload(file, progressHandler, completeHandler, errorHandler)
   }
 
   const getButtonContent = id => {
@@ -105,7 +91,7 @@ const UploadStatus = ({ metadataList, uploadStatus, setUploadStatus }) => {
 
 
   const uploadButton = row => {
-    if (row.videoTitle) {
+    if (row.title) {
       return <FontAwesomeIcon icon={faCheck} size='sm' />
     } else {
       return (<Button
@@ -125,9 +111,9 @@ const UploadStatus = ({ metadataList, uploadStatus, setUploadStatus }) => {
 
   }
 
-  return (
-    <>
-      <TableBuilder data={DATA} overrides={tableOverrides}>
+  const uploadStatusTable = () => {
+    if (uploadChecking === 'checked') {
+      return (<TableBuilder data={DATA} overrides={tableOverrides}>
         <TableBuilderColumn header=''>
           {row => uploadButton(row) }
         </TableBuilderColumn>
@@ -135,36 +121,23 @@ const UploadStatus = ({ metadataList, uploadStatus, setUploadStatus }) => {
           {row => row.filename}
         </TableBuilderColumn>
         <TableBuilderColumn header='Video Title'>
-          {row => row.videoTitle}
+          {row => row.title}
         </TableBuilderColumn>
         <TableBuilderColumn header='Published At'>
           {row => row.publishedAt}
         </TableBuilderColumn>
-        <TableBuilderColumn header='Thumbnail'>
-          {row => <img alt='' src={row.thumbnail}/>}
-        </TableBuilderColumn>
-{/*
-        <TableBuilderColumn header='Uploaded'>
-          {row => statusIcon(row)}
-        </TableBuilderColumn>
-        <TableBuilderColumn header=''>
-          {row =>
-            <Button
-              onClick={() => {
-                uploadFile(row.file)
-              }}
-              title='Upload'
-              kind={KIND.tertiary}
-              size={SIZE.mini}
-              disabled={isUndefined(row)}
-            >
-              ⇧
-            </Button>}
-        </TableBuilderColumn>
-*/}
-      </TableBuilder>
+      </TableBuilder>)
+    } else {
+      return null
+    }
+  }
+
+  return (
+    <>
+      {uploadStatusTable()}
       <Button style={{marginTop: '10px'}}
-              size={SIZE.compact} disabled={metadataList.length === 0}
+              size={SIZE.compact} disabled={metadataList.length === 0 || uploadChecking === 'checking'}
+              kind={uploadChecking === 'checked' ? KIND.secondary : KIND.primary}
               onClick={checkUploadStatus}
       >
         Check Upload Status
