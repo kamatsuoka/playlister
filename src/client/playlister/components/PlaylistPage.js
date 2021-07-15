@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import { Button, KIND as BKind } from 'baseui/button'
+import { Button, KIND, SIZE } from 'baseui/button'
 import { Table } from 'baseui/table-semantic'
 import EventData from './EventData'
 import PlaylistTitle from './PlaylistTitle'
-import { KIND, Notification } from 'baseui/notification'
+import { KIND as NKind, Notification } from 'baseui/notification'
 import { BaseCard } from './BaseCard'
 import { findPlaylist, insertPlaylist } from '../youtube/api'
 import dayjs from 'dayjs'
@@ -115,7 +115,7 @@ const PlaylistPage = ({
 
   const showNotification = () => {
     if (playlistStatus.message) {
-      const kind = playlistStatus.isError ? KIND.negative : KIND.positive
+      const kind = playlistStatus.isError ? NKind.negative : NKind.positive
       return (
         <Notification kind={kind} overrides={{ Body: { style: { width: 'auto' } } }} closeable>
           {playlistStatus.message}
@@ -133,7 +133,11 @@ const PlaylistPage = ({
         eventData={eventData}
         value={playlistTitle} setValue={setPlaylistTitle}
       />
-      <Button onClick={() => findOrCreatePlaylist()} kind={value.id ? BKind.secondary : BKind.primary}>
+      <Button
+        onClick={() => findOrCreatePlaylist()}
+        size={SIZE.compact}
+        kind={value.id ? KIND.secondary : KIND.primary}
+      >
         Find or Create Playlist
       </Button>
       {showNotification()}

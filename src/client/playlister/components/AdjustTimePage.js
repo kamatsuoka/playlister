@@ -31,6 +31,13 @@ const AdjustTimePage = ({ metadataList, startEndList, setStartEndList, timeAdjus
           max={max}
           name={name}
           onChange={handleChange}
+          overrides={{
+            Root: {
+              style: ({ $theme }) => ({
+                height: $theme.sizing.scale1000
+              })
+            }
+          }}
         />
       </FormControl>
     </FlexGridItem>
