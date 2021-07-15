@@ -10,8 +10,8 @@ import { Input } from 'baseui/input'
  * Adjust time on file metadata in case camera doesn't have time zone
  * or has time set incorrectly
  */
-const AdjustTimePage = ({ metadataList, startEndList, setStartEndList, timeAdjust, setTimeAdjust,
-  current, prevButton, nextButton }) => {
+const AdjustTimePage = ({ metadataList, startEndList, setStartEndList,
+  timeAdjust, setTimeAdjust, prevNextButtons }) => {
   const [overrideTimeZone, setOverrideTimeZone] = useState(true)
 
   const handleChange = (evt) => {
@@ -63,11 +63,7 @@ const AdjustTimePage = ({ metadataList, startEndList, setStartEndList, timeAdjus
           {timeOffset('second', 59)}
         </FlexGrid>
       </BaseCard>
-      <div align='right'>
-        {prevButton(current)}
-        &nbsp;
-        {nextButton(current)}
-      </div>
+      {prevNextButtons}
     </>
   )
 }

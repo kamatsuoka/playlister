@@ -10,7 +10,7 @@ import AuthPage from './AuthPage'
 import VideoPage from './VideoPage'
 import { StyledLink } from 'baseui/link'
 import { ProgressSteps, Step } from 'baseui/progress-steps'
-import { Button } from 'baseui/button'
+import { Button, KIND } from 'baseui/button'
 import PlaylistPage from './PlaylistPage'
 import AdjustTimePage from './AdjustTimePage'
 
@@ -28,7 +28,7 @@ function App () {
   })
   const [playlistTitle, setPlaylistTitle] = useState({ titleChoice: 'suggested' })
 
-  const prevButton = (current, disabled = false) => {
+  const prevButton = ({current, disabled = false}) => {
     if (current > 0) {
       return (
         <Button
@@ -40,13 +40,13 @@ function App () {
     } else { return null }
   }
 
-  const nextButton = (current, last, disabled = false) => {
+  const nextButton = ({current, last=false, disabled=false, kind=KIND.primary}) => {
     if (last) {
       return null
     } else {
       return (
         <Button
-          size='compact' disabled={disabled}
+          size='compact' disabled={disabled} kind={kind}
           onClick={() => setCurrent(current + 1)}
         >Next
         </Button>
@@ -54,12 +54,12 @@ function App () {
     }
   }
 
-  const prevNextButtons = (current, last = false) =>
+  const prevNextButtons = ({current, last = false}) =>
     (
       <div align='right'>
-        {prevButton(current)}
+        {prevButton({current})}
         &nbsp;
-        {nextButton(current, last)}
+        {nextButton({current, last})}
       </div>
     )
 
@@ -79,13 +79,13 @@ function App () {
         >
           <Step title='Auth'>
             <AuthPage />
-            {prevNextButtons(0)}
+            {prevNextButtons({current: 0})}
           </Step>
           <Step title='Files'>
             <FilePage
               metadataList={metadataList} setMetadataList={setMetadataList}
               uploadStatus={uploadStatus} setUploadStatus={setUploadStatus}
-              current={1} nextButton={nextButton} prevButton={prevButton}
+              current={1} prevButton={prevButton} nextButton={nextButton}
             />
           </Step>
           <Step title='Time'>
@@ -93,8 +93,8 @@ function App () {
               metadataList={metadataList}
               startEndList={startEndList} setStartEndList={setStartEndList}
               timeAdjust={timeAdjust} setTimeAdjust={setTimeAdjust}
-              current={2} nextButton={nextButton} prevButton={prevButton}
             />
+            {prevNextButtons({current: 2})}
           </Step>
           <Step title='Playlist'>
             <PlaylistPage
@@ -104,14 +104,14 @@ function App () {
               value={playlistSettings} setValue={setPlaylistSettings}
               setActiveKey={setCurrent}
             />
-            {prevNextButtons(3)}
+            {prevNextButtons({current: 3})}
           </Step>
           <Step title='Videos'>
             <VideoPage
               eventData={eventData} startEndList={startEndList}
               playlistSettings={playlistSettings} setActiveKey={setCurrent}
             />
-            {prevNextButtons(4, true)}
+            {prevNextButtons({current: 4, last: true})}
           </Step>
         </ProgressSteps>
         <footer>

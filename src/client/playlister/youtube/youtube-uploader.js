@@ -162,7 +162,7 @@ class UploadWatcher {
     this.errorHandler = errorHandler
   }
 
-  uploadFile(file, token) {
+  uploadFile (file, fileId, token) {
     const videoResource = {
       snippet: {
         title: youtubeTitle(file.name),
@@ -201,8 +201,9 @@ class UploadWatcher {
         const video = response.data
         console.log('uploaded video, response = ', response)
         this.completeHandler({
-          id: video.id,
+          videoId: video.id,
           filename: file.name,
+          fileId: fileId,
           title: video.snippet.title,
           publishedAt: video.snippet.publishedAt,
           thumbnail: video.snippet.thumbnails.default.url,
@@ -215,9 +216,9 @@ class UploadWatcher {
   }
 }
 
-function resumableUpload(file, progressHandler, completeHandler, errorHandler) {
+function resumableUpload (file, fileId, progressHandler, completeHandler, errorHandler) {
   return google.script.run.withSuccessHandler(token =>
-    (new UploadWatcher(progressHandler, completeHandler, errorHandler)).uploadFile(file, token),
+    (new UploadWatcher(progressHandler, completeHandler, errorHandler)).uploadFile(file, fileId, token),
   ).getToken()
 }
 

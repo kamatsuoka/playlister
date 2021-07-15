@@ -64,7 +64,7 @@ function insertPlaylist (title, description) {
  * 3. Listing videos in the uploads playlist
  * 4. Returning videos that match one of the given filenames / titles
  *
- * @param {Object} fileData - map of filename to title, durationSeconds
+ * @param {Object} fileData - map of filename to fileId, title, durationSeconds
  */
 function findUploads(fileData) {
   Logger.log(`filedata = ${JSON.stringify(fileData)}`)
@@ -109,10 +109,11 @@ function findUploads(fileData) {
       const matches = uploads.flatMap(upload => {
         if (filenameSet.has(upload.title)) {
           upload.filename = upload.title
-          return [upload]
-        }
-        if (titleSet.has(upload.title)) {
+        } else if (titleSet.has(upload.title)) {
           upload.filename = titleToFilename[upload.title]
+        }
+        if (upload.filename) {
+          upload.fileId = fileData[upload.filename].fileId
           return [upload]
         }
         return []

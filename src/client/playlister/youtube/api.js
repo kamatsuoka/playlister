@@ -125,9 +125,10 @@ const youtubeTitle = filename => {
  */
 const findUploads = (metadataList, onSuccess, onFailure) => {
   const fileData = Object.fromEntries(
-      metadataList.map(metadata => [metadata.name, {
-      title: youtubeTitle(metadata.name),
-      durationSeconds: Math.round(metadata.duration)
+      metadataList.map(data => [data.name, {
+        fileId: data.fileId,
+        title: youtubeTitle(data.name),
+        durationSeconds: Math.round(data.duration)
     }])
   )
 

@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { TableBuilder, TableBuilderColumn } from 'baseui/table-semantic'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheck, faExclamation, faQuestion } from '@fortawesome/free-solid-svg-icons'
@@ -14,23 +14,39 @@ const ERROR = 'error'
 /**
  * List of files and their upload status
  */
-const UploadStatus = ({ metadataList, uploadStatus, setUploadStatus }) => {
+const UploadStatus = ({ metadataList, uploadStatus, setUploadStatus, allUploaded, setAllUploaded }) => {
   const [error, setError] = useState('')
   // map of fileId to upload button state
   const [uploadButtonState, setUploadButtonState] = useState({})
+  // map of fileId to upload progress
+  const [uploadProgress, setUploadProgress] = useState({})
   // used to show spinner on 'Check Upload Status' button
   const [checkingStatus, setCheckingStatus] = useState(false)
   // file ids that have been checked
   const [checkedFileIds, setCheckedFileIds] = useState(new Set())
 
+  /**
+   * Set the "all uploaded" state to indicate that all files have been uploaded
+   */
+  useEffect(() => {
+    const uploadedFileIds = new Set(
+      uploadStatus
+        .filter(status => status.videoId)
+        .map(status => status.fileId)
+    )
+    setAllUploaded(
+      metadataList.length > 0 &&
+      metadataList.map(data => data.fileId).every(fileId => uploadedFileIds.has(fileId))
+    )
+  }, [metadataList, setAllUploaded])
+
   const DATA = metadataList.flatMap(metadata => {
-    const filename = metadata.name
-    const matchingUploads = uploadStatus.filter(match => match.filename === filename)
+    const matchingUploads = uploadStatus.filter(match => match.fileId === metadata.fileId)
     if (matchingUploads.length > 0) {
       return matchingUploads.map(upload => ({
         fileId: metadata.fileId,
         filename: metadata.name,
-        videoId: upload.id,
+        videoId: upload.videoId,
         title: upload.title,
         publishedAt: upload.publishedAt,
         thumbnail: upload.thumbnail,
@@ -68,7 +84,7 @@ const UploadStatus = ({ metadataList, uploadStatus, setUploadStatus }) => {
 
   const uploadFile = (fileId, file) => {
     const progressHandler = percent => {
-      setUploadButtonState({...uploadButtonState, [fileId]: `progress:${percent}`})
+      setUploadProgress({...uploadProgress, [fileId]: percent})
     }
     const errorHandler = error => {
       setUploadButtonState({...uploadButtonState, [fileId]: ERROR})
@@ -83,43 +99,45 @@ const UploadStatus = ({ metadataList, uploadStatus, setUploadStatus }) => {
           .sort((a, b) => a.filename > b.filename ? 1 : -1)
       )
     }
-    resumableUpload(file, progressHandler, completeHandler, errorHandler)
+    resumableUpload(file, fileId, progressHandler, completeHandler, errorHandler)
   }
 
   const getButtonContent = fileId => {
     if (!uploadButtonState[fileId]) {
       return '⇧'
     }
+    if (uploadButtonState[fileId] === UPLOADING) {
+      return ' '
+    }
     if (uploadButtonState[fileId] === ERROR) {
       return faExclamation
-    }
-    if (uploadButtonState[fileId].startsWith('progress')) {
-      return uploadButtonState[fileId].split(':')[1] + '%'
     }
   }
 
 
   const uploadButton = row => {
     if (row.title) {
-      return <FontAwesomeIcon icon={faCheck} size='sm' title='Uploaded, good job!'/>
+      return <FontAwesomeIcon icon={faCheck} size="sm" title="Uploaded, good job!"/>
+    }
+    if (uploadProgress[row.fileId]) {
+      return `${uploadProgress[row.fileId]}%`
+    }
+    const checked = checkedFileIds.has(row.fileId)
+    if (checked) {
+      return (<Button
+        onClick={() => {
+          setUploadButtonState({ ...uploadButtonState, [row.fileId]: UPLOADING })
+          uploadFile(row.fileId, row.file)
+        }}
+        title="Upload"
+        kind={KIND.tertiary}
+        size={SIZE.mini}
+        isLoading={uploadButtonState[row.fileId] === UPLOADING}
+      >
+        {getButtonContent(row.fileId)}
+      </Button>)
     } else {
-      const checked = checkedFileIds.has(row.fileId)
-      if (checked) {
-        return (<Button
-          onClick={() => {
-            setUploadButtonState({ ...uploadButtonState, [row.fileId]: UPLOADING })
-            uploadFile(row.fileId, row.file)
-          }}
-          title='Upload'
-          kind={KIND.tertiary}
-          size={SIZE.mini}
-          disabled={uploadButtonState[row.fileId] === UPLOADING}
-        >
-          {getButtonContent(row.fileId)}
-        </Button>)
-      } else {
-        return <FontAwesomeIcon icon={faQuestion} size='sm' title='Check upload status'/>
-      }
+      return <FontAwesomeIcon icon={faQuestion} size="sm" title="Check upload status"/>
     }
 
   }
@@ -167,7 +185,9 @@ const UploadStatus = ({ metadataList, uploadStatus, setUploadStatus }) => {
     }
   }
 
-  const allChecked = () => metadataList.map(data => data.fileId).every(fileId => checkedFileIds.has(fileId))
+  const allChecked = () =>
+    metadataList.length > 0 &&
+    metadataList.map(data => data.fileId).every(fileId => checkedFileIds.has(fileId))
 
   return (
     <>

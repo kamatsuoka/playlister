@@ -12,7 +12,7 @@ import { KIND as NKind, Notification } from 'baseui/notification'
  */
 const MetadataList = ({ metadataList, setMetadataList, metadataErrors }) => {
   const onRemove = useCallback(
-    fileId => setMetadataList(metadataList.filter(data => data.fileId !== fileId)),
+    fileId => setMetadataList(datas => datas.filter(data => data.fileId !== fileId)),
     [setMetadataList]
   )
 
