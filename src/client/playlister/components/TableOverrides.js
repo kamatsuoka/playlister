@@ -12,18 +12,18 @@ const tableOverrides = {
     })
   },
   TableHeadCell: {
-    style: ({ $theme, $rowIndex }) => ({
+    style: {
       paddingLeft: tablePadding,
       paddingRight: tablePadding
-    })
+    }
   },
   TableBodyCell: {
-    style: ({ $theme, $rowIndex }) => ({
+    style: {
       paddingLeft: tablePadding,
       paddingRight: tablePadding,
       paddingTop: tablePadding,
       paddingBottom: tablePadding
-    })
+    }
   }
 }
 

@@ -28,7 +28,7 @@ function App () {
   })
   const [playlistTitle, setPlaylistTitle] = useState({ titleChoice: 'suggested' })
 
-  const prevButton = ({current, disabled = false}) => {
+  const prevButton = ({ current, disabled = false }) => {
     if (current > 0) {
       return (
         <Button
@@ -40,7 +40,7 @@ function App () {
     } else { return null }
   }
 
-  const nextButton = ({current, last=false, disabled=false, kind=KIND.primary}) => {
+  const nextButton = ({ current, last = false, disabled = false, kind = KIND.primary }) => {
     if (last) {
       return null
     } else {
@@ -54,12 +54,12 @@ function App () {
     }
   }
 
-  const prevNextButtons = ({current, last = false}) =>
+  const prevNextButtons = ({ current, last = false }) =>
     (
       <div align='right'>
-        {prevButton({current})}
+        {prevButton({ current })}
         &nbsp;
-        {nextButton({current, last})}
+        {nextButton({ current, last })}
       </div>
     )
 
@@ -68,18 +68,18 @@ function App () {
       <BaseProvider theme={LightTheme}>
         <ProgressSteps
           current={current}
-           overrides={{
-             Content: {
-               style: () => ({
-                 // avoids jumping widths on desktop ... not sure about mobile
-                 minWidth: '600px'
-               })
-             }
-           }}
+          overrides={{
+            Content: {
+              style: () => ({
+                // avoids jumping widths on desktop ... not sure about mobile
+                minWidth: '720px'
+              })
+            }
+          }}
         >
           <Step title='Auth'>
             <AuthPage />
-            {prevNextButtons({current: 0})}
+            {prevNextButtons({ current: 0 })}
           </Step>
           <Step title='Files'>
             <FilePage
@@ -94,7 +94,7 @@ function App () {
               startEndList={startEndList} setStartEndList={setStartEndList}
               timeAdjust={timeAdjust} setTimeAdjust={setTimeAdjust}
             />
-            {prevNextButtons({current: 2})}
+            {prevNextButtons({ current: 2 })}
           </Step>
           <Step title='Playlist'>
             <PlaylistPage
@@ -104,14 +104,14 @@ function App () {
               value={playlistSettings} setValue={setPlaylistSettings}
               setActiveKey={setCurrent}
             />
-            {prevNextButtons({current: 3})}
+            {prevNextButtons({ current: 3 })}
           </Step>
           <Step title='Videos'>
             <VideoPage
               eventData={eventData} startEndList={startEndList}
               playlistSettings={playlistSettings} setActiveKey={setCurrent}
             />
-            {prevNextButtons({current: 4, last: true})}
+            {prevNextButtons({ current: 4, last: true })}
           </Step>
         </ProgressSteps>
         <footer>
