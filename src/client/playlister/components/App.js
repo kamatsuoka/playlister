@@ -26,7 +26,7 @@ function App () {
   const [timeAdjust, setTimeAdjust] = useState({
     year: 0, month: 0, day: 0, hour: 0, minute: 0, second: 0
   })
-  const [playlistTitle, setPlaylistTitle] = useState({ titleChoice: 'suggested' })
+  const [playlistTitle, setPlaylistTitle] = useState({ titleChoice: 'suggested', customTitle: '' })
 
   const prevButton = ({ current, disabled = false }) => {
     if (current > 0) {
@@ -101,8 +101,7 @@ function App () {
               startEndList={startEndList}
               eventData={eventData} setEventData={setEventData}
               playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
-              value={playlistSettings} setValue={setPlaylistSettings}
-              setActiveKey={setCurrent}
+              playlistSettings={playlistSettings} setPlaylistSettings={setPlaylistSettings}
             />
             {prevNextButtons({ current: 3 })}
           </Step>

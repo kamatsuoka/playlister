@@ -4,25 +4,23 @@ import { Input } from 'baseui/input'
 import { BaseCard } from './BaseCard'
 import { createTheme, lightThemePrimitives, ThemeProvider } from 'baseui'
 
-const PlaylistTitle = ({ eventData, value, setValue }) => {
+const PlaylistTitle = ({ eventData, playlistTitle, setPlaylistTitle }) => {
   const suggestedTitle = () => eventData.inferredDate ? `${eventData.inferredDate} ${eventData.eventType}` : ''
 
   const handleChange = (evt) => {
     const value = evt.target.value
-    setValue({
+    setPlaylistTitle({
       ...value,
       [evt.target.name]: value
     })
   }
 
-  const themeOverrides = () => {
-    const overrides = value.titleChoice === 'suggested' && eventData.inferredDate
+  const themeOverrides = () =>
+    playlistTitle.titleChoice === 'suggested' && eventData.inferredDate
       ? ({
           colors: { inputTextDisabled: 'black' }
         })
       : {}
-    return overrides
-  }
 
   return (
     <ThemeProvider
@@ -30,7 +28,7 @@ const PlaylistTitle = ({ eventData, value, setValue }) => {
     >
       <BaseCard title='Playlist Title'>
         <RadioGroup
-          value={value.titleChoice}
+          value={playlistTitle.titleChoice}
           name='titleChoice'
           onChange={handleChange}
           align={ALIGN.horizontal}
@@ -38,9 +36,9 @@ const PlaylistTitle = ({ eventData, value, setValue }) => {
           <Radio value='suggested'>Suggested &nbsp;</Radio>
           <Radio value='custom'>Custom</Radio>
         </RadioGroup>
-        {value.titleChoice === 'custom'
+        {playlistTitle.titleChoice === 'custom'
           ? <Input
-              value={value.customTitle || ''}
+              value={playlistTitle.customTitle || ''}
               placeholder='enter custom title'
               name='customTitle'
               onChange={handleChange}

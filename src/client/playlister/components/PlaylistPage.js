@@ -20,13 +20,14 @@ const PlaylistPage = ({
   startEndList,
   eventData, setEventData,
   playlistTitle, setPlaylistTitle,
-  setActiveKey, value, setValue
+  playlistSettings, setPlaylistSettings
 }) => {
   const [playlistStatus, setPlaylistStatus] = useState({ message: '' })
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     setEventData({ ...eventData, inferredDate: inferDate(startEndList) })
-  }, [startEndList])
+  }, [eventData, setEventData, startEndList])
 
   const suggestedTitle = () => {
     const date = eventData.inferredDate || ''
@@ -37,8 +38,8 @@ const PlaylistPage = ({
   const storePlaylist = (playlist) => {
     // eslint-disable-next-line no-prototype-builtins
     if (playlist.hasOwnProperty(['id'])) {
-      return setValue({
-        ...value,
+      return setPlaylistSettings({
+        ...playlistSettings,
         id: playlist.id,
         title: playlist.snippet.title,
         itemCount: playlist.contentDetails.itemCount,
@@ -46,63 +47,68 @@ const PlaylistPage = ({
         description: playlist.snippet.description
       })
     } else {
-      return setValue({})
+      return setPlaylistSettings({})
     }
+  }
+
+  /**
+   * Success handler for creating or finding a playlist
+   */
+  const playlistSuccess = msgIntro => playlist => {
+    storePlaylist(playlist)
+    setPlaylistStatus({
+      ...playlistStatus,
+      message: `${msgIntro} playlist "${playlist.snippet.title}"`,
+      isError: false
+    })
+    setLoading(false)
+  }
+
+  /**
+   * Failure handler for creating or finding a playlist
+   */
+  const playlistFailure = msgIntro => err => {
+    let errorMsg = err
+    try {
+      errorMsg = JSON.stringify(err)
+    } catch {
+      // no-op
+    }
+    setPlaylistStatus({
+      ...playlistStatus,
+      message: `${msgIntro} playlist: ${errorMsg}`,
+      isError: true
+    })
+    setLoading(false)
   }
 
   function findOrCreatePlaylist () {
     setPlaylistStatus({}) // clear message, if any, first
+    storePlaylist({}) // clear existing found playlist, if any
+    setLoading(true)
     const title = playlistTitle.titleChoice === 'custom' ? playlistTitle.customTitle : suggestedTitle()
     const successHandler = playlist => {
       if (playlist) {
-        storePlaylist(playlist)
-        setPlaylistStatus({
-          ...playlistStatus,
-          message: `Found existing playlist "${playlist.snippet.title}"`,
-          isError: false
-        })
+        playlistSuccess('Found existing')(playlist)
       } else {
-        return createPlaylist(title)
+        createPlaylist(title)
       }
     }
-    const failureHandler = error => setPlaylistStatus({
-      ...playlistStatus,
-      message: `Error calling findPlaylist: ${error}`,
-      isError: true
-    })
-
-    return findPlaylist(title, successHandler, failureHandler)
+    return findPlaylist(title, successHandler, playlistFailure('Error finding'))
   }
 
   function createPlaylist (title) {
-    const successHandler = playlist => {
-      storePlaylist(playlist)
-      setPlaylistStatus({
-        ...playlistStatus,
-        message: `Created playlist "${playlist.snippet.title}"`,
-        isError: false
-      })
-    }
-    const failureHandler = err => {
-      console.error('Execute error', err)
-      storePlaylist({})
-      setPlaylistStatus({
-        ...playlistStatus,
-        message: `Error creating playlist: ${JSON.stringify(err)}`,
-        isError: true
-      })
-    }
-    insertPlaylist(title, successHandler, failureHandler)
+    insertPlaylist(title, playlistSuccess('Created'), playlistFailure('Error creating'))
   }
 
   const showPlaylist = () => {
-    if (value.id) {
+    if (playlistSettings.id) {
       const DATA = [
-        ['title', value.title],
-        ['description', value.description],
-        ['id', value.id],
-        ['item count', value.itemCount],
-        ['published at', value.publishedAt]
+        ['title', playlistSettings.title],
+        ['description', playlistSettings.description],
+        ['id', playlistSettings.id],
+        ['item count', playlistSettings.itemCount],
+        ['published at', playlistSettings.publishedAt]
       ]
       return (
         <BaseCard title='Playlist'>
@@ -131,12 +137,13 @@ const PlaylistPage = ({
       <EventData value={eventData} setValue={setEventData} />
       <PlaylistTitle
         eventData={eventData}
-        value={playlistTitle} setValue={setPlaylistTitle}
+        playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
       />
       <Button
         onClick={() => findOrCreatePlaylist()}
         size={SIZE.compact}
-        kind={value.id ? KIND.secondary : KIND.primary}
+        kind={playlistSettings.id ? KIND.secondary : KIND.primary}
+        isLoading={loading}
       >
         Find or Create Playlist
       </Button>
