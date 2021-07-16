@@ -11,7 +11,7 @@ const PlaylistPage = ({
   startEndList,
   eventData, setEventData,
   playlistTitle, setPlaylistTitle,
-  playlistSettings, setPlaylistSettings
+  playlistData, setPlaylistData
 }) => {
   const [playlistStatus, setPlaylistStatus] = useState({ message: '' })
   const [loading, setLoading] = useState(false)
@@ -25,8 +25,8 @@ const PlaylistPage = ({
   const storePlaylist = playlist => {
     // eslint-disable-next-line no-prototype-builtins
     if (playlist.hasOwnProperty(['id'])) {
-      return setPlaylistSettings({
-        ...playlistSettings,
+      return setPlaylistData({
+        ...playlistData,
         id: playlist.id,
         title: playlist.snippet.title,
         itemCount: playlist.contentDetails.itemCount,
@@ -34,7 +34,7 @@ const PlaylistPage = ({
         description: playlist.snippet.description
       })
     } else {
-      return setPlaylistSettings({})
+      return setPlaylistData({})
     }
   }
 
@@ -89,13 +89,13 @@ const PlaylistPage = ({
   }
 
   const showPlaylist = () => {
-    if (playlistSettings.id) {
+    if (playlistData.id) {
       const DATA = [
-        ['title', playlistSettings.title],
-        ['description', playlistSettings.description],
-        ['id', playlistSettings.id],
-        ['item count', playlistSettings.itemCount],
-        ['published at', playlistSettings.publishedAt]
+        ['title', playlistData.title],
+        ['description', playlistData.description],
+        ['id', playlistData.id],
+        ['item count', playlistData.itemCount],
+        ['published at', playlistData.publishedAt]
       ]
       return (
         <BaseCard title='Playlist'>
@@ -136,7 +136,7 @@ const PlaylistPage = ({
       <Button
         onClick={() => findOrCreatePlaylist()}
         size={SIZE.compact}
-        kind={playlistSettings.id ? KIND.secondary : KIND.primary}
+        kind={playlistData.id ? KIND.secondary : KIND.primary}
         isLoading={loading}
         disabled={startEndList.length === 0 || !isValidTitle()}
       >

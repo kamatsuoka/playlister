@@ -29,6 +29,7 @@
   },
   "rules": {
     //    "prettier/prettier": "error",
+    "no-trailing-spaces": "off",
     "react/prop-types": "off",
     "camelcase": "warn",
     "import/prefer-default-export": "warn",

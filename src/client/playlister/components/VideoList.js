@@ -20,7 +20,7 @@ dayjs.extend(utc)
 const VideoList = ({
   eventData,
   startEndList,
-  playlistSettings,
+  playlistData,
   videoNaming,
   setVideoResources
 }) => {
@@ -28,7 +28,7 @@ const VideoList = ({
 
   useEffect(() => {
     const date = eventData.inferredDate
-    const startIndex = parseInt(playlistSettings.itemCount || 0) + 1 + parseInt(videoNaming.indexOffset)
+    const startIndex = parseInt(playlistData.itemCount || 0) + 1 + parseInt(videoNaming.indexOffset)
     const pad = (n) => n < 10 ? `0${n}` : `${n}`
     const resources = startEndList.map((startEnd, index) => ({
       kind: 'youtube#video',
@@ -44,7 +44,7 @@ const VideoList = ({
     setTableData(startEndList.map(s => s.name).map((n, i) =>
       [n, resources[i].snippet.title, resources[i].recordingDetails.recordingDate])
     )
-  }, [startEndList, playlistSettings, videoNaming])
+  }, [startEndList, playlistData, videoNaming])
 
   const COLUMNS = ['File name', 'Video Name', 'Recording Date']
 

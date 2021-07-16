@@ -5,7 +5,7 @@ import { Combobox } from 'baseui/combobox'
 import { BaseCard } from './BaseCard'
 import { FlexGrid, FlexGridItem } from 'baseui/flex-grid'
 
-const VideoNaming = ({ playlistSettings, videoNaming, setVideoNaming }) => {
+const VideoNaming = ({ playlistData, videoNaming, setVideoNaming }) => {
   const handleChange = (evt) => {
     setVideoNaming({
       ...videoNaming,
@@ -54,7 +54,7 @@ const VideoNaming = ({ playlistSettings, videoNaming, setVideoNaming }) => {
         <FlexGridItem {...itemProps}>
           <FormControl label='next index'>
             <Input
-              value={(playlistSettings.itemCount || 0) + 1}
+              value={(playlistData.itemCount || 0) + 1}
               type='number'
               disabled
             />
@@ -66,7 +66,7 @@ const VideoNaming = ({ playlistSettings, videoNaming, setVideoNaming }) => {
               value={videoNaming.indexOffset}
               type='number'
               name='indexOffset'
-              min={-(playlistSettings.itemCount || 0)}
+              min={-(playlistData.itemCount || 0)}
               onChange={handleChange}
             />
           </FormControl>

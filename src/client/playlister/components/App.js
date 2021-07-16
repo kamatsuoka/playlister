@@ -17,16 +17,23 @@ import AdjustTimePage from './AdjustTimePage'
 const engine = new Styletron()
 
 function App () {
+  // index of currently selected step
   const [current, setCurrent] = useState(1)
+  // file metadata as detected by mediainfo.js
   const [metadataList, setMetadataList] = useState([])
+  // status of files uploaded to youtube
   const [uploadStatus, setUploadStatus] = useState([])
   const [startEndList, setStartEndList] = useState([])
+  // attributes of event where the videos were recorded
   const [eventData, setEventData] = useState({ eventType: 'rehearsal' })
-  const [playlistSettings, setPlaylistSettings] = useState({})
+  // playlist title settings for finding / creating a playlist
+  const [playlistTitle, setPlaylistTitle] = useState({ titleChoice: 'suggested', customTitle: '' })
+  // metadata about found / created playlist
+  const [playlistData, setPlaylistData] = useState({})
+  // adjustments to video start/end time, in case camera doesn't record time zone etc.
   const [timeAdjust, setTimeAdjust] = useState({
     year: 0, month: 0, day: 0, hour: 0, minute: 0, second: 0
   })
-  const [playlistTitle, setPlaylistTitle] = useState({ titleChoice: 'suggested', customTitle: '' })
 
   const prevButton = ({ current, disabled = false }) => {
     if (current > 0) {
@@ -101,14 +108,14 @@ function App () {
               startEndList={startEndList}
               eventData={eventData} setEventData={setEventData}
               playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
-              playlistSettings={playlistSettings} setPlaylistSettings={setPlaylistSettings}
+              playlistData={playlistData} setPlaylistData={setPlaylistData}
             />
             {prevNextButtons({ current: 3 })}
           </Step>
           <Step title='Videos'>
             <VideoPage
               eventData={eventData} startEndList={startEndList}
-              playlistSettings={playlistSettings} setActiveKey={setCurrent}
+              playlistData={playlistData} setActiveKey={setCurrent}
             />
             {prevNextButtons({ current: 4, last: true })}
           </Step>
