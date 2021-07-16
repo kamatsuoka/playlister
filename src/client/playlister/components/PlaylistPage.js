@@ -1,20 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { Button, KIND, SIZE } from 'baseui/button'
 import { Table } from 'baseui/table-semantic'
-import EventData from './EventData'
-import PlaylistTitle from './PlaylistTitle'
 import { KIND as NKind, Notification } from 'baseui/notification'
 import { BaseCard } from './BaseCard'
 import { findPlaylist, insertPlaylist } from '../youtube/api'
-import dayjs from 'dayjs'
-
-const inferDate = (startEndList) => {
-  const dateSet = new Set()
-  startEndList.map(f => dayjs(f.startTime)
-    .format('YYYYMMDD'))
-    .forEach(d => dateSet.add(d))
-  return dateSet.size > 0 ? dateSet.values().next().value : ''
-}
+import inferDate from './InferredDate'
+import PlaylistTitle, { CUSTOM, SUGGESTED } from './PlaylistTitle'
 
 const PlaylistPage = ({
   startEndList,
@@ -25,17 +16,13 @@ const PlaylistPage = ({
   const [playlistStatus, setPlaylistStatus] = useState({ message: '' })
   const [loading, setLoading] = useState(false)
 
-  useEffect(() => {
-    setEventData({ ...eventData, inferredDate: inferDate(startEndList) })
-  }, [eventData, setEventData, startEndList])
-
   const suggestedTitle = () => {
-    const date = eventData.inferredDate || ''
+    const date = inferDate(startEndList) || ''
     const eventType = eventData.eventType
     return (date && eventType) ? date.replaceAll('-', '') + ' ' + eventType : ''
   }
 
-  const storePlaylist = (playlist) => {
+  const storePlaylist = playlist => {
     // eslint-disable-next-line no-prototype-builtins
     if (playlist.hasOwnProperty(['id'])) {
       return setPlaylistSettings({
@@ -86,7 +73,7 @@ const PlaylistPage = ({
     setPlaylistStatus({}) // clear message, if any, first
     storePlaylist({}) // clear existing found playlist, if any
     setLoading(true)
-    const title = playlistTitle.titleChoice === 'custom' ? playlistTitle.customTitle : suggestedTitle()
+    const title = playlistTitle.titleChoice === CUSTOM ? playlistTitle.customTitle : suggestedTitle()
     const successHandler = playlist => {
       if (playlist) {
         playlistSuccess('Found existing')(playlist)
@@ -132,11 +119,18 @@ const PlaylistPage = ({
     }
   }
 
+  const isValidTitle = () => {
+    if (playlistTitle.titleChoice === SUGGESTED) {
+      return suggestedTitle() !== ''
+    } else {
+      return playlistTitle.customTitle !== ''
+    }
+  }
+
   return (
     <>
-      <EventData value={eventData} setValue={setEventData} />
       <PlaylistTitle
-        eventData={eventData}
+        eventData={eventData} setEventData={setEventData} suggestedTitle={suggestedTitle()}
         playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
       />
       <Button
@@ -144,6 +138,7 @@ const PlaylistPage = ({
         size={SIZE.compact}
         kind={playlistSettings.id ? KIND.secondary : KIND.primary}
         isLoading={loading}
+        disabled={startEndList.length === 0 || !isValidTitle()}
       >
         Find or Create Playlist
       </Button>

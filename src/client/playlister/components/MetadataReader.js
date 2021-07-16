@@ -39,7 +39,7 @@ const MetadataReader = ({ setMetadataList, setMetadataErrors }) => {
         startTime: general.Encoded_Date
       }
     }
-    throw 'No media detected'
+    throw new Error('No media detected')
   }
 
   /**
@@ -86,7 +86,7 @@ const MetadataReader = ({ setMetadataList, setMetadataErrors }) => {
         }
       }).finally(() => setAnalyzing(false))
     }
-  }, [setMetadataList])
+  }, [setMetadataErrors, setMetadataList])
 
   const locale = {
     // eslint-disable-next-line camelcase
@@ -108,6 +108,5 @@ const MetadataReader = ({ setMetadataList, setMetadataErrors }) => {
       />
     </LocaleProvider>
   )
-
 }
 export default MetadataReader
