@@ -1,25 +1,21 @@
 import React, { useState } from 'react'
 import TimezoneOverride from './TimezoneOverride'
 import StartEndList from './StartEndList'
-import { BaseCard } from './BaseCard'
 import { FormControl } from 'baseui/form-control'
 import { FlexGrid, FlexGridItem } from 'baseui/flex-grid'
 import { Input } from 'baseui/input'
+import MetadataReader from './MetadataReader'
 
 /**
  * Adjust time on file metadata in case camera doesn't have time zone
  * or has time set incorrectly
  */
-const AdjustTimePage = ({ metadataList, startEndList, setStartEndList,
-  timeAdjust, setTimeAdjust, prevNextButtons }) => {
+const AdjustTimePage = ({
+  metadataList, setMetadataList, setMetadataErrors,
+  startEndList, setStartEndList,
+  timeAdjust, setTimeAdjust, prevNextButtons
+}) => {
   const [overrideTimeZone, setOverrideTimeZone] = useState(true)
-
-  const handleChange = (evt) => {
-    setTimeAdjust({
-      ...timeAdjust,
-      [evt.target.name]: evt.target.value
-    })
-  }
 
   const timeOffset = (name, max) => (
     <FlexGridItem>
@@ -30,7 +26,12 @@ const AdjustTimePage = ({ metadataList, startEndList, setStartEndList,
           min={-max}
           max={max}
           name={name}
-          onChange={handleChange}
+          onChange={(evt) => {
+            setTimeAdjust({
+              ...timeAdjust,
+              [evt.target.name]: parseInt(evt.target.value)
+            })
+          }}
           overrides={{
             Root: {
               style: ({ $theme }) => ({
@@ -43,15 +44,14 @@ const AdjustTimePage = ({ metadataList, startEndList, setStartEndList,
     </FlexGridItem>
   )
 
-  return (
-    <>
-      <BaseCard title='Start and End Times'>
+  function filesAndOffset () {
+    return (
+      <>
         <StartEndList
-          metadata={metadataList} overrideTimeZone={overrideTimeZone} timeAdjust={timeAdjust}
+          metadataList={metadataList} setMetadataList={setMetadataList}
+          overrideTimeZone={overrideTimeZone} timeAdjust={timeAdjust}
           startEndList={startEndList} setStartEndList={setStartEndList}
         />
-      </BaseCard>
-      <BaseCard title='Adjust Times'>
         <TimezoneOverride metadata={metadataList} value={overrideTimeZone} setValue={setOverrideTimeZone} />
         Offsets
         <FlexGrid flexGridColumnCount={6} flexGridColumnGap='scale400' flexGridRowGap='scale200'>
@@ -62,7 +62,14 @@ const AdjustTimePage = ({ metadataList, startEndList, setStartEndList,
           {timeOffset('minute', 59)}
           {timeOffset('second', 59)}
         </FlexGrid>
-      </BaseCard>
+      </>
+    )
+  }
+
+  return (
+    <>
+      <MetadataReader setMetadataList={setMetadataList} setMetadataErrors={setMetadataErrors} />
+      {metadataList.length > 0 ? filesAndOffset() : null}
       {prevNextButtons}
     </>
   )

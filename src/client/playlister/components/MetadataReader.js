@@ -93,7 +93,12 @@ const MetadataReader = ({ setMetadataList, setMetadataErrors }) => {
     ...en_US,
     fileuploader: {
       ...en_US.fileuploader,
-      dropFilesToUpload: 'Drop files here ...'
+      dropFilesToUpload: (
+        <div style={{ textAlign: 'center' }}>
+          Drop your videos here to extract their start and end times<br />
+          (this won't upload anything yet)
+        </div>
+      )
     }
   }
   return (

@@ -78,8 +78,13 @@ function App () {
           overrides={{
             Content: {
               style: () => ({
-                // avoids jumping widths on desktop ... not sure about mobile
+                // avoid jumping widths on desktop ... not sure about mobile
                 minWidth: '720px'
+              })
+            },
+            Description: {
+              style: () => ({
+                marginBottom: 0 // compactify a little
               })
             }
           }}
@@ -88,20 +93,20 @@ function App () {
             <AuthPage />
             {prevNextButtons({ current: 0 })}
           </Step>
-          <Step title='Files'>
-            <FilePage
-              metadataList={metadataList} setMetadataList={setMetadataList}
-              uploadStatus={uploadStatus} setUploadStatus={setUploadStatus}
-              current={1} prevButton={prevButton} nextButton={nextButton}
-            />
-          </Step>
-          <Step title='Time'>
+          <Step title='File Metadata'>
             <AdjustTimePage
-              metadataList={metadataList}
+              metadataList={metadataList} setMetadataList={setMetadataList}
               startEndList={startEndList} setStartEndList={setStartEndList}
               timeAdjust={timeAdjust} setTimeAdjust={setTimeAdjust}
             />
-            {prevNextButtons({ current: 2 })}
+            {prevNextButtons({ current: 1 })}
+          </Step>
+          <Step title='Uploads'>
+            <FilePage
+              metadataList={metadataList} setMetadataList={setMetadataList}
+              uploadStatus={uploadStatus} setUploadStatus={setUploadStatus}
+              current={2} prevButton={prevButton} nextButton={nextButton}
+            />
           </Step>
           <Step title='Playlist'>
             <PlaylistPage
