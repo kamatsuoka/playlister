@@ -1,5 +1,4 @@
 const path = require('path')
-const fs = require('fs')
 const webpack = require('webpack')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const GasPlugin = require('gas-webpack-plugin')
@@ -50,8 +49,8 @@ const clientEntrypoints = [
     name: 'CLIENT - playlister',
     entry: './src/client/playlister/index.js',
     filename: 'playlister',
-    template: './src/client/playlister/public/index.html',
-  },
+    template: './src/client/playlister/public/index.html'
+  }
 ]
 
 /*********************************
@@ -64,23 +63,23 @@ const copyFilesConfig = {
   mode: 'production', // unnecessary for this config, but removes console warning
   entry: copyAppscriptEntry,
   output: {
-    path: destination,
+    path: destination
   },
   plugins: [
     new CopyWebpackPlugin({
       patterns: [
         {
           from: copyAppscriptEntry,
-          to: destination,
-        },
-      ],
-    }),
-  ],
+          to: destination
+        }
+      ]
+    })
+  ]
 }
 
 // webpack settings used by both client and server
 const sharedClientAndServerConfig = {
-  context: __dirname,
+  context: __dirname
 }
 
 // webpack settings used by all client entrypoints
@@ -91,10 +90,10 @@ const clientConfig = {
     path: destination,
     // this file will get added to the html template inline
     // and should be put in .claspignore so it is not pushed
-    filename: 'main.js',
+    filename: 'main.js'
   },
   resolve: {
-    extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
+    extensions: ['.ts', '.tsx', '.js', '.jsx', '.json']
   },
   module: {
     rules: [
@@ -104,27 +103,27 @@ const clientConfig = {
         exclude: /node_modules/,
         use: [
           {
-            loader: 'babel-loader',
+            loader: 'babel-loader'
           },
           {
-            loader: 'ts-loader',
-          },
-        ],
+            loader: 'ts-loader'
+          }
+        ]
       },
       {
         test: /\.jsx?$/,
         exclude: /node_modules/,
         use: {
-          loader: 'babel-loader',
-        },
+          loader: 'babel-loader'
+        }
       },
       // we could add support for scss here
       {
         test: /\.css$/,
-        use: ['style-loader', 'css-loader'],
-      },
-    ],
-  },
+        use: ['style-loader', 'css-loader']
+      }
+    ]
+  }
 }
 
 // DynamicCdnWebpackPlugin settings
@@ -147,12 +146,12 @@ const DynamicCdnWebpackPluginConfig = {
           name: packageName,
           var: 'BaseUI',
           version: packageVersion,
-          url: `https://unpkg.com/baseui@${packageVersion}/dist/baseui${packageSuffix}`,
+          url: `https://unpkg.com/baseui@${packageVersion}/dist/baseui${packageSuffix}`
         }
       default:
         return null
     }
-  },
+  }
 }
 
 // webpack settings used by each client entrypoint defined at top
@@ -163,18 +162,18 @@ const clientConfigs = clientEntrypoints.map(clientEntrypoint => {
     entry: clientEntrypoint.entry,
     plugins: [
       new webpack.DefinePlugin({
-        'process.env': JSON.stringify(envVars),
+        'process.env': JSON.stringify(envVars)
       }),
       new HtmlWebpackPlugin({
         template: clientEntrypoint.template,
         filename: `${clientEntrypoint.filename}.html`,
-        inlineSource: '^[^(//)]+.(js|css)$', // embed all js and css inline, exclude packages with '//' for dynamic cdn insertion
+        inlineSource: '^[^(//)]+.(js|css)$' // embed all js and css inline, exclude packages with '//' for dynamic cdn insertion
       }),
       // add the generated js code to the html file inline
       new HtmlWebpackInlineSourcePlugin(),
       // this plugin allows us to add dynamically load packages from a CDN
-      new DynamicCdnWebpackPlugin(DynamicCdnWebpackPluginConfig),
-    ],
+      new DynamicCdnWebpackPlugin(DynamicCdnWebpackPluginConfig)
+    ]
   }
 })
 
@@ -182,7 +181,7 @@ const clientConfigs = clientEntrypoints.map(clientEntrypoint => {
 const devServer = {
   port: PORT,
   contentBase: path.join(__dirname, 'dist'),
-  watchContentBase: true,
+  watchContentBase: true
 }
 
 // webpack settings used by the server-side code
@@ -196,10 +195,10 @@ const serverConfig = {
   output: {
     filename: 'code.js',
     path: destination,
-    libraryTarget: 'this',
+    libraryTarget: 'this'
   },
   resolve: {
-    extensions: ['.ts', '.js', '.json'],
+    extensions: ['.ts', '.js', '.json']
   },
   module: {
     rules: [
@@ -209,21 +208,21 @@ const serverConfig = {
         exclude: /node_modules/,
         use: [
           {
-            loader: 'babel-loader',
+            loader: 'babel-loader'
           },
           {
-            loader: 'ts-loader',
-          },
-        ],
+            loader: 'ts-loader'
+          }
+        ]
       },
       {
         test: /\.js$/,
         exclude: /node_modules/,
         use: {
-          loader: 'babel-loader',
-        },
-      },
-    ],
+          loader: 'babel-loader'
+        }
+      }
+    ]
   },
   optimization: {
     minimize: true,
@@ -237,7 +236,7 @@ const serverConfig = {
           warnings: false,
           parse: {},
           compress: {
-            properties: false,
+            properties: false
           },
           mangle: false,
           module: false,
@@ -245,22 +244,22 @@ const serverConfig = {
             beautify: true,
             // support custom function autocompletion
             // https://developers.google.com/apps-script/guides/sheets/functions
-            comments: /@customfunction/,
-          },
-        },
-      }),
-    ],
+            comments: /@customfunction/
+          }
+        }
+      })
+    ]
   },
   plugins: [
     new webpack.DefinePlugin({
       // replace any env variables in client-side code like PORT and NODE_ENV with actual values
       'process.env': JSON.stringify(envVars),
       'process.env.NODE_ENV': JSON.stringify(
-        isProd ? 'production' : 'development',
-      ),
+        isProd ? 'production' : 'development'
+      )
     }),
-    new GasPlugin(),
-  ],
+    new GasPlugin()
+  ]
 }
 
 module.exports = [
@@ -271,5 +270,5 @@ module.exports = [
   // 3. Create the server bundle
   serverConfig,
   // 4. Create one client bundle for each client entrypoint.
-  ...clientConfigs,
+  ...clientConfigs
 ]

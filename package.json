@@ -92,7 +92,7 @@
     "push:dev": "rimraf dist && yarn run build:dev && npx clasp push",
     "push": "rimraf dist && yarn run build && npx clasp push",
     "deploy": "yarn run push && npx clasp deploy -d 'deployed by deploy'",
-    "serve": "cross-env NODE_ENV=development webpack serve --open",
+    "serve": "cross-env NODE_ENV=development webpack serve",
     "start": "yarn run build:dev && yarn run serve"
   },
   "eslintConfig": {
