@@ -31,7 +31,6 @@ const UploadPage = ({ fileDataList, uploadList, setUploadList, current, prevButt
 
   const checkUploadStatus = useCallback(() => {
     const fileIds = fileDataList.map(data => data.fileId)
-    console.log('UploadPage.checkUploadStatus: fileIds', fileIds)
     setCheckingStatus(true)
     const onSuccess = uploads => {
       const dateNow = dayjs()
@@ -43,7 +42,6 @@ const UploadPage = ({ fileDataList, uploadList, setUploadList, current, prevButt
         publishedAt: upload.publishedAt,
         ...upload.fileData
       }))
-      console.log('recentUploads', recentUploads)
       setUploadList(recentUploads)
       setCheckedFileIds(new Set(fileIds))
       setCheckingStatus(false)

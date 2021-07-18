@@ -90,7 +90,7 @@ const PlaylistPage = ({
   function findOrCreatePlaylist () {
     setPlaylistStatus({}) // clear message, if any, first
     storePlaylist({}) // clear existing found playlist, if any
-    const eventDate = eventData.eventDate
+    const eventDate = eventData.eventDate || inferDate(uploadList)
     setLoading(true)
     const title = playlistTitle.titleChoice === CUSTOM ? playlistTitle.customTitle : suggestedTitle()
     const successHandler = playlist => {

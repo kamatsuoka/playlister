@@ -24,6 +24,7 @@ const VideoList = ({
 }) => {
   const [tableData, setTableData] = useState([])
   console.log('VideoList: uploadList = ', uploadList)
+  console.log('VideoList: playlistData = ', playlistData)
   const date = playlistData.eventDate
   const startIndex = parseInt(playlistData.itemCount || 0) + 1 + parseInt(videoNaming.indexOffset)
   const pad = (n) => n < 10 ? `0${n}` : `${n}`
@@ -37,7 +38,7 @@ const VideoList = ({
   const COLUMNS = ['Filename', 'Original Title', 'New Title']
 
   return (
-    <Table columns={COLUMNS} data={videoList} />
+    <Table columns={COLUMNS} data={videoList.map(video => [video.filename, video.oldTitle, video.newTitle])} />
   )
 }
 
