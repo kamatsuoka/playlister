@@ -43,6 +43,15 @@ const UploadPage = ({ metadataList, uploadStatus, setUploadStatus, current, prev
 
   return (
     <>
+      <Button
+        style={{ marginTop: '10px' }}
+        size={SIZE.compact} disabled={metadataList.length === 0}
+        isLoading={checkingStatus}
+        kind={allChecked() ? KIND.secondary : KIND.primary}
+        onClick={checkUploadStatus}
+      >
+        Check Upload Status
+      </Button>
       <FileList
         metadataList={metadataList} checkedFileIds={checkedFileIds}
         uploadStatus={uploadStatus} setUploadStatus={setUploadStatus}
@@ -50,15 +59,6 @@ const UploadPage = ({ metadataList, uploadStatus, setUploadStatus, current, prev
       />
       {error ? <Notification kind={NKind.negative} closeable>{error}</Notification> : null}
       <div align='left'>
-        <Button
-          style={{ marginTop: '10px' }}
-          size={SIZE.compact} disabled={metadataList.length === 0}
-          isLoading={checkingStatus}
-          kind={allChecked() ? KIND.secondary : KIND.primary}
-          onClick={checkUploadStatus}
-        >
-          Check Upload Status
-        </Button>
       </div>
       <div align='right'>
         {prevButton({ current })}

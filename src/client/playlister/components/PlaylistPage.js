@@ -129,10 +129,6 @@ const PlaylistPage = ({
 
   return (
     <>
-      <PlaylistTitle
-        eventData={eventData} setEventData={setEventData} suggestedTitle={suggestedTitle()}
-        playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
-      />
       <Button
         onClick={() => findOrCreatePlaylist()}
         size={SIZE.compact}
@@ -142,6 +138,10 @@ const PlaylistPage = ({
       >
         Find or Create Playlist
       </Button>
+      <PlaylistTitle
+        eventData={eventData} setEventData={setEventData} suggestedTitle={suggestedTitle()}
+        playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
+      />
       {showNotification()}
       {showPlaylist()}
     </>
