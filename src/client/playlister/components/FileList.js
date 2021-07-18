@@ -1,21 +1,10 @@
-import React, { useCallback, useEffect, useState } from 'react'
-import {
-  StyledTableHead,
-  StyledTableHeadCell,
-  StyledTableHeadRow,
-  TableBuilder,
-  TableBuilderColumn
-} from 'baseui/table-semantic'
+import React, { useEffect, useState } from 'react'
+import { TableBuilder, TableBuilderColumn } from 'baseui/table-semantic'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCheck, faExclamation, faQuestion, faTimes } from '@fortawesome/free-solid-svg-icons'
+import { faCheck, faExclamation, faQuestion } from '@fortawesome/free-solid-svg-icons'
 import { tableOverrides } from './TableOverrides'
 import { Button, KIND, SIZE } from 'baseui/button'
-import { durationSeconds } from '../util/dates'
-import { KIND as NKind, Notification } from 'baseui/notification'
-import dayjs from 'dayjs'
-import { findUploads } from '../youtube/api'
 import resumableUpload from '../youtube/youtube-uploader'
-import { withStyle } from 'baseui'
 
 const UPLOADING = 'uploading'
 const ERROR = 'error'
@@ -23,61 +12,11 @@ const ERROR = 'error'
 /**
  * List of file info from MediaInfo and video info from youtube
  */
-const FileList = ({
-  metadataList, setMetadataList, metadataErrors,
-  uploadStatus, setUploadStatus, setAllUploaded
-}) => {
-  const [error, setError] = useState('')
+const FileList = ({ metadataList, checkedFileIds, uploadStatus, setUploadStatus, setAllUploaded }) => {
   // map of fileId to upload button state
   const [uploadButtonState, setUploadButtonState] = useState({})
   // map of fileId to upload progress
   const [uploadProgress, setUploadProgress] = useState({})
-  // used to show spinner on 'Check Upload Status' button
-  const [checkingStatus, setCheckingStatus] = useState(false)
-  // file ids that have been checked
-  const [checkedFileIds, setCheckedFileIds] = useState(new Set())
-
-  const onRemove = useCallback(
-    fileId => setMetadataList(datas => datas.filter(data => data.fileId !== fileId)),
-    [setMetadataList]
-  )
-
-  const durationOverrides = {
-    TableHeadCell: {
-      style: {
-        textAlign: 'right'
-      }
-    }
-  }
-
-  const removeHeader = () => {
-    if (metadataList.length === 0) {
-      return null
-    } else {
-      return (
-        <Button onClick={() => setMetadataList([])} kind={KIND.tertiary} size={SIZE.mini} title='Remove all'>
-          <FontAwesomeIcon icon={faTimes} />
-        </Button>
-      )
-    }
-  }
-
-  const errorTable = () => {
-    if (metadataErrors.length > 0) {
-      return (
-        <>
-          <Notification kind={NKind.negative} closeable overrides={{ Body: { style: { width: 'auto' } } }}>
-            <p>Invalid media files:</p>
-            <ul>
-              {metadataErrors.map((e, i) => <li key={i}>{e.name}</li>)}
-            </ul>
-          </Notification>
-        </>
-      )
-    } else {
-      return null
-    }
-  }
 
   /**
    * Set the "all uploaded" state to indicate that all files have been uploaded
@@ -103,27 +42,6 @@ const FileList = ({
         thumbnail: upload.thumbnail
       }]
     ))
-
-  const checkUploadStatus = useCallback(() => {
-    const fileIds = metadataList.map(data => data.fileId)
-    setCheckingStatus(true)
-    const onSuccess = uploads => {
-      const dateNow = dayjs()
-      const items = uploads.filter(upload =>
-        dateNow.diff(dayjs(upload.publishedAt), 'days') < 30
-      )
-      setUploadStatus(items)
-      setCheckedFileIds(new Set(fileIds))
-      setCheckingStatus(false)
-    }
-    return findUploads(metadataList,
-      onSuccess,
-      err => {
-        setError(err)
-        console.log(err)
-        setCheckingStatus(false)
-      })
-  }, [metadataList, setCheckingStatus, setUploadStatus])
 
   const uploadFile = (fileId, file) => {
     const progressHandler = percent => {
@@ -219,73 +137,13 @@ const FileList = ({
     }
   }
 
-  const removeColumnStyle = {
-    style: ({ $theme }) => ({
-      textAlign: 'center',
-      paddingLeft: $theme.sizing.scale200,
-      paddingRight: $theme.sizing.scale200
-    })
-  }
-
-  const removeColumnOverrides = {
-    TableHeadCell: removeColumnStyle,
-    TableBodyCell: removeColumnStyle
-  }
-
-  const allChecked = () =>
-    metadataList.length > 0 &&
-    metadataList.map(data => data.fileId).every(fileId => checkedFileIds.has(fileId))
-
-  const HeadCell = withStyle(StyledTableHeadCell, ({ $theme }) => tableCellStyles($theme))
-
   return (
     <div>
-      <TableBuilder
-        data={metadataList} overrides={{
-          ...tableOverrides,
-          TableHead: {
-            component: () => (
-              <StyledTableHead>
-                <StyledTableHeadRow>
-                  <HeadCell>&nbsp;</HeadCell>
-                  <HeadCell colSpan={3}>Local File</HeadCell>
-                  <HeadCell colSpan={3}>YouTube Video</HeadCell>
-                </StyledTableHeadRow>
-                <StyledTableHeadRow>
-                  <HeadCell>{removeHeader()}</HeadCell>
-                  <HeadCell>Filename</HeadCell>
-                  <HeadCell style={{ textAlign: 'right' }}>Length</HeadCell>
-                  <HeadCell>Start Time</HeadCell>
-                  <HeadCell>Title</HeadCell>
-                  <HeadCell>Published</HeadCell>
-                  <HeadCell>Upload</HeadCell>
-                </StyledTableHeadRow>
-              </StyledTableHead>
-            )
-          }
-        }}
-      >
-        <TableBuilderColumn overrides={{ ...columnOverrides, ...removeColumnOverrides }}>
-          {row =>
-            <Button
-              onClick={() => onRemove(row.fileId)}
-              title='Remove from list'
-              kind={KIND.tertiary}
-              size={SIZE.mini}
-            >
-              <FontAwesomeIcon icon={faTimes} size='sm' />
-            </Button>}
-        </TableBuilderColumn>
+      <TableBuilder data={metadataList} overrides={tableOverrides}>
         <TableBuilderColumn overrides={columnOverrides} header='Filename'>
           {row => row.name}
         </TableBuilderColumn>
-        <TableBuilderColumn overrides={{ ...columnOverrides, ...durationOverrides }} header='Duration' numeric>
-          {row => durationSeconds(row.duration)}
-        </TableBuilderColumn>
-        <TableBuilderColumn overrides={columnOverrides} header='Start Time'>
-          {row => row.startTime.replace(/^UTC /, '')}
-        </TableBuilderColumn>
-        <TableBuilderColumn overrides={columnOverrides} header='Title'>
+        <TableBuilderColumn overrides={columnOverrides} header='YouTube Title'>
           {row => uploadData[row.fileId] ? uploadData[row.fileId].title : null}
         </TableBuilderColumn>
         <TableBuilderColumn header='Published At' overrides={columnOverrides}>
@@ -295,19 +153,6 @@ const FileList = ({
           {row => uploadButton(row)}
         </TableBuilderColumn>
       </TableBuilder>
-      {errorTable()}
-      <div align='right'>
-        <Button
-          style={{ marginTop: '10px' }}
-          size={SIZE.compact} disabled={metadataList.length === 0}
-          isLoading={checkingStatus}
-          kind={allChecked() ? KIND.secondary : KIND.primary}
-          onClick={checkUploadStatus}
-        >
-          Check Upload Status
-        </Button>
-      </div>
-      {error ? <Notification kind={NKind.negative} closeable>{error}</Notification> : null}
     </div>
   )
 }

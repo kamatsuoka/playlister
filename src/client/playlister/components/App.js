@@ -5,7 +5,7 @@ import { BaseProvider, LightTheme } from 'baseui'
 import { Provider as StyletronProvider } from 'styletron-react'
 import { Client as Styletron } from 'styletron-engine-atomic'
 
-import FilePage from './FilePage'
+import UploadPage from './UploadPage'
 import AuthPage from './AuthPage'
 import VideoPage from './VideoPage'
 import { StyledLink } from 'baseui/link'
@@ -102,8 +102,8 @@ function App () {
             {prevNextButtons({ current: 1 })}
           </Step>
           <Step title='Uploads'>
-            <FilePage
-              metadataList={metadataList} setMetadataList={setMetadataList}
+            <UploadPage
+              metadataList={metadataList}
               uploadStatus={uploadStatus} setUploadStatus={setUploadStatus}
               current={2} prevButton={prevButton} nextButton={nextButton}
             />
