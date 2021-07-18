@@ -7,6 +7,7 @@ import { Input } from 'baseui/input'
 import MediaReader from './MediaReader'
 import { BaseCard } from './BaseCard'
 import { KIND as NKind, Notification } from 'baseui/notification'
+import { Paragraph3 } from 'baseui/typography'
 
 /**
  * Adjust time on file metadata in case camera doesn't have time zone
@@ -58,11 +59,6 @@ const FileDataPage = ({
   function filesAndOffset () {
     return (
       <>
-        <FileDataList
-          mediaList={mediaList} setMediaList={setMediaList}
-          overrideTimeZone={overrideTimeZone} timeAdjust={timeAdjust}
-          fileDataList={fileDataList} setFileDataList={setFileDataList}
-        />
         <BaseCard title='Time Adjustments'>
           <TimezoneOverride mediaList={mediaList} value={overrideTimeZone} setValue={setOverrideTimeZone} />
           Offsets
@@ -75,6 +71,15 @@ const FileDataPage = ({
             {timeOffset('second', 59)}
           </FlexGrid>
         </BaseCard>
+        <Paragraph3>
+          Take a look at the start and end times below and make sure they match
+          what you expect. <br /> If they need adjusting, you can use the time adjustments above.
+        </Paragraph3>
+        <FileDataList
+          mediaList={mediaList} setMediaList={setMediaList}
+          overrideTimeZone={overrideTimeZone} timeAdjust={timeAdjust}
+          fileDataList={fileDataList} setFileDataList={setFileDataList}
+        />
       </>
     )
   }

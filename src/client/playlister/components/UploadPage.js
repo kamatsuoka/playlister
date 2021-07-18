@@ -5,6 +5,8 @@ import dayjs from 'dayjs'
 import { findUploads } from '../youtube/api'
 import { KIND as NKind, Notification } from 'baseui/notification'
 import { useStyletron } from 'baseui'
+import { StyledLink } from 'baseui/link'
+import { Paragraph3 } from 'baseui/typography'
 
 /**
  * Page for uploading videos, or finding previously-uploaded videos for same files
@@ -70,6 +72,22 @@ const UploadPage = ({ fileDataList, uploadList, setUploadList, current, prevButt
 
   return (
     <>
+      <UploadList
+        fileDataList={fileDataList} checkedFileIds={checkedFileIds}
+        uploadList={uploadList} setUploadList={setUploadList}
+        // setAllUploaded={setAllUploaded}
+      />
+      {error ? <Notification kind={NKind.negative} closeable>{error}</Notification> : null}
+      <Paragraph3>
+        You can upload your files to YouTube either by<br />
+        — using this form, or<br />
+        — using{' '}
+        <StyledLink href='https://www.youtube.com/upload' target='_blank' rel='noopener noreferrer'>
+          YouTube's upload page
+        </StyledLink>.<br />
+        <br />
+        Either way, you'll need to check for your uploads by clicking the button below.
+      </Paragraph3>
       <Button
         style={{ marginTop: '10px' }}
         size={SIZE.compact} disabled={fileDataList.length === 0}
@@ -79,12 +97,6 @@ const UploadPage = ({ fileDataList, uploadList, setUploadList, current, prevButt
       >
         Check Upload Status
       </Button>
-      <UploadList
-        fileDataList={fileDataList} checkedFileIds={checkedFileIds}
-        uploadList={uploadList} setUploadList={setUploadList}
-        // setAllUploaded={setAllUploaded}
-      />
-      {error ? <Notification kind={NKind.negative} closeable>{error}</Notification> : null}
       <div align='right' style={{ marginTop: theme.sizing.scale600 }}>
         {prevButton({ current })}
         &nbsp;

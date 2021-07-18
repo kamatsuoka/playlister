@@ -28,9 +28,16 @@ const PlaylistTitle = ({ eventData, suggestedTitle, playlistTitle, setPlaylistTi
         name='titleChoice'
         onChange={handleChange}
         align={ALIGN.horizontal}
+        overrides={{
+          Label: {
+            style: ({ $theme }) => ({
+              fontSize: $theme.typography.LabelSmall.fontSize
+            })
+          }
+        }}
       >
-        <Radio value={SUGGESTED}>Suggested &nbsp;</Radio>
-        <Radio value={CUSTOM}>Custom</Radio>
+        <Radio value={SUGGESTED}>suggested title&nbsp;</Radio>
+        <Radio value={CUSTOM}>custom title</Radio>
       </RadioGroup>
       {playlistTitle.titleChoice === 'custom'
         ? <Input

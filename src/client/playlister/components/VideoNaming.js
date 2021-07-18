@@ -41,13 +41,13 @@ const VideoNaming = ({ playlistData, videoNaming, setVideoNaming }) => {
           </FormControl>
         </FlexGridItem>
         <FlexGridItem {...itemProps}>
-          <FormControl label='camera view'>
+          <FormControl label='default camera view'>
             <Combobox
               value={videoNaming.cameraView}
               name='cameraView'
               options={['chorus', 'director', 'corner', 'elevated']}
               mapOptionToString={option => option}
-              onChange={handleChange}
+              onChange={cameraView => setVideoNaming({ ...videoNaming, cameraView: cameraView})}
             />
           </FormControl>
         </FlexGridItem>

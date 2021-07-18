@@ -7,6 +7,7 @@ import EventData from './EventData'
 import { findPlaylist, insertPlaylist } from '../youtube/api'
 import PlaylistTitle, { CUSTOM, SUGGESTED } from './PlaylistTitle'
 import inferDate from './InferredDate'
+import { Paragraph3 } from 'baseui/typography'
 
 /**
  * Shows event data form:
@@ -153,6 +154,19 @@ const PlaylistPage = ({
 
   return (
     <>
+      <EventData
+        eventData={eventData} setEventData={setEventData}
+        fileDataList={uploadList}
+      />
+      <Paragraph3>
+        You'll need to find an existing playlist to add your videos to, or create a new one.<br />
+        The suggested playlist title is based on the event date and event type.
+      </Paragraph3>
+      <PlaylistTitle
+        eventData={eventData}
+        fileDataList={uploadList} suggestedTitle={suggestedTitle()}
+        playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
+      />
       <Button
         onClick={() => findOrCreatePlaylist()}
         size={SIZE.compact}
@@ -160,20 +174,16 @@ const PlaylistPage = ({
         isLoading={loading}
         disabled={uploadList.length === 0 || !isValidTitle()}
         overrides={{
-          Root: { style: ({ $theme }) => ({ marginBottom: $theme.sizing.scale600 }) }
+          Root: {
+            style: ({ $theme }) => ({
+              marginTop: $theme.sizing.scale600,
+              marginBottom: $theme.sizing.scale600
+            })
+          }
         }}
       >
         Find or Create Playlist
       </Button>
-      <PlaylistTitle
-        eventData={eventData}
-        fileDataList={uploadList} suggestedTitle={suggestedTitle()}
-        playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
-      />
-      <EventData
-        eventData={eventData} setEventData={setEventData}
-        fileDataList={uploadList}
-      />
       {showNotification()}
       {showPlaylist()}
     </>
