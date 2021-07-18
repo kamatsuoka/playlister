@@ -95,7 +95,7 @@ const MetadataReader = ({ setMetadataList, setMetadataErrors }) => {
       ...en_US.fileuploader,
       dropFilesToUpload: (
         <div style={{ textAlign: 'center' }}>
-          Drop your videos here to extract their start and end times<br />
+          Drop videos file here to extract their start and end times<br />
           (this won't upload anything yet)
         </div>
       )
@@ -110,6 +110,13 @@ const MetadataReader = ({ setMetadataList, setMetadataErrors }) => {
             ? 'Analyzing ...'
             : ''
         }
+        overrides={{
+          Root: {
+            style: ({ $theme }) => ({
+              marginBottom: $theme.sizing.scale600
+            })
+          }
+        }}
       />
     </LocaleProvider>
   )

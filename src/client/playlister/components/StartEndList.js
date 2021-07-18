@@ -193,7 +193,6 @@ const StartEndList = ({ metadataList, setMetadataList, overrideTimeZone, timeAdj
           {row => dayjs(row.endTime).format(displayTemplate)}
         </TableBuilderColumn>
       </TableBuilder>
-      Local time zone: {dayjs.tz.guess()}
     </div>
   )
 }

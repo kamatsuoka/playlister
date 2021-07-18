@@ -3,21 +3,30 @@ import { Checkbox } from 'baseui/checkbox'
 import { SIZE } from 'baseui/input'
 import { useStyletron } from 'baseui'
 import { StatefulTooltip } from 'baseui/tooltip'
+import dayjs from 'dayjs'
 
 const TimezoneOverride = ({ metadata, value, setValue }) => {
   const [css, theme] = useStyletron()
 
-  const SmallSpan = ({children}) => <span className={css({
+  const SmallSpan = ({ children }) => (
+    <span className={css({
       fontSize: theme.typography.LabelSmall.fontSize,
-      fontWeight: theme.typography.ParagraphSmall.fontWeight,
-    })}>{children}</span>
+      fontWeight: theme.typography.ParagraphSmall.fontWeight
+    })}
+    >
+      {children}
+    </span>)
 
+  const utcMessage = (
+    <div>
+      Some cameras don't record times with a time zone. <br />
+      Those times get interpreted in UTC unless this option is checked.
+    </div>
+  )
 
   return (
-    <div style={{paddingTop: '10px', paddingBottom: '10px'}}>
-      <SmallSpan>
-
-      </SmallSpan>
+    <div style={{ paddingTop: '10px', paddingBottom: '10px' }}>
+      <SmallSpan />
       <Checkbox
         size={SIZE.small}
         disabled={Object.keys(metadata).length === 0}
@@ -40,14 +49,14 @@ const TimezoneOverride = ({ metadata, value, setValue }) => {
       >
         <SmallSpan>
           <StatefulTooltip
-            accessibilityType={'tooltip'}
-            content="Metadata times are interpreted in UTC if camera doesn't record time zone"
+            accessibilityType='tooltip'
+            content={utcMessage}
           >
             <span className={css({ borderBottomWidth: '1px', borderBottomStyle: 'dotted' })}>
-              File metadata times
+              Interpret times
             </span>
           </StatefulTooltip>
-          {' '}are actually in local time zone
+          {' '} in local time zone ({dayjs.tz.guess()})
         </SmallSpan>
       </Checkbox>
     </div>
