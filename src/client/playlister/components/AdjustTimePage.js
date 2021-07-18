@@ -6,16 +6,18 @@ import { FlexGrid, FlexGridItem } from 'baseui/flex-grid'
 import { Input } from 'baseui/input'
 import MetadataReader from './MetadataReader'
 import { BaseCard } from './BaseCard'
+import { KIND as NKind, Notification } from 'baseui/notification'
 
 /**
  * Adjust time on file metadata in case camera doesn't have time zone
  * or has time set incorrectly
  */
 const AdjustTimePage = ({
-  metadataList, setMetadataList, setMetadataErrors,
+  metadataList, setMetadataList,
   startEndList, setStartEndList,
   timeAdjust, setTimeAdjust, prevNextButtons
 }) => {
+  const [metadataErrors, setMetadataErrors] = useState([])
   const [overrideTimeZone, setOverrideTimeZone] = useState(true)
 
   const timeOffset = (name, max) => (
@@ -69,9 +71,26 @@ const AdjustTimePage = ({
     )
   }
 
+  const errorTable = () => {
+    if (metadataErrors.length > 0) {
+      return (
+        <>
+          <Notification kind={NKind.negative} closeable overrides={{ Body: { style: { width: 'auto' } } }}>
+            <ul>
+              {metadataErrors.map((e, i) => <li key={i}>{e.name}: invalid media file</li>)}
+            </ul>
+          </Notification>
+        </>
+      )
+    } else {
+      return null
+    }
+  }
+
   return (
     <>
       <MetadataReader setMetadataList={setMetadataList} setMetadataErrors={setMetadataErrors} />
+      {errorTable()}
       {metadataList.length > 0 ? filesAndOffset() : null}
       {prevNextButtons}
     </>

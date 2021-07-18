@@ -6,14 +6,22 @@ import { createTheme, lightThemePrimitives, ThemeProvider } from 'baseui'
 import { FlexGrid, FlexGridItem } from 'baseui/flex-grid'
 import { FormControl } from 'baseui/form-control'
 import { Combobox } from 'baseui/combobox'
+import inferDate from './InferredDate'
 
 const SUGGESTED = 'suggested'
 const CUSTOM = 'custom'
 
-const PlaylistTitle = ({ eventData, setEventData, suggestedTitle, playlistTitle, setPlaylistTitle }) => {
-  const handleChange = (evt) => {
+const PlaylistTitle = ({ eventData, setEventData, startEndList, suggestedTitle, playlistTitle, setPlaylistTitle }) => {
+  const handlePlaylistTitleChange = (evt) => {
     setPlaylistTitle({
       ...playlistTitle,
+      [evt.target.name]: evt.target.value
+    })
+  }
+
+  const handleEventDataChange = (evt) => {
+    setEventData({
+      ...eventData,
       [evt.target.name]: evt.target.value
     })
   }
@@ -27,40 +35,48 @@ const PlaylistTitle = ({ eventData, setEventData, suggestedTitle, playlistTitle,
     <ThemeProvider
       theme={createTheme(lightThemePrimitives, themeOverrides())}
     >
-      <BaseCard title='Playlist Title'>
+      <RadioGroup
+        value={playlistTitle.titleChoice}
+        name='titleChoice'
+        onChange={handlePlaylistTitleChange}
+        align={ALIGN.horizontal}
+      >
+        <Radio value={SUGGESTED}>Suggested &nbsp;</Radio>
+        <Radio value={CUSTOM}>Custom</Radio>
+      </RadioGroup>
+      {playlistTitle.titleChoice === 'custom'
+        ? <Input
+            value={playlistTitle.customTitle || ''}
+            placeholder='enter custom title'
+            name='customTitle'
+            onChange={handlePlaylistTitleChange}
+          />
+        : <Input
+            value={suggestedTitle}
+            placeholder='[date] + [event type]'
+            disabled
+          />}
+      <BaseCard title='Event Data'>
         <FlexGrid
           flexGridColumnCount={2}
           flexGridColumnGap='scale800'
           flexGridRowGap='scale800'
         >
           <FlexGridItem>
-            <RadioGroup
-              value={playlistTitle.titleChoice}
-              name='titleChoice'
-              onChange={handleChange}
-              align={ALIGN.horizontal}
-            >
-              <Radio value={SUGGESTED}>Suggested &nbsp;</Radio>
-              <Radio value={CUSTOM}>Custom</Radio>
-            </RadioGroup>
-            {playlistTitle.titleChoice === 'custom'
-              ? <Input
-                  value={playlistTitle.customTitle || ''}
-                  placeholder='enter custom title'
-                  name='customTitle'
-                  onChange={handleChange}
-                />
-              : <Input
-                  value={suggestedTitle}
-                  placeholder='[date] + [event type]'
-                  disabled
-                />}
+            <FormControl label='event date'>
+              <Input
+                value={eventData.eventDate || inferDate(startEndList)}
+                name='eventDate'
+                onChange={handleEventDataChange}
+              />
+            </FormControl>
           </FlexGridItem>
           <FlexGridItem>
             <FormControl label='event type'>
               <Combobox
                 value={eventData.eventType}
-                onChange={eventType => setEventData({ ...eventData, eventType: eventType })}
+                name='eventType'
+                onChange={handleEventDataChange}
                 options={['rehearsal', 'coaching']}
                 mapOptionToString={option => option}
               />

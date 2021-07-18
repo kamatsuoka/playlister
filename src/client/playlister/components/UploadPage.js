@@ -4,11 +4,13 @@ import FileList from './FileList'
 import dayjs from 'dayjs'
 import { findUploads } from '../youtube/api'
 import { KIND as NKind, Notification } from 'baseui/notification'
+import { useStyletron } from 'baseui'
 
 /**
  * Page for uploading videos, or finding previously-uploaded videos for same files
  */
 const UploadPage = ({ metadataList, uploadStatus, setUploadStatus, current, prevButton, nextButton }) => {
+  const [css, theme] = useStyletron()
   const [error, setError] = useState('')
   const [allUploaded, setAllUploaded] = useState(false)
   // used to show spinner on 'Check Upload Status' button
@@ -58,9 +60,7 @@ const UploadPage = ({ metadataList, uploadStatus, setUploadStatus, current, prev
         setAllUploaded={setAllUploaded}
       />
       {error ? <Notification kind={NKind.negative} closeable>{error}</Notification> : null}
-      <div align='left'>
-      </div>
-      <div align='right'>
+      <div align='right' style={{ marginTop: theme.sizing.scale600 }}>
         {prevButton({ current })}
         &nbsp;
         {nextButton({ current, kind: allUploaded ? KIND.primary : KIND.secondary })}

@@ -6,7 +6,6 @@ import advancedFormat from 'dayjs/plugin/advancedFormat'
 import timezone from 'dayjs/plugin/timezone' // dependent on utc plugin
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { Table } from 'baseui/table-semantic'
-import { BaseCard } from './BaseCard'
 
 dayjs.extend(localizedFormat)
 dayjs.extend(advancedFormat)
@@ -18,8 +17,9 @@ dayjs.extend(utc)
  * List of calculated file properties
  */
 const VideoList = ({
-  eventData,
+  inferredDate,
   startEndList,
+  uploadStatus,
   playlistData,
   videoNaming,
   setVideoResources
@@ -27,7 +27,7 @@ const VideoList = ({
   const [tableData, setTableData] = useState([])
 
   useEffect(() => {
-    const date = eventData.inferredDate
+    const date = inferredDate
     const startIndex = parseInt(playlistData.itemCount || 0) + 1 + parseInt(videoNaming.indexOffset)
     const pad = (n) => n < 10 ? `0${n}` : `${n}`
     const resources = startEndList.map((startEnd, index) => ({
@@ -46,12 +46,10 @@ const VideoList = ({
     )
   }, [startEndList, playlistData, videoNaming])
 
-  const COLUMNS = ['File name', 'Video Name', 'Recording Date']
+  const COLUMNS = ['Original Title', 'New Title']
 
   return (
-    <BaseCard title='Video List'>
-      <Table columns={COLUMNS} data={tableData} />
-    </BaseCard>
+    <Table columns={COLUMNS} data={tableData} />
   )
 }
 

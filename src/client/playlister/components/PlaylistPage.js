@@ -4,8 +4,8 @@ import { Table } from 'baseui/table-semantic'
 import { KIND as NKind, Notification } from 'baseui/notification'
 import { BaseCard } from './BaseCard'
 import { findPlaylist, insertPlaylist } from '../youtube/api'
-import inferDate from './InferredDate'
 import PlaylistTitle, { CUSTOM, SUGGESTED } from './PlaylistTitle'
+import inferDate from './InferredDate'
 
 const PlaylistPage = ({
   startEndList,
@@ -16,8 +16,10 @@ const PlaylistPage = ({
   const [playlistStatus, setPlaylistStatus] = useState({ message: '' })
   const [loading, setLoading] = useState(false)
 
+  const inferredDate = inferDate(startEndList)
+
   const suggestedTitle = () => {
-    const date = inferDate(startEndList) || ''
+    const date = eventData.eventDate || inferredDate
     const eventType = eventData.eventType
     return (date && eventType) ? date.replaceAll('-', '') + ' ' + eventType : ''
   }
@@ -135,11 +137,15 @@ const PlaylistPage = ({
         kind={playlistData.id ? KIND.secondary : KIND.primary}
         isLoading={loading}
         disabled={startEndList.length === 0 || !isValidTitle()}
+        overrides={{
+          Root: { style: ({ $theme }) => ({ marginBottom: $theme.sizing.scale600 }) }
+        }}
       >
         Find or Create Playlist
       </Button>
       <PlaylistTitle
-        eventData={eventData} setEventData={setEventData} suggestedTitle={suggestedTitle()}
+        eventData={eventData} setEventData={setEventData}
+        startEndList={startEndList} suggestedTitle={suggestedTitle()}
         playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
       />
       {showNotification()}

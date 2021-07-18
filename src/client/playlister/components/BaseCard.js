@@ -12,7 +12,7 @@ export const BaseCard = ({ children, title }) => {
         },
         Title: {
           style: ({ $theme }) => ({
-            ...$theme.typography.HeadingXSmall
+            ...$theme.typography.LabelMedium
           })
         }
       }}

@@ -25,7 +25,7 @@ function App () {
   const [uploadStatus, setUploadStatus] = useState([])
   const [startEndList, setStartEndList] = useState([])
   // attributes of event where the videos were recorded
-  const [eventData, setEventData] = useState({ eventType: 'rehearsal' })
+  const [eventData, setEventData] = useState({ eventDate: '', eventType: 'rehearsal' })
   // playlist title settings for finding / creating a playlist
   const [playlistTitle, setPlaylistTitle] = useState({ titleChoice: 'suggested', customTitle: '' })
   // metadata about found / created playlist
@@ -119,7 +119,7 @@ function App () {
           </Step>
           <Step title='Videos'>
             <VideoPage
-              eventData={eventData} startEndList={startEndList}
+              eventData={eventData} uploadStatus={uploadStatus} startEndList={startEndList}
               playlistData={playlistData} setActiveKey={setCurrent}
             />
             {prevNextButtons({ current: 4, last: true })}

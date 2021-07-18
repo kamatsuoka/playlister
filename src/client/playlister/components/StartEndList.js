@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import localizedFormat from 'dayjs/plugin/localizedFormat'
@@ -10,7 +10,6 @@ import { TableBuilder, TableBuilderColumn } from 'baseui/table-semantic'
 import { Button, KIND, SIZE } from 'baseui/button'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTimes } from '@fortawesome/free-solid-svg-icons'
-import { KIND as NKind, Notification } from 'baseui/notification'
 import { durationSeconds } from '../util/dates'
 
 dayjs.extend(localizedFormat)
@@ -22,9 +21,9 @@ dayjs.extend(utc)
 /**
  * List of file metadata
  */
-const StartEndList = ({ metadataList, setMetadataList, overrideTimeZone, timeAdjust, startEndList, setStartEndList }) => {
-  const [metadataErrors, setMetadataErrors] = useState([])
-
+const StartEndList = ({
+  metadataList, setMetadataList, overrideTimeZone, timeAdjust, startEndList, setStartEndList
+}) => {
   const onRemove = useCallback(
     fileId => setMetadataList(datas => datas.filter(data => data.fileId !== fileId)),
     [setMetadataList]
@@ -105,23 +104,6 @@ const StartEndList = ({ metadataList, setMetadataList, overrideTimeZone, timeAdj
     }
   }
 
-  const errorTable = () => {
-    if (metadataErrors.length > 0) {
-      return (
-        <>
-          <Notification kind={NKind.negative} closeable overrides={{ Body: { style: { width: 'auto' } } }}>
-            <p>Invalid media files:</p>
-            <ul>
-              {metadataErrors.map((e, i) => <li key={i}>{e.name}</li>)}
-            </ul>
-          </Notification>
-        </>
-      )
-    } else {
-      return null
-    }
-  }
-
   const tableCellStyles = $theme => ({
     verticalAlign: 'center',
     paddingLeft: $theme.sizing.scale200,
@@ -153,18 +135,6 @@ const StartEndList = ({ metadataList, setMetadataList, overrideTimeZone, timeAdj
 
   return (
     <div id='start-end'>
-      {/*
-      <Table
-        style={{ marginBottom: '30px' }}
-        columns={COLUMNS} overrides={tableOverrides}
-        data={startEndList.map(startEnd => [
-          startEnd.name,
-          dayjs(startEnd.startTime).format(displayTemplate),
-          startEnd.duration,
-          dayjs(startEnd.endTime).format(displayTemplate)
-        ])}
-      />
-*/}
       <TableBuilder data={startEndList} overrides={tableOverrides}>
         <TableBuilderColumn
           overrides={{ ...columnOverrides, ...removeColumnOverrides }}
