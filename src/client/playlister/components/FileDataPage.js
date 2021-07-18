@@ -4,7 +4,7 @@ import FileDataList from './FileDataList'
 import { FormControl } from 'baseui/form-control'
 import { FlexGrid, FlexGridItem } from 'baseui/flex-grid'
 import { Input } from 'baseui/input'
-import MetadataReader from './MetadataReader'
+import MediaReader from './MediaReader'
 import { BaseCard } from './BaseCard'
 import { KIND as NKind, Notification } from 'baseui/notification'
 
@@ -13,11 +13,19 @@ import { KIND as NKind, Notification } from 'baseui/notification'
  * or has time set incorrectly
  */
 const FileDataPage = ({
-  metadataList, setMetadataList,
+  mediaList, setMediaList,
   fileDataList, setFileDataList,
   timeAdjust, setTimeAdjust, prevNextButtons
 }) => {
-  const [metadataErrors, setMetadataErrors] = useState([])
+  /**
+   * fileDataList items:
+   * - fileId
+   * - name
+   * - startTime
+   * - duration
+   * - endTime
+   */
+  const [mediaErrors, setMediaErrors] = useState([])
   const [overrideTimeZone, setOverrideTimeZone] = useState(true)
 
   const timeOffset = (name, max) => (
@@ -51,12 +59,12 @@ const FileDataPage = ({
     return (
       <>
         <FileDataList
-          metadataList={metadataList} setMetadataList={setMetadataList}
+          mediaList={mediaList} setMediaList={setMediaList}
           overrideTimeZone={overrideTimeZone} timeAdjust={timeAdjust}
           fileDataList={fileDataList} setFileDataList={setFileDataList}
         />
         <BaseCard title='Time Adjustments'>
-          <TimezoneOverride metadata={metadataList} value={overrideTimeZone} setValue={setOverrideTimeZone} />
+          <TimezoneOverride mediaList={mediaList} value={overrideTimeZone} setValue={setOverrideTimeZone} />
           Offsets
           <FlexGrid flexGridColumnCount={6} flexGridColumnGap='scale400' flexGridRowGap='scale200'>
             {timeOffset('year', 2000)}
@@ -72,12 +80,12 @@ const FileDataPage = ({
   }
 
   const errorTable = () => {
-    if (metadataErrors.length > 0) {
+    if (mediaErrors.length > 0) {
       return (
         <>
           <Notification kind={NKind.negative} closeable overrides={{ Body: { style: { width: 'auto' } } }}>
             <ul>
-              {metadataErrors.map((e, i) => <li key={i}>{e.name}: invalid media file</li>)}
+              {mediaErrors.map((e, i) => <li key={i}>{e.filename}: invalid media file</li>)}
             </ul>
           </Notification>
         </>
@@ -89,9 +97,9 @@ const FileDataPage = ({
 
   return (
     <>
-      <MetadataReader setMetadataList={setMetadataList} setMetadataErrors={setMetadataErrors} />
+      <MediaReader setMediaList={setMediaList} setMediaErrors={setMediaErrors} />
       {errorTable()}
-      {metadataList.length > 0 ? filesAndOffset() : null}
+      {mediaList.length > 0 ? filesAndOffset() : null}
       {prevNextButtons}
     </>
   )

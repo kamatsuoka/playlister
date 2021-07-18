@@ -3,6 +3,7 @@ import { Button, KIND, SIZE } from 'baseui/button'
 import { Table } from 'baseui/table-semantic'
 import { KIND as NKind, Notification } from 'baseui/notification'
 import { BaseCard } from './BaseCard'
+import EventData from './EventData'
 import { findPlaylist, insertPlaylist } from '../youtube/api'
 import PlaylistTitle, { CUSTOM, SUGGESTED } from './PlaylistTitle'
 import inferDate from './InferredDate'
@@ -13,15 +14,24 @@ import inferDate from './InferredDate'
  * Shows suggested playlist as [inferred date] + [event type]
  */
 const PlaylistPage = ({
-  fileDataList,
+  uploadList,
   eventData, setEventData,
   playlistTitle, setPlaylistTitle,
   playlistData, setPlaylistData
 }) => {
+  /**
+   * playlistData:
+   * - id
+   * - title
+   * - itemCount
+   * - publishedAt
+   * - description
+   * - eventDate
+   */
   const [playlistStatus, setPlaylistStatus] = useState({ message: '' })
   const [loading, setLoading] = useState(false)
 
-  const inferredDate = inferDate(fileDataList)
+  const inferredDate = inferDate(uploadList)
 
   const suggestedTitle = () => {
     const date = eventData.eventDate || inferredDate
@@ -29,7 +39,7 @@ const PlaylistPage = ({
     return (date && eventType) ? date.replaceAll('-', '') + ' ' + eventType : ''
   }
 
-  const storePlaylist = playlist => {
+  const storePlaylist = (playlist, eventDate) => {
     // eslint-disable-next-line no-prototype-builtins
     if (playlist.hasOwnProperty(['id'])) {
       return setPlaylistData({
@@ -38,7 +48,8 @@ const PlaylistPage = ({
         title: playlist.snippet.title,
         itemCount: playlist.contentDetails.itemCount,
         publishedAt: playlist.snippet.publishedAt,
-        description: playlist.snippet.description
+        description: playlist.snippet.description,
+        eventDate: eventDate
       })
     } else {
       return setPlaylistData({})
@@ -48,8 +59,8 @@ const PlaylistPage = ({
   /**
    * Success handler for creating or finding a playlist
    */
-  const playlistSuccess = msgIntro => playlist => {
-    storePlaylist(playlist)
+  const playlistSuccess = (msgIntro, eventDate) => playlist => {
+    storePlaylist(playlist, eventDate)
     setPlaylistStatus({
       ...playlistStatus,
       message: `${msgIntro} playlist "${playlist.snippet.title}"`,
@@ -79,20 +90,26 @@ const PlaylistPage = ({
   function findOrCreatePlaylist () {
     setPlaylistStatus({}) // clear message, if any, first
     storePlaylist({}) // clear existing found playlist, if any
+    const eventDate = eventData.eventDate
     setLoading(true)
     const title = playlistTitle.titleChoice === CUSTOM ? playlistTitle.customTitle : suggestedTitle()
     const successHandler = playlist => {
       if (playlist) {
-        playlistSuccess('Found existing')(playlist)
+        playlistSuccess('Found existing', eventDate)(playlist)
       } else {
-        createPlaylist(title)
+        createPlaylist(title, eventDate)
       }
     }
     return findPlaylist(title, successHandler, playlistFailure('Error finding'))
   }
 
-  function createPlaylist (title) {
-    insertPlaylist(title, playlistSuccess('Created'), playlistFailure('Error creating'))
+  function createPlaylist (title, eventDate) {
+    insertPlaylist(
+      title,
+      eventDate,
+      playlistSuccess('Created', eventDate),
+      playlistFailure('Error creating')
+    )
   }
 
   const showPlaylist = () => {
@@ -141,7 +158,7 @@ const PlaylistPage = ({
         size={SIZE.compact}
         kind={playlistData.id ? KIND.secondary : KIND.primary}
         isLoading={loading}
-        disabled={fileDataList.length === 0 || !isValidTitle()}
+        disabled={uploadList.length === 0 || !isValidTitle()}
         overrides={{
           Root: { style: ({ $theme }) => ({ marginBottom: $theme.sizing.scale600 }) }
         }}
@@ -149,9 +166,13 @@ const PlaylistPage = ({
         Find or Create Playlist
       </Button>
       <PlaylistTitle
-        eventData={eventData} setEventData={setEventData}
-        fileDataList={fileDataList} suggestedTitle={suggestedTitle()}
+        eventData={eventData}
+        fileDataList={uploadList} suggestedTitle={suggestedTitle()}
         playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
+      />
+      <EventData
+        eventData={eventData} setEventData={setEventData}
+        fileDataList={uploadList}
       />
       {showNotification()}
       {showPlaylist()}

@@ -77,7 +77,7 @@ const searchPlaylists = (title, pageToken = '') => {
  * I think that means we can't let the app create a playlist on our behalf
  * unless we're signed in as the account owner.
  */
-function insertPlaylist (title, onSuccess, onFailure) {
+function insertPlaylist (title, eventDate, onSuccess, onFailure) {
   const description = `created by playlister on ${dayjs().format()}`
   const run = getAppsScriptRun()
   if (run) {
@@ -93,7 +93,7 @@ function insertPlaylist (title, onSuccess, onFailure) {
       resource: {
         snippet: {
           title: title,
-          description: `created by playlister on ${dayjs()}`
+          description: `created by playlister for event on ${eventDate}`
         },
         status: {
           privacyStatus: 'unlisted'
@@ -125,8 +125,8 @@ const youtubeTitle = filename => {
  */
 const findUploads = (fileDataList, onSuccess, onFailure) => {
   const fileData = Object.fromEntries(
-    fileDataList.map(fileData => [fileData.name, {
-      title: youtubeTitle(fileData.name),
+    fileDataList.map(fileData => [fileData.filename, {
+      title: youtubeTitle(fileData.filename),
       fileData: fileData
     }])
   )

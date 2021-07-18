@@ -27,10 +27,10 @@ const getRandomId = () => Math.random().toString(36).substr(2, 9)
 /**
  * Renders DropZone (and file picker) for one or more media files
  */
-const MetadataReader = ({ setMetadataList, setMetadataErrors }) => {
+const MediaReader = ({ setMediaList, setMediaErrors }) => {
   const [analyzing, setAnalyzing] = useState(false)
 
-  function filterMetadata (data) {
+  function filterMedia (data) {
     const general = data.media.track.filter(track => track['@type'] === 'General')[0]
     if (general.Format && general.Duration && general.Encoded_Date) {
       return {
@@ -47,22 +47,22 @@ const MetadataReader = ({ setMetadataList, setMetadataErrors }) => {
    */
   const onDrop = useCallback(files => {
     /**
-     * Gets metadata for a single file.
+     * Gets media info for a single file.
      */
-    const getMetadata = (mediainfo, file) => {
+    const getMedia = (mediainfo, file) => {
       return mediainfo
         .analyzeData(() => file.size, readChunk(file))
         .then(data => {
           try {
             return ({
-              ...filterMetadata(data),
+              ...filterMedia(data),
               fileId: getRandomId(),
-              name: file.name,
+              filename: file.name,
               file: file
             })
           } catch (e) {
-            setMetadataErrors(errors => errors.concat({
-              name: file.name,
+            setMediaErrors(errors => errors.concat({
+              filename: file.filename,
               error: 'media not detected'
             }))
             return null
@@ -75,18 +75,18 @@ const MetadataReader = ({ setMetadataList, setMetadataErrors }) => {
       MediaInfo().then(async mediainfo => {
         for (const file of files) {
           if (file) {
-            const data = await getMetadata(mediainfo, file)
+            const data = await getMedia(mediainfo, file)
             if (data) {
-              setMetadataList(metadataList =>
-                metadataList
+              setMediaList(mediaList =>
+                mediaList
                   .concat([data])
-                  .sort((d1, d2) => d1.name.toLowerCase() > d2.name.toLowerCase() ? 1 : -1))
+                  .sort((d1, d2) => d1.filename.toLowerCase() > d2.filename.toLowerCase() ? 1 : -1))
             }
           }
         }
       }).finally(() => setAnalyzing(false))
     }
-  }, [setMetadataErrors, setMetadataList])
+  }, [setMediaErrors, setMediaList])
 
   const locale = {
     // eslint-disable-next-line camelcase
@@ -95,7 +95,7 @@ const MetadataReader = ({ setMetadataList, setMetadataErrors }) => {
       ...en_US.fileuploader,
       dropFilesToUpload: (
         <div style={{ textAlign: 'center' }}>
-          Drop videos file here to extract their start and end times<br />
+          Drop video files here to extract their start and end times<br />
           (this won't upload anything yet)
         </div>
       )
@@ -121,4 +121,4 @@ const MetadataReader = ({ setMetadataList, setMetadataErrors }) => {
     </LocaleProvider>
   )
 }
-export default MetadataReader
+export default MediaReader

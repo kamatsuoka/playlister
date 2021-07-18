@@ -19,8 +19,8 @@ const engine = new Styletron()
 function App () {
   // index of currently selected step
   const [current, setCurrent] = useState(1)
-  // file metadata as detected by mediainfo.js
-  const [metadataList, setMetadataList] = useState([])
+  // media info as detected by mediainfo.js
+  const [mediaList, setMediaList] = useState([])
   // list of videos uploaded to youtube
   const [uploadList, setUploadList] = useState([])
   const [fileDataList, setFileDataList] = useState([])
@@ -93,9 +93,9 @@ function App () {
             <AuthPage />
             {prevNextButtons({ current: 0 })}
           </Step>
-          <Step title='File Metadata'>
+          <Step title='File Data'>
             <FileDataPage
-              metadataList={metadataList} setMetadataList={setMetadataList}
+              mediaList={mediaList} setMediaList={setMediaList}
               fileDataList={fileDataList} setFileDataList={setFileDataList}
               timeAdjust={timeAdjust} setTimeAdjust={setTimeAdjust}
             />
@@ -109,7 +109,7 @@ function App () {
           </Step>
           <Step title='Playlist'>
             <PlaylistPage
-              fileDataList={fileDataList} eventData={eventData} setEventData={setEventData}
+              uploadList={uploadList} eventData={eventData} setEventData={setEventData}
               playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
               playlistData={playlistData} setPlaylistData={setPlaylistData}
             />
@@ -117,8 +117,7 @@ function App () {
           </Step>
           <Step title='Videos'>
             <VideoPage
-              eventData={eventData} uploadList={uploadList} fileDataList={fileDataList}
-              playlistData={playlistData} setActiveKey={setCurrent}
+              uploadList={uploadList} playlistData={playlistData} setActiveKey={setCurrent}
             />
             {prevNextButtons({ current: 4, last: true })}
           </Step>

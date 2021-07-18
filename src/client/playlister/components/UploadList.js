@@ -20,7 +20,7 @@ const UploadList = ({ fileDataList, checkedFileIds, uploadList, setUploadList })
 
   const uploadData = Object.fromEntries(
     uploadList.map(upload =>
-      [upload.fileData.fileId, {
+      [upload.fileId, {
         videoId: upload.videoId,
         title: upload.title,
         publishedAt: upload.publishedAt
@@ -125,7 +125,7 @@ const UploadList = ({ fileDataList, checkedFileIds, uploadList, setUploadList })
     <div>
       <TableBuilder data={fileDataList} overrides={tableOverrides}>
         <TableBuilderColumn overrides={columnOverrides} header='Filename'>
-          {row => row.name}
+          {row => row.filename}
         </TableBuilderColumn>
         <TableBuilderColumn overrides={columnOverrides} header='YouTube Title'>
           {row => uploadData[row.fileId] ? uploadData[row.fileId].title : null}

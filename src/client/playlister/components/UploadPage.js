@@ -15,11 +15,10 @@ const UploadPage = ({ fileDataList, uploadList, setUploadList, current, prevButt
    * - videoId
    * - title
    * - publishedAt
-   * - fileData
-   *   - fileId
-   *   - filename
-   *   - startTime
-   *   - endTime
+   * - fileId
+   * - filename
+   * - startTime
+   * - endTime
    */
 
   const [, theme] = useStyletron()
@@ -38,7 +37,12 @@ const UploadPage = ({ fileDataList, uploadList, setUploadList, current, prevButt
       const dateNow = dayjs()
       const recentUploads = uploads.filter(upload =>
         dateNow.diff(dayjs(upload.publishedAt), 'days') < 30
-      )
+      ).map(upload => ({
+        videoId: upload.videoId,
+        title: upload.title,
+        publishedAt: upload.publishedAt,
+        ...upload.fileData
+      }))
       console.log('recentUploads', recentUploads)
       setUploadList(recentUploads)
       setCheckedFileIds(new Set(fileIds))
@@ -56,7 +60,7 @@ const UploadPage = ({ fileDataList, uploadList, setUploadList, current, prevButt
   const uploadedFileIds = new Set(
     uploadList
       .filter(upload => upload.videoId)
-      .map(upload => upload.fileData.fileId)
+      .map(upload => upload.fileId)
   )
 
   const allUploaded = fileDataList.length > 0 &&

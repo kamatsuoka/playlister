@@ -218,7 +218,7 @@ class UploadWatcher {
 
 function resumableUpload (file, fileId, progressHandler, completeHandler, errorHandler) {
   return google.script.run.withSuccessHandler(token =>
-    (new UploadWatcher(progressHandler, completeHandler, errorHandler)).uploadFile(file, fileId, token),
+    (new UploadWatcher(progressHandler, completeHandler, errorHandler)).uploadFile(file, fileId, token)
   ).getToken()
 }
 

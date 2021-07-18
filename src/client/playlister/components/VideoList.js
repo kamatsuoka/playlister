@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import localizedFormat from 'dayjs/plugin/localizedFormat'
@@ -17,39 +17,27 @@ dayjs.extend(utc)
  * List of calculated file properties
  */
 const VideoList = ({
-  inferredDate,
-  fileDataList,
-  uploadStatus,
+  uploadList,
   playlistData,
   videoNaming,
   setVideoResources
 }) => {
   const [tableData, setTableData] = useState([])
+  console.log('VideoList: uploadList = ', uploadList)
+  const date = playlistData.eventDate
+  const startIndex = parseInt(playlistData.itemCount || 0) + 1 + parseInt(videoNaming.indexOffset)
+  const pad = (n) => n < 10 ? `0${n}` : `${n}`
+  const videoList = uploadList.map((upload, index) => ({
+    filename: upload.filename,
+    oldTitle: upload.title,
+    newTitle: `${videoNaming.prefix} ${date} ${videoNaming.cameraView} ${pad(startIndex + index)}`
+  }))
+  console.log('VideoList: videoList = ', videoList)
 
-  useEffect(() => {
-    const date = inferredDate
-    const startIndex = parseInt(playlistData.itemCount || 0) + 1 + parseInt(videoNaming.indexOffset)
-    const pad = (n) => n < 10 ? `0${n}` : `${n}`
-    const resources = fileDataList.map((startEnd, index) => ({
-      kind: 'youtube#video',
-      snippet: {
-        title: `${videoNaming.prefix} ${date} ${videoNaming.cameraView} ${pad(startIndex + index)}`,
-        categoryId: 10 // Music
-      },
-      recordingDetails: {
-        recordingDate: dayjs(startEnd.startTime).utc().format()
-      }
-    }))
-    setVideoResources(resources)
-    setTableData(fileDataList.map(s => s.name).map((n, i) =>
-      [n, resources[i].snippet.title, resources[i].recordingDetails.recordingDate])
-    )
-  }, [fileDataList, playlistData, videoNaming])
-
-  const COLUMNS = ['Original Title', 'New Title']
+  const COLUMNS = ['Filename', 'Original Title', 'New Title']
 
   return (
-    <Table columns={COLUMNS} data={tableData} />
+    <Table columns={COLUMNS} data={videoList} />
   )
 }
 

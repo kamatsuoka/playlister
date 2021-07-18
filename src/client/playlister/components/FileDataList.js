@@ -19,23 +19,14 @@ dayjs.extend(timezone)
 dayjs.extend(utc)
 
 /**
- * List of file metadata with time adjustments applied
+ * List of file media info with time adjustments applied
  */
 const FileDataList = ({
-  metadataList, setMetadataList, overrideTimeZone, timeAdjust, fileDataList, setFileDataList
+  mediaList, setMediaList, overrideTimeZone, timeAdjust, fileDataList, setFileDataList
 }) => {
-  /**
-   * fileDataList items:
-   * - fileId
-   * - name
-   * - startTime
-   * - duration
-   * - endTime
-   */
-
   const onRemove = useCallback(
-    fileId => setMetadataList(datas => datas.filter(data => data.fileId !== fileId)),
-    [setMetadataList]
+    fileId => setMediaList(datas => datas.filter(data => data.fileId !== fileId)),
+    [setMediaList]
   )
 
   const durationOverrides = {
@@ -77,36 +68,36 @@ const FileDataList = ({
       .add(timeAdjust.minute || 0, 'minute')
       .add(timeAdjust.second || 0, 'second')
 
-    const calculateStartEnd = metadata => {
-      const parsedStartTime = parseTimestamp(metadata.startTime)
+    const calculateStartEnd = media => {
+      const parsedStartTime = parseTimestamp(media.startTime)
       const startTime = adjustTime(parsedStartTime)
-      const endTime = startTime.add(metadata.duration, 'second')
+      const endTime = startTime.add(media.duration, 'second')
       return {
-        fileId: metadata.fileId,
-        name: metadata.name,
+        fileId: media.fileId,
+        filename: media.filename,
         startTime: startTime.toISOString(),
-        duration: metadata.duration,
+        duration: media.duration,
         endTime: endTime.toISOString()
       }
     }
 
     // filter out any files that don't have a start time (probably not media files)
-    const fileDatas = metadataList
-      .flatMap(metadata =>
-        metadata.startTime ? [calculateStartEnd(metadata)] : []
+    const fileDatas = mediaList
+      .flatMap(media =>
+        media.startTime ? [calculateStartEnd(media)] : []
       ).sort((s1, s2) => s1.startTime > s2.startTime ? 1 : -1)
     setFileDataList(fileDatas)
-  }, [metadataList, overrideTimeZone, setFileDataList, timeAdjust])
+  }, [mediaList, overrideTimeZone, setFileDataList, timeAdjust])
 
   // .sort((s1, s2) => s1.startTime > s2.startTime ? 1 : -1)
   const displayTemplate = 'YYYY-MM-DD HH:mm:ss z'
 
   const removeHeader = () => {
-    if (metadataList.length === 0) {
+    if (mediaList.length === 0) {
       return null
     } else {
       return (
-        <Button onClick={() => setMetadataList([])} kind={KIND.tertiary} size={SIZE.mini} title='Remove all'>
+        <Button onClick={() => setMediaList([])} kind={KIND.tertiary} size={SIZE.mini} title='Remove all'>
           <FontAwesomeIcon icon={faTimes} />
         </Button>
       )
@@ -160,7 +151,7 @@ const FileDataList = ({
             </Button>}
         </TableBuilderColumn>
         <TableBuilderColumn overrides={columnOverrides} header='Filename'>
-          {row => row.name}
+          {row => row.filename}
         </TableBuilderColumn>
         <TableBuilderColumn overrides={columnOverrides} header='Start Time'>
           {row => dayjs(row.startTime).format(displayTemplate)}

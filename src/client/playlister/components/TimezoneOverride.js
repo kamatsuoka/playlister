@@ -5,7 +5,7 @@ import { useStyletron } from 'baseui'
 import { StatefulTooltip } from 'baseui/tooltip'
 import dayjs from 'dayjs'
 
-const TimezoneOverride = ({ metadata, value, setValue }) => {
+const TimezoneOverride = ({ mediaList, value, setValue }) => {
   const [css, theme] = useStyletron()
 
   const SmallSpan = ({ children }) => (
@@ -29,7 +29,7 @@ const TimezoneOverride = ({ metadata, value, setValue }) => {
       <SmallSpan />
       <Checkbox
         size={SIZE.small}
-        disabled={Object.keys(metadata).length === 0}
+        disabled={mediaList.length === 0}
         checked={value}
         onChange={e => setValue(e.target.checked)}
         overrides={{
