@@ -19,11 +19,20 @@ dayjs.extend(timezone)
 dayjs.extend(utc)
 
 /**
- * List of file metadata
+ * List of file metadata with time adjustments applied
  */
-const StartEndList = ({
-  metadataList, setMetadataList, overrideTimeZone, timeAdjust, startEndList, setStartEndList
+const FileDataList = ({
+  metadataList, setMetadataList, overrideTimeZone, timeAdjust, fileDataList, setFileDataList
 }) => {
+  /**
+   * fileDataList items:
+   * - fileId
+   * - name
+   * - startTime
+   * - duration
+   * - endTime
+   */
+
   const onRemove = useCallback(
     fileId => setMetadataList(datas => datas.filter(data => data.fileId !== fileId)),
     [setMetadataList]
@@ -68,12 +77,12 @@ const StartEndList = ({
       .add(timeAdjust.minute || 0, 'minute')
       .add(timeAdjust.second || 0, 'second')
 
-    const calculateStartEnd = (fileId, metadata) => {
+    const calculateStartEnd = metadata => {
       const parsedStartTime = parseTimestamp(metadata.startTime)
       const startTime = adjustTime(parsedStartTime)
       const endTime = startTime.add(metadata.duration, 'second')
       return {
-        fileId: fileId,
+        fileId: metadata.fileId,
         name: metadata.name,
         startTime: startTime.toISOString(),
         duration: metadata.duration,
@@ -82,12 +91,12 @@ const StartEndList = ({
     }
 
     // filter out any files that don't have a start time (probably not media files)
-    const startEnds = Object.entries(metadataList)
-      .flatMap(([resultId, result]) =>
-        result.startTime ? [calculateStartEnd(resultId, result)] : []
+    const fileDatas = metadataList
+      .flatMap(metadata =>
+        metadata.startTime ? [calculateStartEnd(metadata)] : []
       ).sort((s1, s2) => s1.startTime > s2.startTime ? 1 : -1)
-    setStartEndList(startEnds)
-  }, [metadataList, overrideTimeZone, setStartEndList, timeAdjust])
+    setFileDataList(fileDatas)
+  }, [metadataList, overrideTimeZone, setFileDataList, timeAdjust])
 
   // .sort((s1, s2) => s1.startTime > s2.startTime ? 1 : -1)
   const displayTemplate = 'YYYY-MM-DD HH:mm:ss z'
@@ -135,7 +144,7 @@ const StartEndList = ({
 
   return (
     <div id='start-end'>
-      <TableBuilder data={startEndList} overrides={tableOverrides}>
+      <TableBuilder data={fileDataList} overrides={tableOverrides}>
         <TableBuilderColumn
           overrides={{ ...columnOverrides, ...removeColumnOverrides }}
           header={removeHeader()}
@@ -167,4 +176,4 @@ const StartEndList = ({
   )
 }
 
-export default StartEndList
+export default FileDataList

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import TimezoneOverride from './TimezoneOverride'
-import StartEndList from './StartEndList'
+import FileDataList from './FileDataList'
 import { FormControl } from 'baseui/form-control'
 import { FlexGrid, FlexGridItem } from 'baseui/flex-grid'
 import { Input } from 'baseui/input'
@@ -12,9 +12,9 @@ import { KIND as NKind, Notification } from 'baseui/notification'
  * Adjust time on file metadata in case camera doesn't have time zone
  * or has time set incorrectly
  */
-const AdjustTimePage = ({
+const FileDataPage = ({
   metadataList, setMetadataList,
-  startEndList, setStartEndList,
+  fileDataList, setFileDataList,
   timeAdjust, setTimeAdjust, prevNextButtons
 }) => {
   const [metadataErrors, setMetadataErrors] = useState([])
@@ -50,10 +50,10 @@ const AdjustTimePage = ({
   function filesAndOffset () {
     return (
       <>
-        <StartEndList
+        <FileDataList
           metadataList={metadataList} setMetadataList={setMetadataList}
           overrideTimeZone={overrideTimeZone} timeAdjust={timeAdjust}
-          startEndList={startEndList} setStartEndList={setStartEndList}
+          fileDataList={fileDataList} setFileDataList={setFileDataList}
         />
         <BaseCard title='Time Adjustments'>
           <TimezoneOverride metadata={metadataList} value={overrideTimeZone} setValue={setOverrideTimeZone} />
@@ -97,4 +97,4 @@ const AdjustTimePage = ({
   )
 }
 
-export default AdjustTimePage
+export default FileDataPage

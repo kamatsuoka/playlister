@@ -35,7 +35,7 @@ const MetadataReader = ({ setMetadataList, setMetadataErrors }) => {
     if (general.Format && general.Duration && general.Encoded_Date) {
       return {
         format: general.Format,
-        duration: general.Duration,
+        duration: general.Duration ? Math.round(general.Duration) : null,
         startTime: general.Encoded_Date
       }
     }

@@ -18,7 +18,7 @@ dayjs.extend(utc)
  */
 const VideoList = ({
   inferredDate,
-  startEndList,
+  fileDataList,
   uploadStatus,
   playlistData,
   videoNaming,
@@ -30,7 +30,7 @@ const VideoList = ({
     const date = inferredDate
     const startIndex = parseInt(playlistData.itemCount || 0) + 1 + parseInt(videoNaming.indexOffset)
     const pad = (n) => n < 10 ? `0${n}` : `${n}`
-    const resources = startEndList.map((startEnd, index) => ({
+    const resources = fileDataList.map((startEnd, index) => ({
       kind: 'youtube#video',
       snippet: {
         title: `${videoNaming.prefix} ${date} ${videoNaming.cameraView} ${pad(startIndex + index)}`,
@@ -41,10 +41,10 @@ const VideoList = ({
       }
     }))
     setVideoResources(resources)
-    setTableData(startEndList.map(s => s.name).map((n, i) =>
+    setTableData(fileDataList.map(s => s.name).map((n, i) =>
       [n, resources[i].snippet.title, resources[i].recordingDetails.recordingDate])
     )
-  }, [startEndList, playlistData, videoNaming])
+  }, [fileDataList, playlistData, videoNaming])
 
   const COLUMNS = ['Original Title', 'New Title']
 

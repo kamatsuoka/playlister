@@ -11,7 +11,7 @@ import inferDate from './InferredDate'
 const SUGGESTED = 'suggested'
 const CUSTOM = 'custom'
 
-const PlaylistTitle = ({ eventData, setEventData, startEndList, suggestedTitle, playlistTitle, setPlaylistTitle }) => {
+const PlaylistTitle = ({ eventData, setEventData, fileDataList, suggestedTitle, playlistTitle, setPlaylistTitle }) => {
   const handlePlaylistTitleChange = (evt) => {
     setPlaylistTitle({
       ...playlistTitle,
@@ -65,7 +65,7 @@ const PlaylistTitle = ({ eventData, setEventData, startEndList, suggestedTitle, 
           <FlexGridItem>
             <FormControl label='event date'>
               <Input
-                value={eventData.eventDate || inferDate(startEndList)}
+                value={eventData.eventDate || inferDate(fileDataList)}
                 name='eventDate'
                 onChange={handleEventDataChange}
               />

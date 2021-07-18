@@ -118,17 +118,16 @@ const youtubeTitle = filename => {
 /**
  * Finds uploads given local file metadata
  *
- * @param metadataList local file metadata
+ * @param fileDataList local file metadata with start/end times
  * @param onSuccess success handler: (video) => {}
  * @param onFailure failure handler: (error) => {}
  * @returns {Promise<*>}
  */
-const findUploads = (metadataList, onSuccess, onFailure) => {
+const findUploads = (fileDataList, onSuccess, onFailure) => {
   const fileData = Object.fromEntries(
-      metadataList.map(data => [data.name, {
-        fileId: data.fileId,
-        title: youtubeTitle(data.name),
-        durationSeconds: Math.round(data.duration)
+    fileDataList.map(fileData => [fileData.name, {
+      title: youtubeTitle(fileData.name),
+      fileData: fileData
     }])
   )
 
@@ -139,7 +138,7 @@ const findUploads = (metadataList, onSuccess, onFailure) => {
       .withFailureHandler(onFailure)
       .findUploads(fileData)
   } else {
-    throw 'standalone findUploads (outside Apps Script) not implemented'
+    throw Error('standalone findUploads (outside Apps Script) not implemented')
     // return searchVideos()
     //   .then(onSuccess)
     //   .catch(onFailure)

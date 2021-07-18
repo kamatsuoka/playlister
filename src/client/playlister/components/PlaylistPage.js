@@ -7,8 +7,13 @@ import { findPlaylist, insertPlaylist } from '../youtube/api'
 import PlaylistTitle, { CUSTOM, SUGGESTED } from './PlaylistTitle'
 import inferDate from './InferredDate'
 
+/**
+ * Shows event data form:
+ * - event date (defaults to date inferred from video start time)
+ * Shows suggested playlist as [inferred date] + [event type]
+ */
 const PlaylistPage = ({
-  startEndList,
+  fileDataList,
   eventData, setEventData,
   playlistTitle, setPlaylistTitle,
   playlistData, setPlaylistData
@@ -16,7 +21,7 @@ const PlaylistPage = ({
   const [playlistStatus, setPlaylistStatus] = useState({ message: '' })
   const [loading, setLoading] = useState(false)
 
-  const inferredDate = inferDate(startEndList)
+  const inferredDate = inferDate(fileDataList)
 
   const suggestedTitle = () => {
     const date = eventData.eventDate || inferredDate
@@ -136,7 +141,7 @@ const PlaylistPage = ({
         size={SIZE.compact}
         kind={playlistData.id ? KIND.secondary : KIND.primary}
         isLoading={loading}
-        disabled={startEndList.length === 0 || !isValidTitle()}
+        disabled={fileDataList.length === 0 || !isValidTitle()}
         overrides={{
           Root: { style: ({ $theme }) => ({ marginBottom: $theme.sizing.scale600 }) }
         }}
@@ -145,7 +150,7 @@ const PlaylistPage = ({
       </Button>
       <PlaylistTitle
         eventData={eventData} setEventData={setEventData}
-        startEndList={startEndList} suggestedTitle={suggestedTitle()}
+        fileDataList={fileDataList} suggestedTitle={suggestedTitle()}
         playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
       />
       {showNotification()}

@@ -12,7 +12,7 @@ import { StyledLink } from 'baseui/link'
 import { ProgressSteps, Step } from 'baseui/progress-steps'
 import { Button, KIND } from 'baseui/button'
 import PlaylistPage from './PlaylistPage'
-import AdjustTimePage from './AdjustTimePage'
+import FileDataPage from './FileDataPage'
 
 const engine = new Styletron()
 
@@ -21,9 +21,9 @@ function App () {
   const [current, setCurrent] = useState(1)
   // file metadata as detected by mediainfo.js
   const [metadataList, setMetadataList] = useState([])
-  // status of files uploaded to youtube
-  const [uploadStatus, setUploadStatus] = useState([])
-  const [startEndList, setStartEndList] = useState([])
+  // list of videos uploaded to youtube
+  const [uploadList, setUploadList] = useState([])
+  const [fileDataList, setFileDataList] = useState([])
   // attributes of event where the videos were recorded
   const [eventData, setEventData] = useState({ eventDate: '', eventType: 'rehearsal' })
   // playlist title settings for finding / creating a playlist
@@ -94,24 +94,22 @@ function App () {
             {prevNextButtons({ current: 0 })}
           </Step>
           <Step title='File Metadata'>
-            <AdjustTimePage
+            <FileDataPage
               metadataList={metadataList} setMetadataList={setMetadataList}
-              startEndList={startEndList} setStartEndList={setStartEndList}
+              fileDataList={fileDataList} setFileDataList={setFileDataList}
               timeAdjust={timeAdjust} setTimeAdjust={setTimeAdjust}
             />
             {prevNextButtons({ current: 1 })}
           </Step>
           <Step title='Uploads'>
             <UploadPage
-              metadataList={metadataList}
-              uploadStatus={uploadStatus} setUploadStatus={setUploadStatus}
+              fileDataList={fileDataList} uploadList={uploadList} setUploadList={setUploadList}
               current={2} prevButton={prevButton} nextButton={nextButton}
             />
           </Step>
           <Step title='Playlist'>
             <PlaylistPage
-              startEndList={startEndList}
-              eventData={eventData} setEventData={setEventData}
+              fileDataList={fileDataList} eventData={eventData} setEventData={setEventData}
               playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
               playlistData={playlistData} setPlaylistData={setPlaylistData}
             />
@@ -119,7 +117,7 @@ function App () {
           </Step>
           <Step title='Videos'>
             <VideoPage
-              eventData={eventData} uploadStatus={uploadStatus} startEndList={startEndList}
+              eventData={eventData} uploadList={uploadList} fileDataList={fileDataList}
               playlistData={playlistData} setActiveKey={setCurrent}
             />
             {prevNextButtons({ current: 4, last: true })}

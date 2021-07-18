@@ -19,8 +19,8 @@ const TimezoneOverride = ({ metadata, value, setValue }) => {
 
   const utcMessage = (
     <div>
-      Some cameras don't record times with a time zone. <br />
-      Those times get interpreted in UTC unless this option is checked.
+      If your videos are from a camera that doesn't put a time zone on its timestamps,<br />
+      the start/end times get interpreted in UTC unless this option is checked.
     </div>
   )
 

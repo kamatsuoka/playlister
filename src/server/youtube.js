@@ -64,20 +64,20 @@ function insertPlaylist (title, description) {
  * 3. Listing videos in the uploads playlist
  * 4. Returning videos that match one of the given filenames / titles
  *
- * @param {Object} fileData - map of filename to fileId, title, durationSeconds
+ * @param {Object} files - map of filename to { title, fileData }
  */
-function findUploads(fileData) {
-  Logger.log(`filedata = ${JSON.stringify(fileData)}`)
+function findUploads (files) {
+  Logger.log(`files = ${JSON.stringify(files)}`)
   // titles as they have likely been munged from filenames:
   // extension removed, any non-alnum character replaced with space
-  const filenameSet = new Set(Object.keys(fileData))
-  const titleSet = new Set(Object.values(fileData).map(data => data.title))
+  const filenameSet = new Set(Object.keys(files))
+  const titleSet = new Set(Object.values(files).map(file => file.title))
   const titleToFilename = Object.fromEntries(
-    Object.entries(fileData).map(([filename, data]) => [data.title, filename])
+    Object.entries(files).map(([filename, data]) => [data.title, filename])
   )
   Logger.log(`titleToFilename = ${JSON.stringify(titleToFilename)}`)
 
-  const matchingVideos = {}  // map of filename to video data
+  const matchingVideos = {} // map of filename to video data
   const channels = YouTube.Channels.list('contentDetails', { mine: true })
   // we *probably* just have one channel, but just in case ...
   channels.items.forEach(channel => {
@@ -103,8 +103,7 @@ function findUploads(fileData) {
       const uploads = items.map(item => ({
         videoId: item.snippet.resourceId.videoId,
         title: item.snippet.title,
-        publishedAt: item.snippet.publishedAt,
-        thumbnail: item.snippet.thumbnails.default ? item.snippet.thumbnails.default.url : null
+        publishedAt: item.snippet.publishedAt
       }))
       const matches = uploads.flatMap(upload => {
         if (filenameSet.has(upload.title)) {
@@ -113,7 +112,7 @@ function findUploads(fileData) {
           upload.filename = titleToFilename[upload.title]
         }
         if (upload.filename) {
-          upload.fileId = fileData[upload.filename].fileId
+          upload.fileData = files[upload.filename].fileData
           return [upload]
         }
         return []
@@ -129,15 +128,15 @@ function findUploads(fileData) {
         }
         Logger.log(`matching video: ${JSON.stringify(video)}`)
         const videoSeconds = dayjs.duration(video.contentDetails.duration).asSeconds()
-        if (Math.abs(videoSeconds - fileData[match.filename].durationSeconds) > 1) {
+        if (Math.abs(videoSeconds - files[match.filename].durationSeconds) > 1) {
           Logger.log(`duration of video ${video.id}, "${video.snippet.title}" at ${videoSeconds} seconds ` +
-            `doesn't match file ${match.filename} at ${fileData[match.filename].durationSeconds} seconds ` +
+            `doesn't match file ${match.filename} at ${files[match.filename].durationSeconds} seconds ` +
             ' (±1), ignoring')
           continue
         }
         if (matchingVideos[match.filename] &&
           video.snippet.publishedAt < matchingVideos[match.filename].publishedAt) {
-            Logger.log(`video ${video.id} ${video.snippet.title} at ${video.snippet.publishedAt} ` +
+          Logger.log(`video ${video.id} ${video.snippet.title} at ${video.snippet.publishedAt} ` +
               `is older than video ${matchingVideos[match.filename].id} ${matchingVideos[match.filename].title} ` +
               `at ${matchingVideos[match.filename].publishedAt}, ignoring`)
           continue

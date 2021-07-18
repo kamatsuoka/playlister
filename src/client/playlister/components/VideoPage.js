@@ -2,16 +2,16 @@ import React, { useState } from 'react'
 import VideoNaming from './VideoNaming'
 import VideoList from './VideoList'
 
-const VideoPage = ({ inferredDate, startEndList, uploadStatus, playlistData, setActiveKey }) => {
+const VideoPage = ({ inferredDate, fileDataList, uploadList, playlistData, setActiveKey }) => {
   const [videoNaming, setVideoNaming] = useState({
     prefix: 'fcs', cameraView: 'chorus', nextIndex: 1, indexOffset: 0
   })
-  const [videoResources, setVideoResources] = useState({})
+  const [, setVideoResources] = useState({})
 
   return (
     <>
       <VideoList
-        inferredDate={inferredDate} startEndList={startEndList} uploadStatus={uploadStatus}
+        inferredDate={inferredDate} fileDataList={fileDataList} uploadStatus={uploadList}
         playlistData={playlistData} videoNaming={videoNaming} setVideoResources={setVideoResources}
       />
       <VideoNaming playlistData={playlistData} videoNaming={videoNaming} setVideoNaming={setVideoNaming} />

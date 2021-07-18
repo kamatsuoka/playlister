@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { TableBuilder, TableBuilderColumn } from 'baseui/table-semantic'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheck, faExclamation, faQuestion } from '@fortawesome/free-solid-svg-icons'
@@ -10,36 +10,20 @@ const UPLOADING = 'uploading'
 const ERROR = 'error'
 
 /**
- * List of file info from MediaInfo and video info from youtube
+ * List of file upload status
  */
-const FileList = ({ metadataList, checkedFileIds, uploadStatus, setUploadStatus, setAllUploaded }) => {
+const UploadList = ({ fileDataList, checkedFileIds, uploadList, setUploadList }) => {
   // map of fileId to upload button state
   const [uploadButtonState, setUploadButtonState] = useState({})
   // map of fileId to upload progress
   const [uploadProgress, setUploadProgress] = useState({})
 
-  /**
-   * Set the "all uploaded" state to indicate that all files have been uploaded
-   */
-  useEffect(() => {
-    const uploadedFileIds = new Set(
-      uploadStatus
-        .filter(status => status.videoId)
-        .map(status => status.fileId)
-    )
-    setAllUploaded(
-      metadataList.length > 0 &&
-      metadataList.map(data => data.fileId).every(fileId => uploadedFileIds.has(fileId))
-    )
-  }, [uploadStatus, metadataList, setAllUploaded])
-
   const uploadData = Object.fromEntries(
-    uploadStatus.map(upload =>
-      [upload.fileId, {
+    uploadList.map(upload =>
+      [upload.fileData.fileId, {
         videoId: upload.videoId,
         title: upload.title,
-        publishedAt: upload.publishedAt,
-        thumbnail: upload.thumbnail
+        publishedAt: upload.publishedAt
       }]
     ))
 
@@ -53,8 +37,8 @@ const FileList = ({ metadataList, checkedFileIds, uploadStatus, setUploadStatus,
     }
     const completeHandler = uploaded => {
       console.log('completeHandler: uploaded = ', uploaded)
-      return setUploadStatus(
-        uploadStatus
+      return setUploadList(
+        uploadList
           .filter(status => status.fileId !== fileId)
           .concat(uploaded)
           .sort((a, b) => a.filename > b.filename ? 1 : -1)
@@ -139,7 +123,7 @@ const FileList = ({ metadataList, checkedFileIds, uploadStatus, setUploadStatus,
 
   return (
     <div>
-      <TableBuilder data={metadataList} overrides={tableOverrides}>
+      <TableBuilder data={fileDataList} overrides={tableOverrides}>
         <TableBuilderColumn overrides={columnOverrides} header='Filename'>
           {row => row.name}
         </TableBuilderColumn>
@@ -157,4 +141,4 @@ const FileList = ({ metadataList, checkedFileIds, uploadStatus, setUploadStatus,
   )
 }
 
-export default FileList
+export default UploadList
