@@ -13,6 +13,7 @@ import { ProgressSteps, Step } from 'baseui/progress-steps'
 import { Button, KIND } from 'baseui/button'
 import PlaylistPage from './PlaylistPage'
 import FileDataPage from './FileDataPage'
+import { SnackbarProvider } from 'baseui/snackbar'
 
 const engine = new Styletron()
 
@@ -75,57 +76,59 @@ function App () {
   return (
     <StyletronProvider value={engine}>
       <BaseProvider theme={LightTheme}>
-        <ProgressSteps
-          current={current}
-          overrides={{
-            Content: {
-              style: () => ({
+        <SnackbarProvider>
+          <ProgressSteps
+            current={current}
+            overrides={{
+              Content: {
+                style: () => ({
                 // avoid jumping widths on desktop ... not sure about mobile
-                minWidth: '720px'
-              })
-            },
-            Description: {
-              style: () => ({
-                marginBottom: 0 // compactify a little
-              })
-            }
-          }}
-        >
-          <Step title='Auth'>
-            <AuthPage />
-            {prevNextButtons({ current: 0 })}
-          </Step>
-          <Step title='File Data'>
-            <FileDataPage
-              mediaList={mediaList} setMediaList={setMediaList}
-              fileDataList={fileDataList} setFileDataList={setFileDataList}
-              timeAdjust={timeAdjust} setTimeAdjust={setTimeAdjust}
-            />
-            {prevNextButtons({ current: 1 })}
-          </Step>
-          <Step title='Uploads'>
-            <UploadPage
-              fileDataList={fileDataList} uploadList={uploadList} setUploadList={setUploadList}
-              current={2} prevButton={prevButton} nextButton={nextButton}
-            />
-          </Step>
-          <Step title='Playlist'>
-            <PlaylistPage
-              uploadList={uploadList} eventData={eventData} setEventData={setEventData}
-              playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
-              playlistData={playlistData} setPlaylistData={setPlaylistData}
-            />
-            {prevNextButtons({ current: 3 })}
-          </Step>
-          <Step title='Videos'>
-            <VideoPage
-              uploadList={uploadList} setUploadList={setUploadList}
-              playlistData={playlistData} setActiveKey={setCurrent}
-              newTitles={newTitles} setNewTitles={setNewTitles}
-            />
-            {prevNextButtons({ current: 4, last: true })}
-          </Step>
-        </ProgressSteps>
+                  minWidth: '720px'
+                })
+              },
+              Description: {
+                style: () => ({
+                  marginBottom: 0 // compactify a little
+                })
+              }
+            }}
+          >
+            <Step title='Auth'>
+              <AuthPage />
+              {prevNextButtons({ current: 0 })}
+            </Step>
+            <Step title='File Data'>
+              <FileDataPage
+                mediaList={mediaList} setMediaList={setMediaList}
+                fileDataList={fileDataList} setFileDataList={setFileDataList}
+                timeAdjust={timeAdjust} setTimeAdjust={setTimeAdjust}
+              />
+              {prevNextButtons({ current: 1 })}
+            </Step>
+            <Step title='Uploads'>
+              <UploadPage
+                fileDataList={fileDataList} uploadList={uploadList} setUploadList={setUploadList}
+                current={2} prevButton={prevButton} nextButton={nextButton}
+              />
+            </Step>
+            <Step title='Playlist'>
+              <PlaylistPage
+                uploadList={uploadList} eventData={eventData} setEventData={setEventData}
+                playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
+                playlistData={playlistData} setPlaylistData={setPlaylistData}
+              />
+              {prevNextButtons({ current: 3 })}
+            </Step>
+            <Step title='Videos'>
+              <VideoPage
+                uploadList={uploadList} setUploadList={setUploadList}
+                playlistData={playlistData} setActiveKey={setCurrent}
+                newTitles={newTitles} setNewTitles={setNewTitles}
+              />
+              {prevNextButtons({ current: 4, last: true })}
+            </Step>
+          </ProgressSteps>
+        </SnackbarProvider>
         <footer>
           <StyledLink
             href='https://github.com/kamatsuoka/playlister'

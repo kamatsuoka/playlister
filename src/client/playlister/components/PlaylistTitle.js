@@ -19,6 +19,13 @@ const PlaylistTitle = ({ eventData, suggestedTitle, playlistTitle, setPlaylistTi
       ? ({ colors: { inputTextDisabled: 'black' } })
       : {}
 
+  const radioOverrides = {
+    Label: {
+      style: ({ $theme }) => ({
+        fontSize: $theme.typography.LabelSmall.fontSize
+      })
+    }
+  }
   return (
     <ThemeProvider
       theme={createTheme(lightThemePrimitives, themeOverrides())}
@@ -28,16 +35,9 @@ const PlaylistTitle = ({ eventData, suggestedTitle, playlistTitle, setPlaylistTi
         name='titleChoice'
         onChange={handleChange}
         align={ALIGN.horizontal}
-        overrides={{
-          Label: {
-            style: ({ $theme }) => ({
-              fontSize: $theme.typography.LabelSmall.fontSize
-            })
-          }
-        }}
       >
-        <Radio value={SUGGESTED}>suggested title&nbsp;</Radio>
-        <Radio value={CUSTOM}>custom title</Radio>
+        <Radio value={SUGGESTED} overrides={radioOverrides}>suggested title&nbsp;</Radio>
+        <Radio value={CUSTOM} overrides={radioOverrides}>custom title</Radio>
       </RadioGroup>
       {playlistTitle.titleChoice === 'custom'
         ? <Input

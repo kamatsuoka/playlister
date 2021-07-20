@@ -1,13 +1,12 @@
 import React, { useState } from 'react'
 import { Button, KIND, SIZE } from 'baseui/button'
-import { Table } from 'baseui/table-semantic'
 import { KIND as NKind, Notification } from 'baseui/notification'
-import { BaseCard } from './BaseCard'
 import EventData from './EventData'
 import { findPlaylist, insertPlaylist } from '../youtube/api'
 import PlaylistTitle, { CUSTOM, SUGGESTED } from './PlaylistTitle'
 import inferDate from './InferredDate'
 import { Paragraph3 } from 'baseui/typography'
+import { useSnackbar } from 'baseui/snackbar'
 
 /**
  * Shows event data form:
@@ -31,6 +30,7 @@ const PlaylistPage = ({
    */
   const [playlistStatus, setPlaylistStatus] = useState({ message: '' })
   const [loading, setLoading] = useState(false)
+  const { enqueue } = useSnackbar()
 
   const inferredDate = inferDate(uploadList)
 
@@ -40,7 +40,7 @@ const PlaylistPage = ({
     return (date && eventType) ? date.replaceAll('-', '') + ' ' + eventType : ''
   }
 
-  const storePlaylist = (playlist, eventDate) => {
+  const storePlaylist = (playlist, eventDate, msgIntro) => {
     // eslint-disable-next-line no-prototype-builtins
     if (playlist.hasOwnProperty(['id'])) {
       return setPlaylistData({
@@ -50,7 +50,8 @@ const PlaylistPage = ({
         itemCount: playlist.contentDetails.itemCount,
         publishedAt: playlist.snippet.publishedAt,
         description: playlist.snippet.description,
-        eventDate: eventDate
+        eventDate: eventDate,
+        msgIntro: msgIntro
       })
     } else {
       return setPlaylistData({})
@@ -61,7 +62,7 @@ const PlaylistPage = ({
    * Success handler for creating or finding a playlist
    */
   const playlistSuccess = (msgIntro, eventDate) => playlist => {
-    storePlaylist(playlist, eventDate)
+    storePlaylist(playlist, eventDate, msgIntro)
     setPlaylistStatus({
       ...playlistStatus,
       message: `${msgIntro} playlist "${playlist.snippet.title}"`,
@@ -80,11 +81,7 @@ const PlaylistPage = ({
     } catch {
       // no-op
     }
-    setPlaylistStatus({
-      ...playlistStatus,
-      message: `${msgIntro} playlist: ${errorMsg}`,
-      isError: true
-    })
+    enqueue({ message: `${msgIntro} playlist: ${errorMsg}` })
     setLoading(false)
   }
 
@@ -101,7 +98,13 @@ const PlaylistPage = ({
         createPlaylist(title, eventDate)
       }
     }
-    return findPlaylist(title, successHandler, playlistFailure('Error finding'))
+
+    try {
+      return findPlaylist(title, successHandler, playlistFailure('Error finding'))
+    } catch (e) {
+      enqueue({ message: e.message })
+      setLoading(false)
+    }
   }
 
   function createPlaylist (title, eventDate) {
@@ -113,30 +116,12 @@ const PlaylistPage = ({
     )
   }
 
-  const showPlaylist = () => {
+  const showFindCreateStatus = () => {
     if (playlistData.id) {
-      const DATA = [
-        ['title', playlistData.title],
-        ['description', playlistData.description],
-        ['id', playlistData.id],
-        ['item count', playlistData.itemCount],
-        ['published at', playlistData.publishedAt]
-      ]
+      const kind = NKind.positive
       return (
-        <BaseCard title='Playlist'>
-          <Table data={DATA} columns={['Field', 'Value']} />
-        </BaseCard>
-      )
-    }
-    return null
-  }
-
-  const showNotification = () => {
-    if (playlistStatus.message) {
-      const kind = playlistStatus.isError ? NKind.negative : NKind.positive
-      return (
-        <Notification kind={kind} overrides={{ Body: { style: { width: 'auto' } } }} closeable>
-          {playlistStatus.message}
+        <Notification kind={kind}>
+          {playlistData.msgIntro} playlist {playlistData.title}
         </Notification>
       )
     } else {
@@ -154,10 +139,6 @@ const PlaylistPage = ({
 
   return (
     <>
-      <EventData
-        eventData={eventData} setEventData={setEventData}
-        fileDataList={uploadList}
-      />
       <Paragraph3>
         You'll need to find an existing playlist to add your videos to, or create a new one.<br />
         The suggested playlist title is based on the event date and event type.
@@ -167,25 +148,30 @@ const PlaylistPage = ({
         fileDataList={uploadList} suggestedTitle={suggestedTitle()}
         playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
       />
-      <Button
-        onClick={() => findOrCreatePlaylist()}
-        size={SIZE.compact}
-        kind={playlistData.id ? KIND.secondary : KIND.primary}
-        isLoading={loading}
-        disabled={uploadList.length === 0 || !isValidTitle()}
-        overrides={{
-          Root: {
-            style: ({ $theme }) => ({
-              marginTop: $theme.sizing.scale600,
-              marginBottom: $theme.sizing.scale600
-            })
-          }
-        }}
-      >
-        Find or Create Playlist
-      </Button>
-      {showNotification()}
-      {showPlaylist()}
+      <EventData
+        eventData={eventData} setEventData={setEventData}
+        fileDataList={uploadList}
+      />
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Button
+          onClick={() => findOrCreatePlaylist()}
+          size={SIZE.compact}
+          kind={playlistData.id ? KIND.secondary : KIND.primary}
+          isLoading={loading}
+          disabled={uploadList.length === 0 || !isValidTitle()}
+          overrides={{
+            Root: {
+              style: ({ $theme }) => ({
+                marginTop: $theme.sizing.scale600,
+                marginBottom: $theme.sizing.scale600
+              })
+            }
+          }}
+        >
+          Find or Create Playlist
+        </Button>
+        {showFindCreateStatus()}
+      </div>
     </>
   )
 }

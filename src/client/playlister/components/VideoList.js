@@ -12,7 +12,7 @@ import { updateTitle } from '../youtube/api'
 import { faCheck } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
-import { SnackbarProvider, useSnackbar } from 'baseui/snackbar'
+import { useSnackbar } from 'baseui/snackbar'
 
 dayjs.extend(localizedFormat)
 dayjs.extend(advancedFormat)
@@ -26,6 +26,7 @@ dayjs.extend(utc)
 const VideoList = ({ uploadList, setUploadList, playlistData, videoNaming }) => {
   const [cameraViews, setCameraViews] = useState({})
   const [renaming, setRenaming] = useState(new Set())
+  const { enqueue } = useSnackbar()
 
   const date = playlistData.eventDate
   const startIndex = parseInt(playlistData.itemCount || 0) + 1 + parseInt(videoNaming.indexOffset)
@@ -60,8 +61,6 @@ const VideoList = ({ uploadList, setUploadList, playlistData, videoNaming }) => 
     }
   }
 
-  const { enqueue } = useSnackbar()
-
   const allRenamed = uploadList.every((video, index) => video.newTitle === getNewTitle(video, index))
 
   const renameVideo = (video, newTitle) => {
@@ -84,7 +83,13 @@ const VideoList = ({ uploadList, setUploadList, playlistData, videoNaming }) => 
         renaming.delete(video.videoId)
         return renaming
       })
-      enqueue({ msessage: err })
+      let errMsg = err
+      try {
+        errMsg = JSON.stringify(err)
+      } catch {
+        // no -op
+      }
+      enqueue({ msessage: errMsg })
     }
     updateTitle(video.videoId, newTitle, onSuccess, onFailure)
   }
@@ -99,7 +104,7 @@ const VideoList = ({ uploadList, setUploadList, playlistData, videoNaming }) => 
   }
 
   return (
-    <SnackbarProvider>
+    <>
       <TableBuilder data={uploadList}>
         <TableBuilderColumn overrides={columnOverrides} header='Filename'>
           {row => row.filename}
@@ -143,7 +148,7 @@ const VideoList = ({ uploadList, setUploadList, playlistData, videoNaming }) => 
       >
         Rename Videos
       </Button>
-    </SnackbarProvider>
+    </>
   )
 }
 

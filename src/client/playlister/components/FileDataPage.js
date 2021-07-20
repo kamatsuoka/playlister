@@ -51,7 +51,7 @@ const FileDataPage = ({
         <FormControl label={name}>
           <Input
             value={timeAdjust[name] || 0}
-            type="number"
+            type='number'
             min={-max}
             max={max}
             name={name}

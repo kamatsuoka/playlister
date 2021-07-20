@@ -72,22 +72,20 @@ const UploadPage = ({ fileDataList, uploadList, setUploadList, current, prevButt
 
   return (
     <>
+      <Paragraph3>
+        You can upload your files to YouTube on this page or by using {' '}
+        <StyledLink href='https://www.youtube.com/upload' target='_blank' rel='noopener noreferrer'>
+          YouTube's upload page
+        </StyledLink>.
+        <br />
+        Either way, you'll need to check for your uploads by clicking the button below.
+      </Paragraph3>
       <UploadList
         fileDataList={fileDataList} checkedFileIds={checkedFileIds}
         uploadList={uploadList} setUploadList={setUploadList}
         // setAllUploaded={setAllUploaded}
       />
       {error ? <Notification kind={NKind.negative} closeable>{error}</Notification> : null}
-      <Paragraph3>
-        You can upload your files to YouTube either by<br />
-        — using this form, or<br />
-        — using{' '}
-        <StyledLink href='https://www.youtube.com/upload' target='_blank' rel='noopener noreferrer'>
-          YouTube's upload page
-        </StyledLink>.<br />
-        <br />
-        Either way, you'll need to check for your uploads by clicking the button below.
-      </Paragraph3>
       <Button
         style={{ marginTop: '10px' }}
         size={SIZE.compact} disabled={fileDataList.length === 0}
