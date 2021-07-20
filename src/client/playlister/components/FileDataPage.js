@@ -59,10 +59,15 @@ const FileDataPage = ({
   function filesAndOffset () {
     return (
       <>
-        <BaseCard title='Time Adjustments'>
-          <TimezoneOverride mediaList={mediaList} value={overrideTimeZone} setValue={setOverrideTimeZone} />
-          Offsets
-          <FlexGrid flexGridColumnCount={6} flexGridColumnGap='scale400' flexGridRowGap='scale200'>
+        <BaseCard title=''>
+          <FlexGrid flexGridColumnCount={2}>
+            <FlexGridItem>Time Adjustments</FlexGridItem>
+            <FlexGridItem>
+              <TimezoneOverride mediaList={mediaList} value={overrideTimeZone} setValue={setOverrideTimeZone} />
+            </FlexGridItem>
+          </FlexGrid>
+          <FlexGrid flexGridColumnCount={7} flexGridColumnGap='scale400' flexGridRowGap='scale200'>
+            <FlexGridItem>Offsets</FlexGridItem>
             {timeOffset('year', 2000)}
             {timeOffset('month', 11)}
             {timeOffset('day', 30)}
