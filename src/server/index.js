@@ -1,12 +1,14 @@
-import { findMyPlaylist, findUploads, insertPlaylist } from './youtube'
+import * as youtube from './youtube'
 import { openPlaylister } from './ui'
 
-function getToken() {
+global.getToken = () => {
   return ScriptApp.getOAuthToken()
 }
 
 global.doGet = openPlaylister
-global.findMyPlaylist = findMyPlaylist
-global.findUploads = findUploads
-global.insertPlaylist = insertPlaylist
-global.getToken = getToken
+
+global.findMyPlaylist = youtube.findMyPlaylist
+global.findUploads = youtube.findUploads
+global.insertPlaylist = youtube.insertPlaylist
+global.getToken = youtube.getToken
+global.updateTitle = youtube.updateTitle

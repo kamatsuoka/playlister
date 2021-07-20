@@ -17,7 +17,7 @@ const findMatchingItem = (result, title) => {
 /**
  * Finds my playlist with given title
  */
-const findMyPlaylist = (title, nextPageToken = '') => {
+export const findMyPlaylist = (title, nextPageToken = '') => {
   const MAX_RESULTS = 50
   const part = ['snippet', 'contentDetails']
   const optionalArgs = {
@@ -42,7 +42,7 @@ const findMyPlaylist = (title, nextPageToken = '') => {
 /**
  * Inserts (creates) a new playlist
  */
-function insertPlaylist (title, description) {
+export function insertPlaylist (title, description) {
   const resource = {
     snippet: {
       title: title,
@@ -66,7 +66,7 @@ function insertPlaylist (title, description) {
  *
  * @param {Object} files - map of filename to { title, fileData }
  */
-function findUploads (files) {
+export function findUploads (files) {
   Logger.log(`files = ${JSON.stringify(files)}`)
   // titles as they have likely been munged from filenames:
   // extension removed, any non-alnum character replaced with space
@@ -150,4 +150,28 @@ function findUploads (files) {
   return Object.values(matchingVideos)
 }
 
-export { findMyPlaylist, insertPlaylist, findUploads }
+/**
+ * Updates the title of a video
+ *
+ * @param videoId id of video to update
+ * @param title new title
+ * @returns {GoogleAppsScript.YouTube.Schema.Video}
+ */
+export function updateTitle (videoId, title) {
+  // TODO: add in update to status: unlisted once app is approved
+  const response = YouTube.Videos.update(
+    {
+      id: videoId,
+      snippet: {
+        title: title,
+        categoryId: 10
+      }
+    },
+    'snippet'
+  )
+  Logger.log(`updateTitle: response = ${JSON.stringify(response)}`)
+  return {
+    videoId: response.id,
+    title: response.snippet.title
+  }
+}

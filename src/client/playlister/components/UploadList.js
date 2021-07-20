@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { TableBuilder, TableBuilderColumn } from 'baseui/table-semantic'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCheck, faExclamation, faQuestion } from '@fortawesome/free-solid-svg-icons'
+import { faQuestion } from '@fortawesome/free-solid-svg-icons'
 import { tableOverrides } from './TableOverrides'
 import { Button, KIND, SIZE } from 'baseui/button'
 import resumableUpload from '../youtube/youtube-uploader'
@@ -49,19 +49,19 @@ const UploadList = ({ fileDataList, checkedFileIds, uploadList, setUploadList })
 
   const getButtonContent = fileId => {
     if (!uploadButtonState[fileId]) {
-      return '⇧'
+      return '⇧ upload'
     }
     if (uploadButtonState[fileId] === UPLOADING) {
       return ' '
     }
     if (uploadButtonState[fileId] === ERROR) {
-      return faExclamation
+      return 'upload error'
     }
   }
 
   /**
    * Renders:
-   * - a question icon if the file's upload status hasn't been checked,
+   * - the published-at date if the file has been uploaded
    * - an upload button if the file's upload status has been checked but it hasn't been uploaded
    * - a spinner if the upload button has been clicked but no progress event has been received
    * - a progress percent if the file is being uploaded and a progress event was received
@@ -70,8 +70,8 @@ const UploadList = ({ fileDataList, checkedFileIds, uploadList, setUploadList })
    * @returns {JSX.Element|string}
    */
   const uploadButton = row => {
-    if (uploadData[row.fileId] && uploadData[row.fileId].title) {
-      return <FontAwesomeIcon icon={faCheck} size='sm' title='Uploaded, good job!' />
+    if (uploadData[row.fileId] && uploadData[row.fileId].publishedAt) {
+      return `published ${uploadData[row.fileId].publishedAt}`
     }
     if (uploadProgress[row.fileId]) {
       return `${uploadProgress[row.fileId]}%`
@@ -113,28 +113,17 @@ const UploadList = ({ fileDataList, checkedFileIds, uploadList, setUploadList })
     }
   }
 
-  const buttonColumnOverrides = {
-    TableBodyCell: {
-      style: ({
-        textAlign: 'center'
-      })
-    }
-  }
-
   return (
     <div>
       <TableBuilder data={fileDataList} overrides={tableOverrides}>
         <TableBuilderColumn overrides={columnOverrides} header='Filename'>
           {row => row.filename}
         </TableBuilderColumn>
+        <TableBuilderColumn header='Upload Status' overrides={columnOverrides}>
+          {row => uploadButton(row)}
+        </TableBuilderColumn>
         <TableBuilderColumn overrides={columnOverrides} header='YouTube Title'>
           {row => uploadData[row.fileId] ? uploadData[row.fileId].title : null}
-        </TableBuilderColumn>
-        <TableBuilderColumn header='Published At' overrides={columnOverrides}>
-          {row => uploadData[row.fileId] ? uploadData[row.fileId].publishedAt : null}
-        </TableBuilderColumn>
-        <TableBuilderColumn header='Upload' overrides={{ ...columnOverrides, ...buttonColumnOverrides }}>
-          {row => uploadButton(row)}
         </TableBuilderColumn>
       </TableBuilder>
     </div>

@@ -34,6 +34,8 @@ function App () {
   const [timeAdjust, setTimeAdjust] = useState({
     year: 0, month: 0, day: 0, hour: 0, minute: 0, second: 0
   })
+  // map of video id to new title
+  const [newTitles, setNewTitles] = useState({})
 
   const prevButton = ({ current, disabled = false }) => {
     if (current > 0) {
@@ -117,7 +119,9 @@ function App () {
           </Step>
           <Step title='Videos'>
             <VideoPage
-              uploadList={uploadList} playlistData={playlistData} setActiveKey={setCurrent}
+              uploadList={uploadList} setUploadList={setUploadList}
+              playlistData={playlistData} setActiveKey={setCurrent}
+              newTitles={newTitles} setNewTitles={setNewTitles}
             />
             {prevNextButtons({ current: 4, last: true })}
           </Step>

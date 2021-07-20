@@ -145,4 +145,16 @@ const findUploads = (fileDataList, onSuccess, onFailure) => {
   }
 }
 
-export { findPlaylist, insertPlaylist, findUploads, youtubeTitle }
+const updateTitle = (videoId, title, onSuccess, onFailure) => {
+  const run = getAppsScriptRun()
+  if (run) {
+    return run
+      .withSuccessHandler(onSuccess)
+      .withFailureHandler(onFailure)
+      .updateTitle(videoId, title)
+  } else {
+    throw Error('updateTitle not implented outside Apps Script')
+  }
+}
+
+export { findPlaylist, insertPlaylist, findUploads, youtubeTitle, updateTitle }
