@@ -9,8 +9,9 @@ import { tableOverrides } from './TableOverrides'
 import { TableBuilder, TableBuilderColumn } from 'baseui/table-semantic'
 import { Button, KIND, SIZE } from 'baseui/button'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faTimes } from '@fortawesome/free-solid-svg-icons'
+import { faPlay, faTimes } from '@fortawesome/free-solid-svg-icons'
 import { durationSeconds } from '../util/dates'
+import { useStyletron } from 'baseui'
 
 dayjs.extend(localizedFormat)
 dayjs.extend(advancedFormat)
@@ -22,26 +23,13 @@ dayjs.extend(utc)
  * List of file media info with time adjustments applied
  */
 const FileDataList = ({
-  mediaList, setMediaList, overrideTimeZone, timeAdjust, fileDataList, setFileDataList
+  mediaList, setMediaList, overrideTimeZone, timeAdjust, fileDataList, setFileDataList, setPreviewFile
 }) => {
+  const [css, theme] = useStyletron()
   const onRemove = useCallback(
     fileId => setMediaList(datas => datas.filter(data => data.fileId !== fileId)),
     [setMediaList]
   )
-
-  const durationOverrides = {
-    TableHeadCell: {
-      style: ({ $theme }) => ({
-        textAlign: 'right',
-        marginRight: $theme.sizing.scale400
-      })
-    },
-    TableBodyCell: {
-      style: ({ $theme }) => ({
-        marginRight: $theme.sizing.scale400
-      })
-    }
-  }
 
   /**
    * Calculate start and end time from file info
@@ -77,7 +65,8 @@ const FileDataList = ({
         filename: media.filename,
         startTime: startTime.toISOString(),
         duration: media.duration,
-        endTime: endTime.toISOString()
+        endTime: endTime.toISOString(),
+        file: media.file
       }
     }
 
@@ -120,8 +109,24 @@ const FileDataList = ({
     }
   }
 
+  const durationOverrides = {
+    TableHeadCell: {
+      style: ({ $theme }) => ({
+        textAlign: 'right',
+        marginRight: $theme.sizing.scale400
+      })
+    },
+    TableBodyCell: {
+      style: ({ $theme }) => ({
+        marginRight: $theme.sizing.scale400,
+        ...tableCellStyles($theme)
+      })
+    }
+  }
+
   const removeColumnStyle = {
     style: ({ $theme }) => ({
+      ...tableCellStyles($theme),
       textAlign: 'center',
       paddingLeft: $theme.sizing.scale200,
       paddingRight: $theme.sizing.scale200
@@ -149,6 +154,9 @@ const FileDataList = ({
             >
               <FontAwesomeIcon icon={faTimes} size='sm' />
             </Button>}
+        </TableBuilderColumn>
+        <TableBuilderColumn overrides={columnOverrides} header=''>
+          {row => <Button onClick={() => setPreviewFile(row.file)}><FontAwesomeIcon icon={faPlay} /></Button>}
         </TableBuilderColumn>
         <TableBuilderColumn overrides={columnOverrides} header='Filename'>
           {row => row.filename}

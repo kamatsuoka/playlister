@@ -28,6 +28,16 @@ const getRandomId = () => Math.random().toString(36).substr(2, 9)
  * Renders DropZone (and file picker) for one or more media files
  */
 const MediaReader = ({ setMediaList, setMediaErrors }) => {
+  /**
+   * mediaList items:
+   *
+   * - format
+   * - duration
+   * - startTime
+   * - fileId
+   * - filename
+   * - file
+   */
   const [analyzing, setAnalyzing] = useState(false)
 
   function filterMedia (data) {

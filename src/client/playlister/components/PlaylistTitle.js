@@ -6,7 +6,7 @@ import { createTheme, lightThemePrimitives, ThemeProvider } from 'baseui'
 const SUGGESTED = 'suggested'
 const CUSTOM = 'custom'
 
-const PlaylistTitle = ({ eventData, suggestedTitle, playlistTitle, setPlaylistTitle }) => {
+const PlaylistTitle = ({ suggestedTitle, playlistTitle, setPlaylistTitle }) => {
   const handleChange = (evt) => {
     setPlaylistTitle({
       ...playlistTitle,

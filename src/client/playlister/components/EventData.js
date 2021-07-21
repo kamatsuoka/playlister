@@ -36,7 +36,7 @@ const EventData = ({ fileDataList, eventData, setEventData }) => {
               value={eventData.eventType}
               name='eventType'
               onChange={handleChange}
-              options={['rehearsal', 'coaching']}
+              options={['rehearsal', 'coaching', 'performance']}
               mapOptionToString={option => option}
             />
           </FormControl>

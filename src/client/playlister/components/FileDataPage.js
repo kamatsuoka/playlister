@@ -10,6 +10,7 @@ import { Paragraph3 } from 'baseui/typography'
 import { StyledTable, StyledTableBody, StyledTableBodyCell, StyledTableBodyRow } from 'baseui/table-semantic'
 import { withStyle } from 'styletron-react'
 import { useStyletron } from 'baseui'
+import { Modal, ModalBody, ModalHeader } from 'baseui/modal'
 
 const TableCell = withStyle(StyledTableBodyCell, ({ $theme }) => ({
   paddingTop: $theme.sizing.scale200,
@@ -34,6 +35,7 @@ const FileDataPage = ({
    * - startTime
    * - duration
    * - endTime
+   * - file
    */
   const [mediaErrors, setMediaErrors] = useState([])
   const [overrideTimeZone, setOverrideTimeZone] = useState(true)
@@ -44,6 +46,35 @@ const FileDataPage = ({
       [evt.target.name]: parseInt(evt.target.value)
     })
   }
+
+  const [previewFile, setPreviewFile] = React.useState(null)
+  function closePreview () {
+    setPreviewFile(null)
+  }
+
+  const videoPreview = () => (
+    <Modal
+      onClose={closePreview}
+      isOpen={previewFile != null}
+      overrides={{
+        Dialog: {
+          style: {
+            width: '80vw',
+            height: '80vh',
+            display: 'flex',
+            flexDirection: 'column'
+          }
+        }
+      }}
+    >
+      <ModalHeader>Preview</ModalHeader>
+      <ModalBody style={{ flex: '1 1 0' }}>
+        <video controls>
+          <source src={previewFile ? URL.createObjectURL(previewFile) : null} />
+        </video>
+      </ModalBody>
+    </Modal>
+  )
 
   const timeOffset = (name, max, width = theme.sizing.scale2400) => {
     return (
@@ -81,6 +112,7 @@ const FileDataPage = ({
           mediaList={mediaList} setMediaList={setMediaList}
           overrideTimeZone={overrideTimeZone} timeAdjust={timeAdjust}
           fileDataList={fileDataList} setFileDataList={setFileDataList}
+          setPreviewFile={setPreviewFile}
         />
         <BaseCard title=''>
           <StyledTable>
@@ -132,6 +164,7 @@ const FileDataPage = ({
   return (
     <>
       <MediaReader setMediaList={setMediaList} setMediaErrors={setMediaErrors} />
+      {videoPreview()}
       {errorTable()}
       {mediaList.length > 0 ? filesAndOffset() : null}
       {prevNextButtons}
