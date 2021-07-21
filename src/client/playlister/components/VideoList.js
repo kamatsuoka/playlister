@@ -13,6 +13,7 @@ import { faCheck } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { useSnackbar } from 'baseui/snackbar'
+import { showError } from '../util/showError'
 
 dayjs.extend(localizedFormat)
 dayjs.extend(advancedFormat)
@@ -83,15 +84,13 @@ const VideoList = ({ uploadList, setUploadList, playlistData, videoNaming }) => 
         renaming.delete(video.videoId)
         return renaming
       })
-      let errMsg = err
-      try {
-        errMsg = JSON.stringify(err)
-      } catch {
-        // no -op
-      }
-      enqueue({ msessage: errMsg })
+      showError(enqueue, err)
     }
-    updateTitle(video.videoId, newTitle, onSuccess, onFailure)
+    try {
+      updateTitle(video.videoId, newTitle, onSuccess, onFailure)
+    } catch (e) {
+      onFailure(e)
+    }
   }
 
   const renameVideos = () => {

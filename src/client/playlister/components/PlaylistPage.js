@@ -7,6 +7,7 @@ import PlaylistTitle, { CUSTOM, SUGGESTED } from './PlaylistTitle'
 import inferDate from './InferredDate'
 import { Paragraph3 } from 'baseui/typography'
 import { useSnackbar } from 'baseui/snackbar'
+import { errorMessage, showError } from '../util/showError'
 
 /**
  * Shows event data form:
@@ -75,13 +76,7 @@ const PlaylistPage = ({
    * Failure handler for creating or finding a playlist
    */
   const playlistFailure = msgIntro => err => {
-    let errorMsg = err
-    try {
-      errorMsg = JSON.stringify(err)
-    } catch {
-      // no-op
-    }
-    enqueue({ message: `${msgIntro} playlist: ${errorMsg}` })
+    showError(enqueue, `${msgIntro} playlist: ${errorMessage(err)}`)
     setLoading(false)
   }
 
@@ -102,18 +97,21 @@ const PlaylistPage = ({
     try {
       return findPlaylist(title, successHandler, playlistFailure('Error finding'))
     } catch (e) {
-      enqueue({ message: e.message })
-      setLoading(false)
+      playlistFailure('Error finding', e)
     }
   }
 
   function createPlaylist (title, eventDate) {
-    insertPlaylist(
-      title,
-      eventDate,
-      playlistSuccess('Created', eventDate),
-      playlistFailure('Error creating')
-    )
+    try {
+      insertPlaylist(
+        title,
+        eventDate,
+        playlistSuccess('Created', eventDate),
+        playlistFailure('Error creating')
+      )
+    } catch (e) {
+      playlistFailure('Error creating', e)
+    }
   }
 
   const showFindCreateStatus = () => {

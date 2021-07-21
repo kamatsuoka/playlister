@@ -5,7 +5,6 @@ import { FormControl } from 'baseui/form-control'
 import { Input } from 'baseui/input'
 import MediaReader from './MediaReader'
 import { BaseCard } from './BaseCard'
-import { KIND as NKind, Notification } from 'baseui/notification'
 import { Paragraph3 } from 'baseui/typography'
 import { StyledTable, StyledTableBody, StyledTableBodyCell, StyledTableBodyRow } from 'baseui/table-semantic'
 import { withStyle } from 'styletron-react'
@@ -37,7 +36,6 @@ const FileDataPage = ({
    * - endTime
    * - file
    */
-  const [mediaErrors, setMediaErrors] = useState([])
   const [overrideTimeZone, setOverrideTimeZone] = useState(true)
   const [css, theme] = useStyletron()
   const handleChange = (evt) => {
@@ -152,27 +150,10 @@ const FileDataPage = ({
     )
   }
 
-  const errorTable = () => {
-    if (mediaErrors.length > 0) {
-      return (
-        <>
-          <Notification kind={NKind.negative} closeable overrides={{ Body: { style: { width: 'auto' } } }}>
-            <ul>
-              {mediaErrors.map((e, i) => <li key={i}>{e.filename}: invalid media file</li>)}
-            </ul>
-          </Notification>
-        </>
-      )
-    } else {
-      return null
-    }
-  }
-
   return (
     <>
-      <MediaReader setMediaList={setMediaList} setMediaErrors={setMediaErrors} />
+      <MediaReader setMediaList={setMediaList} />
       {videoPreview()}
-      {errorTable()}
       {mediaList.length > 0 ? filesAndOffset() : null}
       {prevNextButtons}
     </>

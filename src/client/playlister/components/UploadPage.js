@@ -3,10 +3,11 @@ import { Button, KIND, SIZE } from 'baseui/button'
 import UploadList from './UploadList'
 import dayjs from 'dayjs'
 import { findUploads } from '../youtube/api'
-import { KIND as NKind, Notification } from 'baseui/notification'
 import { useStyletron } from 'baseui'
 import { StyledLink } from 'baseui/link'
 import { Paragraph3 } from 'baseui/typography'
+import { useSnackbar } from 'baseui/snackbar'
+import { showError } from '../util/showError'
 
 /**
  * Page for uploading videos, or finding previously-uploaded videos for same files
@@ -24,12 +25,12 @@ const UploadPage = ({ fileDataList, uploadList, setUploadList, current, prevButt
    */
 
   const [, theme] = useStyletron()
-  const [error, setError] = useState('')
   // const [allUploaded, setAllUploaded] = useState(false)
   // used to show spinner on 'Check Upload Status' button
   const [checkingStatus, setCheckingStatus] = useState(false)
   // file ids that have been checked
   const [checkedFileIds, setCheckedFileIds] = useState(new Set())
+  const { enqueue } = useSnackbar()
 
   const checkUploadStatus = useCallback(() => {
     const fileIds = fileDataList.map(data => data.fileId)
@@ -48,14 +49,18 @@ const UploadPage = ({ fileDataList, uploadList, setUploadList, current, prevButt
       setCheckedFileIds(new Set(fileIds))
       setCheckingStatus(false)
     }
-    return findUploads(fileDataList,
-      onSuccess,
-      err => {
-        setError(err)
-        console.log(err)
-        setCheckingStatus(false)
-      })
-  }, [fileDataList, setCheckingStatus, setUploadList])
+    const onFailure = err => {
+      showError(enqueue, err)
+      console.log(err)
+      setCheckingStatus(false)
+    }
+
+    try {
+      return findUploads(fileDataList, onSuccess, onFailure)
+    } catch (e) {
+      onFailure(e)
+    }
+  }, [enqueue, fileDataList, setCheckingStatus, setUploadList])
 
   const uploadedFileIds = new Set(
     uploadList
@@ -85,7 +90,6 @@ const UploadPage = ({ fileDataList, uploadList, setUploadList, current, prevButt
         uploadList={uploadList} setUploadList={setUploadList}
         // setAllUploaded={setAllUploaded}
       />
-      {error ? <Notification kind={NKind.negative} closeable>{error}</Notification> : null}
       <Button
         style={{ marginTop: '10px' }}
         size={SIZE.compact} disabled={fileDataList.length === 0}
