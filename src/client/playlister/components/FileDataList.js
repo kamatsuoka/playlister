@@ -11,7 +11,6 @@ import { Button, KIND, SIZE } from 'baseui/button'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlay, faTimes } from '@fortawesome/free-solid-svg-icons'
 import { durationSeconds } from '../util/dates'
-import { useStyletron } from 'baseui'
 
 dayjs.extend(localizedFormat)
 dayjs.extend(advancedFormat)
@@ -23,9 +22,8 @@ dayjs.extend(utc)
  * List of file media info with time adjustments applied
  */
 const FileDataList = ({
-  mediaList, setMediaList, overrideTimeZone, timeAdjust, fileDataList, setFileDataList, setPreviewFile
+  mediaList, setMediaList, overrideTimeZone, timeAdjust, fileDataList, setFileDataList, setPreviewUrl
 }) => {
-  const [css, theme] = useStyletron()
   const onRemove = useCallback(
     fileId => setMediaList(datas => datas.filter(data => data.fileId !== fileId)),
     [setMediaList]
@@ -113,13 +111,13 @@ const FileDataList = ({
     TableHeadCell: {
       style: ({ $theme }) => ({
         textAlign: 'right',
-        marginRight: $theme.sizing.scale400
+        paddingRight: $theme.sizing.scale800
       })
     },
     TableBodyCell: {
       style: ({ $theme }) => ({
-        marginRight: $theme.sizing.scale400,
-        ...tableCellStyles($theme)
+        ...tableCellStyles($theme),
+        paddingRight: $theme.sizing.scale800
       })
     }
   }
@@ -141,6 +139,27 @@ const FileDataList = ({
   return (
     <div id='start-end'>
       <TableBuilder data={fileDataList} overrides={tableOverrides}>
+        <TableBuilderColumn overrides={columnOverrides} header=''>
+          {row =>
+            <Button
+              onClick={() => setPreviewUrl(URL.createObjectURL(row.file))}
+              kind={KIND.minimal}
+            >
+              <FontAwesomeIcon icon={faPlay} />
+            </Button>}
+        </TableBuilderColumn>
+        <TableBuilderColumn overrides={columnOverrides} header='Filename'>
+          {row => row.filename}
+        </TableBuilderColumn>
+        <TableBuilderColumn overrides={columnOverrides} header='Start Time'>
+          {row => dayjs(row.startTime).format(displayTemplate)}
+        </TableBuilderColumn>
+        <TableBuilderColumn overrides={durationOverrides} header='Duration' numeric>
+          {row => durationSeconds(row.duration)}
+        </TableBuilderColumn>
+        <TableBuilderColumn overrides={columnOverrides} header='End Time'>
+          {row => dayjs(row.endTime).format(displayTemplate)}
+        </TableBuilderColumn>
         <TableBuilderColumn
           overrides={{ ...columnOverrides, ...removeColumnOverrides }}
           header={removeHeader()}
@@ -154,21 +173,6 @@ const FileDataList = ({
             >
               <FontAwesomeIcon icon={faTimes} size='sm' />
             </Button>}
-        </TableBuilderColumn>
-        <TableBuilderColumn overrides={columnOverrides} header=''>
-          {row => <Button onClick={() => setPreviewFile(row.file)}><FontAwesomeIcon icon={faPlay} /></Button>}
-        </TableBuilderColumn>
-        <TableBuilderColumn overrides={columnOverrides} header='Filename'>
-          {row => row.filename}
-        </TableBuilderColumn>
-        <TableBuilderColumn overrides={columnOverrides} header='Start Time'>
-          {row => dayjs(row.startTime).format(displayTemplate)}
-        </TableBuilderColumn>
-        <TableBuilderColumn overrides={{ ...columnOverrides, ...durationOverrides }} header='Duration' numeric>
-          {row => durationSeconds(row.duration)}
-        </TableBuilderColumn>
-        <TableBuilderColumn overrides={columnOverrides} header='End Time'>
-          {row => dayjs(row.endTime).format(displayTemplate)}
         </TableBuilderColumn>
       </TableBuilder>
     </div>
