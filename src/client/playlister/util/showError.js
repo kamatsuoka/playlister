@@ -5,9 +5,10 @@ export function errorMessage (err) {
   let message = 'an error occurred'
   if (typeof err === 'string') {
     message = err
-  } else if (err instanceof Error) {
+  } else if (err instanceof Error ||
+    (typeof err === 'object' && 'message' in err)) {
     message = err.message
-  } else if (err instanceof Object) {
+  } else if (typeof err === 'object') {
     message = JSON.stringify(err)
   }
   return message

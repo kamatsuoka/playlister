@@ -10,5 +10,4 @@ global.doGet = openPlaylister
 global.findMyPlaylist = youtube.findMyPlaylist
 global.findUploads = youtube.findUploads
 global.insertPlaylist = youtube.insertPlaylist
-global.getToken = youtube.getToken
 global.updateTitle = youtube.updateTitle

@@ -127,7 +127,7 @@ const findUploads = (fileDataList, onSuccess, onFailure) => {
   const fileData = Object.fromEntries(
     fileDataList.map(fileData => [fileData.filename, {
       title: youtubeTitle(fileData.filename),
-      fileData: fileData
+      fileData: { ...fileData, file: undefined } // can't send file object over wire
     }])
   )
 
@@ -138,10 +138,7 @@ const findUploads = (fileDataList, onSuccess, onFailure) => {
       .withFailureHandler(onFailure)
       .findUploads(fileData)
   } else {
-    throw Error('standalone findUploads (outside Apps Script) not implemented')
-    // return searchVideos()
-    //   .then(onSuccess)
-    //   .catch(onFailure)
+    throw Error('findUploads not implemented outside Apps Script')
   }
 }
 
