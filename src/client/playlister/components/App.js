@@ -102,8 +102,9 @@ function App () {
                 mediaList={mediaList} setMediaList={setMediaList}
                 fileDataList={fileDataList} setFileDataList={setFileDataList}
                 timeAdjust={timeAdjust} setTimeAdjust={setTimeAdjust}
+                eventData={eventData} setEventData={setEventData} prevNextButtons={prevNextButtons}
               />
-              {prevNextButtons({ current: 1 })}
+              {/*{prevNextButtons({ current: 1 })}*/}
             </Step>
             <Step title='Uploads'>
               <UploadPage
