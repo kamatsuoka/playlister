@@ -27,7 +27,12 @@ function App () {
   const [uploadList, setUploadList] = useState([])
   const [fileDataList, setFileDataList] = useState([])
   // attributes of event where the videos were recorded
-  const [eventData, setEventData] = useState({ eventDate: '', eventType: 'rehearsal', dateChoice: DEFAULT_DATE })
+  const [eventData, setEventData] = useState({
+    defaultDate: '',
+    customDate: '',
+    eventType: 'rehearsal',
+    dateChoice: DEFAULT_DATE
+  })
   // playlist title settings for finding / creating a playlist
   const [playlistTitle, setPlaylistTitle] = useState({ titleChoice: 'suggested', customTitle: '' })
   // metadata about found / created playlist

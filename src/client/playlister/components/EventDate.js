@@ -2,12 +2,11 @@ import { ALIGN, Radio, RadioGroup } from 'baseui/radio'
 import React from 'react'
 import { Input } from 'baseui/input'
 import { createTheme, lightThemePrimitives, ThemeProvider, useStyletron } from 'baseui'
-import { getStartDates } from './InferredDate'
 
 const DEFAULT_DATE = 'default_date'
 const CUSTOM_DATE = 'custom_date'
 
-const EventDate = ({ fileDataList, eventData, setEventData }) => {
+const EventDate = ({ eventData, setEventData }) => {
   const [css, theme] = useStyletron()
 
   const handleChange = (evt) => {
@@ -17,11 +16,8 @@ const EventDate = ({ fileDataList, eventData, setEventData }) => {
     })
   }
 
-  const startDates = getStartDates(fileDataList)
-  const suggestedDate = startDates[0]
-
   const themeOverrides = () =>
-    eventData.dateChoice === DEFAULT_DATE && suggestedDate
+    eventData.dateChoice === DEFAULT_DATE && eventData.defaultDate
       ? ({
           colors: {
             inputTextDisabled: 'black',
@@ -78,7 +74,7 @@ const EventDate = ({ fileDataList, eventData, setEventData }) => {
       >
         <Radio value={DEFAULT_DATE} overrides={radioOverrides}>
           <Input
-            value={startDates[0]}
+            value={eventData.defaultDate || ''}
             placeholder='[inferred from start times]'
             readOnly
             maxLength={8}

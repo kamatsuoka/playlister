@@ -18,20 +18,12 @@ const TableCell = withStyle(StyledTableBodyCell, ({ $theme }) => ({
 /**
  * Adjust time on file metadata in case camera has time set incorrectly
  */
-const TimeOffset = ({ mediaList, fileDataList,
+const TimeOffset = ({
+  mediaList,
   timeAdjust, setTimeAdjust,
   overrideTimeZone, setOverrideTimeZone,
   eventData, setEventData
 }) => {
-  /**
-   * fileDataList items:
-   * - fileId
-   * - name
-   * - startTime
-   * - duration
-   * - endTime
-   * - file
-   */
   const [css, theme] = useStyletron()
   const handleChange = (evt) => {
     setTimeAdjust({
@@ -132,7 +124,7 @@ const TimeOffset = ({ mediaList, fileDataList,
                 Event Date
               </TableCell>
               <TableCell colSpan={3} style={{ display: 'inline-block' }}>
-                <EventDate fileDataList={fileDataList} eventData={eventData} setEventData={setEventData} />
+                <EventDate eventData={eventData} setEventData={setEventData} />
               </TableCell>
             </StyledTableBodyRow>
           </StyledTableBody>

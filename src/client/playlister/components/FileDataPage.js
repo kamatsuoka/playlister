@@ -1,8 +1,10 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import FileDataList from './FileDataList'
 import MediaReader from './MediaReader'
 import { Modal } from 'baseui/modal'
 import TimeOffset from './TimeOffset'
+import { getStartDates } from './InferredDate'
+import { KIND as NKind, Notification } from 'baseui/notification'
 
 /**
  * Adjust time on file metadata in case camera doesn't have time zone
@@ -25,6 +27,13 @@ const FileDataPage = ({
    */
   const [overrideTimeZone, setOverrideTimeZone] = useState(true)
   const [previewUrl, setPreviewUrl] = React.useState(null)
+
+  const startDates = getStartDates(fileDataList)
+  const defaultDate = startDates[0]
+  useEffect(() => {
+    setEventData(({ ...eventData, defaultDate: defaultDate }))
+  }, [defaultDate])
+
   function closePreview () {
     if (previewUrl != null) {
       URL.revokeObjectURL(previewUrl)
@@ -70,12 +79,14 @@ const FileDataPage = ({
           setPreviewUrl={setPreviewUrl} eventData={eventData} setEventData={setEventData}
         />
         <TimeOffset
-          mediaList={mediaList} fileDataList={fileDataList}
+          mediaList={mediaList} startDates={startDates}
           timeAdjust={timeAdjust} setTimeAdjust={setTimeAdjust}
           overrideTimeZone={overrideTimeZone} setOverrideTimeZone={setOverrideTimeZone}
           eventData={eventData} setEventData={setEventData}
         />
-        {/*<EventDate fileDataList={fileDataList} eventData={eventData} setEventData={setEventData} />*/}
+        {startDates.length > 1
+          ? <Notification kind={NKind.negative}>Multiple dates found in start times</Notification>
+          : null}
       </>
     )
   }
