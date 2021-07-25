@@ -6,6 +6,7 @@ import { StyledTable, StyledTableBody, StyledTableBodyCell, StyledTableBodyRow }
 import { withStyle } from 'styletron-react'
 import { useStyletron } from 'baseui'
 import { Accordion, StatefulPanel } from 'baseui/accordion'
+import EventDate from './EventDate'
 
 const TableCell = withStyle(StyledTableBodyCell, ({ $theme }) => ({
   paddingTop: $theme.sizing.scale200,
@@ -17,7 +18,11 @@ const TableCell = withStyle(StyledTableBodyCell, ({ $theme }) => ({
 /**
  * Adjust time on file metadata in case camera has time set incorrectly
  */
-const TimeOffset = ({ mediaList, timeAdjust, setTimeAdjust, overrideTimeZone, setOverrideTimeZone }) => {
+const TimeOffset = ({ mediaList, fileDataList,
+  timeAdjust, setTimeAdjust,
+  overrideTimeZone, setOverrideTimeZone,
+  eventData, setEventData
+}) => {
   /**
    * fileDataList items:
    * - fileId
@@ -73,7 +78,7 @@ const TimeOffset = ({ mediaList, timeAdjust, setTimeAdjust, overrideTimeZone, se
     )
   }
 
-  const timestampAdjustmentTitle = <span style={{ paddingLeft: theme.sizing.scale600 }}>Timestamp Adjustments </span>
+  const timestampAdjustmentTitle = <span style={{ paddingLeft: theme.sizing.scale600 }}>Time Adjustments </span>
 
   // panel expander icon is placed to the left of the title by shifting the title
   return (
@@ -120,6 +125,14 @@ const TimeOffset = ({ mediaList, timeAdjust, setTimeAdjust, overrideTimeZone, se
                 {timeOffset('hour', 23)}
                 {timeOffset('minute', 59)}
                 {timeOffset('second', 59)}
+              </TableCell>
+            </StyledTableBodyRow>
+            <StyledTableBodyRow>
+              <TableCell style={{ verticalAlign: 'middle' }}>
+                Event Date
+              </TableCell>
+              <TableCell colSpan={3} style={{ display: 'inline-block' }}>
+                <EventDate fileDataList={fileDataList} eventData={eventData} setEventData={setEventData} />
               </TableCell>
             </StyledTableBodyRow>
           </StyledTableBody>

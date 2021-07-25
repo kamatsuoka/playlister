@@ -67,12 +67,15 @@ const FileDataPage = ({
           mediaList={mediaList} setMediaList={setMediaList}
           overrideTimeZone={overrideTimeZone} timeAdjust={timeAdjust}
           fileDataList={fileDataList} setFileDataList={setFileDataList}
-          setPreviewUrl={setPreviewUrl}
+          setPreviewUrl={setPreviewUrl} eventData={eventData} setEventData={setEventData}
         />
         <TimeOffset
-          mediaList={mediaList} timeAdjust={timeAdjust} setTimeAdjust={setTimeAdjust}
+          mediaList={mediaList} fileDataList={fileDataList}
+          timeAdjust={timeAdjust} setTimeAdjust={setTimeAdjust}
           overrideTimeZone={overrideTimeZone} setOverrideTimeZone={setOverrideTimeZone}
+          eventData={eventData} setEventData={setEventData}
         />
+        {/*<EventDate fileDataList={fileDataList} eventData={eventData} setEventData={setEventData} />*/}
       </>
     )
   }

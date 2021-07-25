@@ -14,6 +14,7 @@ import { Button, KIND } from 'baseui/button'
 import PlaylistPage from './PlaylistPage'
 import FileDataPage from './FileDataPage'
 import { SnackbarProvider } from 'baseui/snackbar'
+import { DEFAULT_DATE } from './EventDate'
 
 const engine = new Styletron()
 
@@ -26,7 +27,7 @@ function App () {
   const [uploadList, setUploadList] = useState([])
   const [fileDataList, setFileDataList] = useState([])
   // attributes of event where the videos were recorded
-  const [eventData, setEventData] = useState({ eventDate: '', eventType: 'rehearsal' })
+  const [eventData, setEventData] = useState({ eventDate: '', eventType: 'rehearsal', dateChoice: DEFAULT_DATE })
   // playlist title settings for finding / creating a playlist
   const [playlistTitle, setPlaylistTitle] = useState({ titleChoice: 'suggested', customTitle: '' })
   // metadata about found / created playlist
@@ -104,7 +105,7 @@ function App () {
                 timeAdjust={timeAdjust} setTimeAdjust={setTimeAdjust}
                 eventData={eventData} setEventData={setEventData} prevNextButtons={prevNextButtons}
               />
-              {/*{prevNextButtons({ current: 1 })}*/}
+              {/* {prevNextButtons({ current: 1 })} */}
             </Step>
             <Step title='Uploads'>
               <UploadPage

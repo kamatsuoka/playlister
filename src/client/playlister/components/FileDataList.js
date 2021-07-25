@@ -24,6 +24,9 @@ dayjs.extend(utc)
 const FileDataList = ({
   mediaList, setMediaList, overrideTimeZone, timeAdjust, fileDataList, setFileDataList, setPreviewUrl
 }) => {
+  /**
+   * Handles removing a file from the list of files
+   */
   const onRemove = useCallback(
     fileId => setMediaList(datas => datas.filter(data => data.fileId !== fileId)),
     [setMediaList]
@@ -146,7 +149,7 @@ const FileDataList = ({
   }
 
   return (
-    <div id='start-end'>
+    <>
       <TableBuilder data={fileDataList} overrides={tableOverrides}>
         <TableBuilderColumn overrides={columnOverrides} header=''>
           {row =>
@@ -191,7 +194,7 @@ const FileDataList = ({
             </Button>}
         </TableBuilderColumn>
       </TableBuilder>
-    </div>
+    </>
   )
 }
 
