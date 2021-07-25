@@ -122,6 +122,15 @@ const FileDataList = ({
     }
   }
 
+  const filenameColumnOverrides = {
+    TableBodyCell: {
+      style: ({ $theme }) => ({
+        ...tableCellStyles($theme),
+        paddingLeft: 0
+      })
+    }
+  }
+
   const removeColumnStyle = {
     style: ({ $theme }) => ({
       ...tableCellStyles($theme),
@@ -144,11 +153,18 @@ const FileDataList = ({
             <Button
               onClick={() => setPreviewUrl(URL.createObjectURL(row.file))}
               kind={KIND.minimal}
+              overrides={{
+                Root: {
+                  style: ({ $theme }) => ({
+                    paddingRight: $theme.sizing.scale200
+                  })
+                }
+              }}
             >
               <FontAwesomeIcon icon={faPlay} />
             </Button>}
         </TableBuilderColumn>
-        <TableBuilderColumn overrides={columnOverrides} header='Filename'>
+        <TableBuilderColumn overrides={filenameColumnOverrides} header='Filename'>
           {row => row.filename}
         </TableBuilderColumn>
         <TableBuilderColumn overrides={columnOverrides} header='Start Time'>

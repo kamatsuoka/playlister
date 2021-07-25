@@ -120,8 +120,7 @@ const MediaReader = ({ setMediaList }) => {
       ...en_US.fileuploader,
       dropFilesToUpload: (
         <div style={{ textAlign: 'center' }}>
-          Drop video files here to extract their start and end times<br />
-          (this won't upload anything yet)
+          Drop video files here to extract their timestamps
         </div>
       )
     }

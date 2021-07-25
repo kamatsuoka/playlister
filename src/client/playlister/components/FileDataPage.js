@@ -4,12 +4,11 @@ import FileDataList from './FileDataList'
 import { FormControl } from 'baseui/form-control'
 import { Input } from 'baseui/input'
 import MediaReader from './MediaReader'
-import { BaseCard } from './BaseCard'
-import { Paragraph3 } from 'baseui/typography'
 import { StyledTable, StyledTableBody, StyledTableBodyCell, StyledTableBodyRow } from 'baseui/table-semantic'
 import { withStyle } from 'styletron-react'
 import { useStyletron } from 'baseui'
 import { Modal } from 'baseui/modal'
+import { Accordion, StatefulPanel } from 'baseui/accordion'
 
 const TableCell = withStyle(StyledTableBodyCell, ({ $theme }) => ({
   paddingTop: $theme.sizing.scale200,
@@ -81,7 +80,7 @@ const FileDataPage = ({
     </Modal>
   )
 
-  const timeOffset = (name, max, width = theme.sizing.scale2400) => {
+  const timeOffset = (name, max, width = theme.sizing.scale1600) => {
     return (
       <div className={css({ float: 'left', paddingRight: theme.sizing.scale200 })}>
         <FormControl label={name}>
@@ -98,6 +97,12 @@ const FileDataPage = ({
                   width: width,
                   height: theme.sizing.scale1000
                 })
+              },
+              Input: {
+                style: ({
+                  paddingLeft: theme.sizing.scale200,
+                  paddingRight: theme.sizing.scale200
+                })
               }
             }}
           />
@@ -107,45 +112,65 @@ const FileDataPage = ({
   }
 
   function filesAndOffset () {
+    // panel expander icon is placed to the left of the title by shifting the title
+    const timestampAdjustmentTitle = <span style={{ paddingLeft: theme.sizing.scale600 }}>Timestamp Adjustments </span>
     return (
       <>
-        <Paragraph3>
-          Take a look at the start and end times and make sure they match
-          what you expect. <br /> If they need adjusting, you can use the settings below.
-        </Paragraph3>
         <FileDataList
           mediaList={mediaList} setMediaList={setMediaList}
           overrideTimeZone={overrideTimeZone} timeAdjust={timeAdjust}
           fileDataList={fileDataList} setFileDataList={setFileDataList}
           setPreviewUrl={setPreviewUrl}
         />
-        <BaseCard title=''>
-          <StyledTable>
-            <StyledTableBody>
-              <StyledTableBodyRow>
-                <TableCell style={{ verticalAlign: 'middle' }}>
-                  Time Zone
-                </TableCell>
-                <TableCell colSpan={3}>
-                  <TimezoneOverride mediaList={mediaList} value={overrideTimeZone} setValue={setOverrideTimeZone} />
-                </TableCell>
-              </StyledTableBodyRow>
-              <StyledTableBodyRow>
-                <TableCell style={{ verticalAlign: 'middle' }}>
-                  Offsets
-                </TableCell>
-                <TableCell colSpan={3} style={{ display: 'inline-block' }}>
-                  {timeOffset('year', 2000, theme.sizing.scale3200)}
-                  {timeOffset('month', 11)}
-                  {timeOffset('day', 30)}
-                  {timeOffset('hour', 23)}
-                  {timeOffset('minute', 59)}
-                  {timeOffset('second', 59)}
-                </TableCell>
-              </StyledTableBodyRow>
-            </StyledTableBody>
-          </StyledTable>
-        </BaseCard>
+        <Accordion>
+          <StatefulPanel
+            title={timestampAdjustmentTitle}
+            overrides={{
+              Content: {
+                style: ({ $theme }) => ({
+                  paddingBottom: $theme.sizing.scale400,
+                  marginBottom: $theme.sizing.scale800
+                })
+              },
+              PanelContainer: {
+                style: ({
+                  borderBottomWidth: 0
+                })
+              },
+              ToggleIcon: {
+                style: ({
+                  position: 'absolute' // moves icon all the way to the left of its div
+                })
+              }
+            }}
+          >
+            <StyledTable>
+              <StyledTableBody>
+                <StyledTableBodyRow>
+                  <TableCell style={{ verticalAlign: 'middle' }}>
+                    Time Zone
+                  </TableCell>
+                  <TableCell colSpan={3}>
+                    <TimezoneOverride mediaList={mediaList} value={overrideTimeZone} setValue={setOverrideTimeZone} />
+                  </TableCell>
+                </StyledTableBodyRow>
+                <StyledTableBodyRow>
+                  <TableCell style={{ verticalAlign: 'middle' }}>
+                    Offset
+                  </TableCell>
+                  <TableCell colSpan={3} style={{ display: 'inline-block' }}>
+                    {timeOffset('year', 2000, theme.sizing.scale2400)}
+                    {timeOffset('month', 11)}
+                    {timeOffset('day', 30)}
+                    {timeOffset('hour', 23)}
+                    {timeOffset('minute', 59)}
+                    {timeOffset('second', 59)}
+                  </TableCell>
+                </StyledTableBodyRow>
+              </StyledTableBody>
+            </StyledTable>
+          </StatefulPanel>
+        </Accordion>
       </>
     )
   }
