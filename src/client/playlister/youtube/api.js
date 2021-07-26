@@ -17,6 +17,7 @@ import dayjs from 'dayjs'
  * @returns {Promise<*>}
  */
 const findPlaylist = (title, onSuccess, onFailure) => {
+  console.log(`findPlaylist: searching for ${title}`)
   const run = getAppsScriptRun()
   if (run) {
     return run
@@ -139,6 +140,18 @@ const findUploads = (fileDataList, onSuccess, onFailure) => {
       .findUploads(fileData)
   } else {
     throw Error('findUploads not implemented outside Apps Script')
+  }
+}
+
+const insertPlaylistItem = (videoId, playlistId, onSuccess, onFailure) => {
+  const run = getAppsScriptRun()
+  if (run) {
+    return run
+      .withSuccessHandler(onSuccess)
+      .withFailureHandler(onFailure)
+      .insertPlaylistItem(videoId, playlistId)
+  } else {
+    throw Error('insertPlaylistItem not implented outside Apps Script')
   }
 }
 

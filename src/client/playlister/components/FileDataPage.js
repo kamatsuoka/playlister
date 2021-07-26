@@ -5,15 +5,17 @@ import { Modal } from 'baseui/modal'
 import TimeOffset from './TimeOffset'
 import { getStartDates } from './InferredDate'
 import { KIND as NKind, Notification } from 'baseui/notification'
+import { KIND } from 'baseui/button'
 
 /**
  * Adjust time on file metadata in case camera doesn't have time zone
  * or has time set incorrectly
  */
 const FileDataPage = ({
+  current,
   mediaList, setMediaList,
   fileDataList, setFileDataList,
-  timeAdjust, setTimeAdjust, prevNextButtons,
+  timeAdjust, setTimeAdjust, prevButton, nextButton,
   eventData, setEventData
 }) => {
   /**
@@ -96,7 +98,12 @@ const FileDataPage = ({
       <MediaReader setMediaList={setMediaList} />
       {videoPreview()}
       {mediaList.length > 0 ? filesAndOffset() : null}
-      {prevNextButtons({ current: 1 })}
+      <div align='right'>
+        {prevButton({ current })}
+        &nbsp;
+        {nextButton({ current, kind: mediaList.length === 0 ? KIND.secondary : KIND.primary })}
+      </div>
+
     </>
   )
 }

@@ -2,6 +2,7 @@ import { ALIGN, Radio, RadioGroup } from 'baseui/radio'
 import React from 'react'
 import { Input } from 'baseui/input'
 import { createTheme, lightThemePrimitives, ThemeProvider, useStyletron } from 'baseui'
+import { FormControl } from 'baseui/form-control'
 
 const DEFAULT_DATE = 'default_date'
 const CUSTOM_DATE = 'custom_date'
@@ -53,7 +54,8 @@ const EventDate = ({ eventData, setEventData }) => {
     },
     Input: {
       style: ({ $theme }) => ({
-        paddingLeft: $theme.sizing.scale100,
+        paddingLeft: $theme.sizing.scale200,
+        paddingRight: $theme.sizing.scale200,
         ...inputInputStyle
       })
     }
@@ -73,27 +75,31 @@ const EventDate = ({ eventData, setEventData }) => {
         align={ALIGN.horizontal}
       >
         <Radio value={DEFAULT_DATE} overrides={radioOverrides}>
-          <Input
-            value={eventData.defaultDate || ''}
-            placeholder='[inferred from start times]'
-            readOnly
-            maxLength={8}
-            overrides={defaultInputOverrides}
-          />
-          <div className={css({ marginLeft: theme.sizing.scale300 })}>default</div>
+          <FormControl caption='default'>
+            <Input
+              value={eventData.defaultDate || ''}
+              placeholder='[inferred from start times]'
+              readOnly
+              overrides={defaultInputOverrides}
+            />
+          </FormControl>
         </Radio>
         <Radio value={CUSTOM_DATE} overrides={radioOverrides}>
-          <Input
-            value={eventData.customDate || ''}
-            placeholder='custom date'
-            name='customDate'
-            inputMode='numeric'
-            maxLength={8}
-            onChange={handleChange}
-            onFocus={() => setEventData({ ...eventData, dateChoice: CUSTOM_DATE })}
-            overrides={customInputOverrides}
-          />
-          <div className={css({ marginLeft: theme.sizing.scale300 })}>custom</div>
+          <FormControl caption='custom'>
+            <Input
+              value={eventData.customDate || ''}
+              placeholder='YYYYMMDD'
+              name='customDate'
+              type='number'
+              inputMode='numeric'
+              maxLength={8}
+              min={19320000}
+              max={99999999}
+              onChange={handleChange}
+              onFocus={() => setEventData({ ...eventData, dateChoice: CUSTOM_DATE })}
+              overrides={customInputOverrides}
+            />
+          </FormControl>
         </Radio>
       </RadioGroup>
     </ThemeProvider>

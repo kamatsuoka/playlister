@@ -175,3 +175,20 @@ export function updateTitle (videoId, title) {
     title: response.snippet.title
   }
 }
+
+/**
+ * Inserts a video into a playlist
+ */
+export function insertPlaylistItem (videoId, playlistId) {
+  const resource = {
+    snippet: {
+      playlistId: playlistId,
+      resourceId: {
+        kind: 'youtube#video',
+        videoId: videoId
+      }
+    }
+  }
+  const part = ['snippet']
+  return YouTube.PlaylistItems.insert(resource, part)
+}

@@ -2,6 +2,7 @@ import { ALIGN, Radio, RadioGroup } from 'baseui/radio'
 import React from 'react'
 import { Input } from 'baseui/input'
 import { createTheme, lightThemePrimitives, ThemeProvider } from 'baseui'
+import { FormControl } from 'baseui/form-control'
 
 const SUGGESTED = 'suggested'
 const CUSTOM = 'custom'
@@ -20,9 +21,27 @@ const PlaylistTitle = ({ suggestedTitle, playlistTitle, setPlaylistTitle }) => {
       : {}
 
   const radioOverrides = {
+    Root: {
+      style: () => ({
+        alignItems: 'start'
+      })
+    },
+    RadioMarkOuter: {
+      style: ({ $theme }) => ({
+        marginTop: $theme.sizing.scale600
+      })
+    },
     Label: {
       style: ({ $theme }) => ({
         fontSize: $theme.typography.LabelSmall.fontSize
+      })
+    }
+  }
+
+  const inputOverrides = {
+    Root: {
+      style: ({ $theme }) => ({
+        minWidth: '250px' // $theme.sizing.scale4800
       })
     }
   }
@@ -36,23 +55,31 @@ const PlaylistTitle = ({ suggestedTitle, playlistTitle, setPlaylistTitle }) => {
         onChange={handleChange}
         align={ALIGN.horizontal}
       >
-        <Radio value={SUGGESTED} overrides={radioOverrides}>suggested title&nbsp;</Radio>
-        <Radio value={CUSTOM} overrides={radioOverrides}>custom title</Radio>
+        <Radio value={SUGGESTED} overrides={radioOverrides}>
+          <FormControl caption='suggested'>
+            <Input
+              value={suggestedTitle}
+              readOnly
+              overrides={inputOverrides}
+            />
+          </FormControl>
+        </Radio>
+        <Radio value={CUSTOM} overrides={radioOverrides}>
+          <FormControl caption='custom'>
+            <Input
+              value={playlistTitle.customTitle || ''}
+              placeholder='custom title'
+              name='customTitle'
+              onChange={handleChange}
+              onFocus={() => setPlaylistTitle({ ...playlistTitle, titleChoice: CUSTOM })}
+              overrides={inputOverrides}
+            />
+          </FormControl>
+        </Radio>
       </RadioGroup>
-      {playlistTitle.titleChoice === 'custom'
-        ? <Input
-            value={playlistTitle.customTitle || ''}
-            placeholder='enter custom title'
-            name='customTitle'
-            onChange={handleChange}
-          />
-        : <Input
-            value={suggestedTitle}
-            placeholder='[date] + [event type]'
-            disabled
-          />}
     </ThemeProvider>
   )
 }
+
 export default PlaylistTitle
 export { SUGGESTED, CUSTOM }

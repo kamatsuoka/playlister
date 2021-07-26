@@ -113,12 +113,13 @@ function App () {
             </Step>
             <Step title='File Data'>
               <FileDataPage
+                current={1}
                 mediaList={mediaList} setMediaList={setMediaList}
                 fileDataList={fileDataList} setFileDataList={setFileDataList}
                 timeAdjust={timeAdjust} setTimeAdjust={setTimeAdjust}
-                eventData={eventData} setEventData={setEventData} prevNextButtons={prevNextButtons}
+                eventData={eventData} setEventData={setEventData}
+                prevButton={prevButton} nextButton={nextButton}
               />
-              {/* {prevNextButtons({ current: 1 })} */}
             </Step>
             <Step title='Uploads'>
               <UploadPage
@@ -128,9 +129,11 @@ function App () {
             </Step>
             <Step title='Playlist'>
               <PlaylistPage
-                uploadList={uploadList} eventData={eventData} setEventData={setEventData}
+                orgInfo={orgInfo}
+                uploadList={uploadList} eventData={eventData}
                 playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
                 playlistData={playlistData} setPlaylistData={setPlaylistData}
+                cameraInfo={cameraInfo}
               />
               {prevNextButtons({ current: 3 })}
             </Step>
