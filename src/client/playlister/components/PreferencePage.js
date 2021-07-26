@@ -1,64 +1,101 @@
 /**
  * Stores preferences that aren't expected to change too often
  */
-import { copyData, usePersist } from '../hooks/usePersist'
 import { Input } from 'baseui/input'
 import { FormControl } from 'baseui/form-control'
-import React, { useState } from 'react'
-import { BaseCard } from './BaseCard'
+import React from 'react'
 import { FlexGrid, FlexGridItem } from 'baseui/flex-grid'
-import { getAppsScriptRun } from '../util/auth'
+import { Combobox } from 'baseui/combobox'
+import { copyData, usePersist } from '../hooks/usePersist'
 
-const API_DATA_KEY = 'preferences'
-const getPreferences = () => {
-  const restoredJson = window.localStorage.getItem(API_DATA_KEY)
-  if (restoredJson) {
-    try {
-      return JSON.parse(restoredJson)
-    } catch {
-      // no-op
-    }
+const PreferencePage = ({
+  orgInfo, setOrgInfo,
+  password, setPassword,
+  eventData, setEventData,
+  cameraInfo, setCameraInfo
+}) => {
+  const handleChange = (evt, setValues) => {
+    const value = evt.target.value
+    setValues(values => ({
+      ...values,
+      [evt.target.name]: value
+    }))
   }
-  return {}
-}
-const PreferencePage = () => {
-  const [preferences, setPreferences] = useState({ channelId: '', videoPrefix: 'fcs' })
 
+  const ORG_DATA_KEY = 'org_info'
   usePersist({
-    key: API_DATA_KEY,
+    key: ORG_DATA_KEY,
     onRestore: copyData,
-    setState: setPreferences,
-    state: preferences
+    setState: setOrgInfo,
+    state: orgInfo
+  })
+
+  const CAMERA_DATA_KEY = 'camera_info'
+  usePersist({
+    key: CAMERA_DATA_KEY,
+    onRestore: copyData,
+    setState: setCameraInfo,
+    state: cameraInfo
   })
 
   return (
-    <BaseCard title='Preferences'>
-      <FlexGrid
-        flexGridColumnCount={2}
-        flexGridColumnGap='scale800'
-        flexGridRowGap='scale800'
-      >
-        {getAppsScriptRun()
-          ? null
-          : <FlexGridItem>
-            <FormControl label='youtube channel id'>
-              <Input
-                value={preferences.channelId || ''}
-                onChange={e => setPreferences({ ...preferences, channelId: e.target.value })}
-              />
-            </FormControl>
-          </FlexGridItem>}
-        <FlexGridItem>
-          <FormControl label='video prefix'>
-            <Input
-              value={preferences.videoPrefix || ''}
-              onChange={e => setPreferences({ ...preferences, videoPrefix: e.target.value })}
-            />
-          </FormControl>
-        </FlexGridItem>
-      </FlexGrid>
-    </BaseCard>
+    <FlexGrid
+      flexGridColumnCount={2}
+      flexGridColumnGap='scale800'
+      flexGridRowGap='scale800'
+    >
+      <FlexGridItem>
+        <FormControl label='password'>
+          <Input
+            value={password || ''}
+            onChange={setPassword}
+          />
+        </FormControl>
+      </FlexGridItem>
+      <FlexGridItem />
+      <FlexGridItem>
+        <FormControl label='organization' caption="short form of your organization's name, for video titles">
+          <Input
+            value={orgInfo.orgName || ''}
+            name='orgName'
+            onChange={evt => handleChange(evt, setOrgInfo)}
+          />
+        </FormControl>
+      </FlexGridItem>
+      <FlexGridItem>
+        <FormControl label='event type' caption='the type of event you recorded'>
+          <Combobox
+            value={eventData.eventType}
+            onChange={value => setEventData({ ...eventData, eventType: value })}
+            options={['rehearsal', 'coaching', 'performance']}
+            mapOptionToString={option => option}
+          />
+        </FormControl>
+      </FlexGridItem>
+      <FlexGridItem>
+        <FormControl label='camera number' caption='cameras are numbered 1-N'>
+          <Input
+            value={cameraInfo.cameraNumber || ''}
+            name='cameraNumber'
+            type='number'
+            min={1}
+            max={9}
+            onChange={evt => handleChange(evt, setCameraInfo)}
+          />
+        </FormControl>
+      </FlexGridItem>
+      <FlexGridItem>
+        <FormControl label='camera name' caption='name or type of camera you used'>
+          <Combobox
+            value={cameraInfo.cameraName || ''}
+            onChange={value => setCameraInfo({ ...cameraInfo, cameraName: value })}
+            options={['q2n4k', 'q2n', 'iPhone']}
+            mapOptionToString={option => option}
+          />
+        </FormControl>
+      </FlexGridItem>
+    </FlexGrid>
   )
 }
 
-export { getPreferences, PreferencePage }
+export default PreferencePage

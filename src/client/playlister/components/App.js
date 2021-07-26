@@ -6,7 +6,6 @@ import { Provider as StyletronProvider } from 'styletron-react'
 import { Client as Styletron } from 'styletron-engine-atomic'
 
 import UploadPage from './UploadPage'
-import AuthPage from './AuthPage'
 import VideoPage from './VideoPage'
 import { StyledLink } from 'baseui/link'
 import { ProgressSteps, Step } from 'baseui/progress-steps'
@@ -15,12 +14,17 @@ import PlaylistPage from './PlaylistPage'
 import FileDataPage from './FileDataPage'
 import { SnackbarProvider } from 'baseui/snackbar'
 import { DEFAULT_DATE } from './EventDate'
+import PreferencePage from './PreferencePage'
 
 const engine = new Styletron()
 
 function App () {
   // index of currently selected step
-  const [current, setCurrent] = useState(1)
+  const [current, setCurrent] = useState(0)
+  // info about the organization
+  const [orgInfo, setOrgInfo] = useState({ orgName: 'fcs' })
+  // info about the camera
+  const [cameraInfo, setCameraInfo] = useState({ cameraNumber: 1, cameraName: '' })
   // media info as detected by mediainfo.js
   const [mediaList, setMediaList] = useState([])
   // list of videos uploaded to youtube
@@ -99,8 +103,12 @@ function App () {
               }
             }}
           >
-            <Step title='Auth'>
-              <AuthPage />
+            <Step title='Basics'>
+              <PreferencePage
+                orgInfo={orgInfo} setOrgInfo={setOrgInfo}
+                eventData={eventData} setEventData={setEventData}
+                cameraInfo={cameraInfo} setCameraInfo={setCameraInfo}
+              />
               {prevNextButtons({ current: 0 })}
             </Step>
             <Step title='File Data'>
