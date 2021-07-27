@@ -196,7 +196,7 @@ const PlaylistPage = ({
       <div className={css({ display: 'inline-flex', alignItems: 'center' })}>
         <Button
           onClick={listPlaylists}
-          size={SIZE.small}
+          size={SIZE.compact}
           isLoading={listing}
           overrides={buttonOverrides}
         >
@@ -215,7 +215,7 @@ const PlaylistPage = ({
       />
       <Button
         onClick={() => createPlaylist()}
-        size={SIZE.small}
+        size={SIZE.compact}
         kind={playlistWasCreated() ? KIND.secondary : KIND.primary}
         isLoading={creating}
         disabled={uploadList.length === 0 || !isValidTitle()}
@@ -231,6 +231,14 @@ const PlaylistPage = ({
   const nextOkay = (playlistTitle.tabIndex === 0 && createdPlaylist.title) ||
     (playlistTitle.tabIndex === 1 && selectedPlaylist[0] && selectedPlaylist[0].title)
 
+  const tabOverrides = {
+    TabPanel: {
+      style: ({
+        paddingBottom: 0
+      })
+    }
+  }
+
   return (
     <>
       <Tabs
@@ -242,10 +250,10 @@ const PlaylistPage = ({
           }
         }}
       >
-        <Tab title='Create new playlist'>
+        <Tab title='Create new playlist' overrides={tabOverrides}>
           {showCreate()}
         </Tab>
-        <Tab title='Use existing playlist'>
+        <Tab title='Use existing playlist' overrides={tabOverrides}>
           {showList()}
         </Tab>
       </Tabs>

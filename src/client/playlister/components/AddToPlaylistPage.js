@@ -30,11 +30,11 @@ const AddToPlaylistPage = ({
       setAdding(adding => adding.filter(id => id !== videoId))
     }
     const failureHandler = err => showError(enqueue, err)
-    uploadList.forEach((upload, index) => {
-      youtube.insertPlaylistItem(
+    for (const [index, upload] of uploadList.entries()) {
+      await youtube.insertPlaylistItem(
         upload.videoId, playlistData.playlistId, index + playlistData.itemCount,
         successHandler, failureHandler)
-    })
+    }
   }
 
   const buttonOverrides = {
