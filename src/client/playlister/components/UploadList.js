@@ -13,7 +13,7 @@ const ERROR = 'error'
 /**
  * List of file upload status
  */
-const UploadList = ({ fileDataList, checkedFileIds, uploadList, setUploadList }) => {
+const UploadList = ({ fileList, checkedFileIds, uploadList, setUploadList }) => {
   // map of fileId to upload button state
   const [uploadButtonState, setUploadButtonState] = useState({})
   // map of fileId to upload progress
@@ -116,7 +116,7 @@ const UploadList = ({ fileDataList, checkedFileIds, uploadList, setUploadList })
 
   return (
     <div>
-      <TableBuilder data={fileDataList} overrides={tableOverrides}>
+      <TableBuilder data={fileList} overrides={tableOverrides}>
         <TableBuilderColumn overrides={columnOverrides} header='Filename'>
           {row => row.filename}
         </TableBuilderColumn>

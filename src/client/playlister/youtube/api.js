@@ -157,14 +157,14 @@ export const youtubeTitle = filename => {
 /**
  * Finds uploads given local file metadata
  *
- * @param fileDataList local file metadata with start/end times
+ * @param fileList local file metadata with start/end times
  * @param onSuccess success handler: (video) => {}
  * @param onFailure failure handler: (error) => {}
  * @returns {Promise<*>}
  */
-export const findUploads = (fileDataList, onSuccess, onFailure) => {
+export const findUploads = (fileList, onSuccess, onFailure) => {
   const fileData = Object.fromEntries(
-    fileDataList.map(fileData => [fileData.filename, {
+    fileList.map(fileData => [fileData.filename, {
       title: youtubeTitle(fileData.filename),
       fileData: { ...fileData, file: undefined } // can't send file object over wire
     }])
@@ -177,7 +177,7 @@ export const findUploads = (fileDataList, onSuccess, onFailure) => {
       .withFailureHandler(onFailure)
       .findUploads(fileData)
   } else {
-    const uploads = fileDataList.map(fd => ({
+    const uploads = fileList.map(fd => ({
       videoId: Math.random().toString(36).substr(2, 9),
       title: youtubeTitle(fd.filename),
       publishedAt: dayjs().toISOString(),

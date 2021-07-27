@@ -21,8 +21,8 @@ dayjs.extend(utc)
 /**
  * List of file media info with time adjustments applied
  */
-const FileDataList = ({
-  mediaList, setMediaList, overrideTimeZone, timeAdjust, fileDataList, setFileDataList, setPreviewUrl
+const FileList = ({
+  mediaList, setMediaList, overrideTimeZone, timeAdjust, fileList, setFileList, setPreviewUrl
 }) => {
   /**
    * Handles removing a file from the list of files
@@ -76,8 +76,8 @@ const FileDataList = ({
       .flatMap(media =>
         media.startTime ? [calculateStartEnd(media)] : []
       ).sort((s1, s2) => s1.startTime > s2.startTime ? 1 : -1)
-    setFileDataList(fileDatas)
-  }, [mediaList, overrideTimeZone, setFileDataList, timeAdjust])
+    setFileList(fileDatas)
+  }, [mediaList, overrideTimeZone, setFileList, timeAdjust])
 
   const removeHeader = () => {
     if (mediaList.length === 0) {
@@ -147,7 +147,7 @@ const FileDataList = ({
 
   return (
     <>
-      <TableBuilder data={fileDataList} overrides={tableOverrides}>
+      <TableBuilder data={fileList} overrides={tableOverrides}>
         <TableBuilderColumn overrides={columnOverrides} header=''>
           {row =>
             <Button
@@ -195,4 +195,4 @@ const FileDataList = ({
   )
 }
 
-export default FileDataList
+export default FileList

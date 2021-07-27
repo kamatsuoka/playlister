@@ -207,7 +207,7 @@ const PlaylistPage = ({
     <>
       <PlaylistTitle
         eventData={eventData}
-        fileDataList={uploadList} suggestedTitle={suggestedTitle}
+        fileList={uploadList} suggestedTitle={suggestedTitle}
         playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
       />
       <Button

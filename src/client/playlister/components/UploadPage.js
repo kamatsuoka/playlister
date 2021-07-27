@@ -12,7 +12,7 @@ import prevNextButtons from './PrevNextButtons'
 /**
  * Page for uploading videos, or finding previously-uploaded videos for same files
  */
-const UploadPage = ({ current, setCurrent, fileDataList, uploadList, setUploadList }) => {
+const UploadPage = ({ current, setCurrent, fileList, uploadList, setUploadList }) => {
   /**
    * uploadList items:
    * - videoId
@@ -31,7 +31,7 @@ const UploadPage = ({ current, setCurrent, fileDataList, uploadList, setUploadLi
   const { enqueue } = useSnackbar()
 
   const checkUploadStatus = useCallback(() => {
-    const fileIds = fileDataList.map(data => data.fileId)
+    const fileIds = fileList.map(data => data.fileId)
     setCheckingStatus(true)
     const onSuccess = uploads => {
       const dateNow = dayjs()
@@ -54,11 +54,11 @@ const UploadPage = ({ current, setCurrent, fileDataList, uploadList, setUploadLi
     }
 
     try {
-      return findUploads(fileDataList, onSuccess, onFailure)
+      return findUploads(fileList, onSuccess, onFailure)
     } catch (e) {
       onFailure(e)
     }
-  }, [enqueue, fileDataList, setCheckingStatus, setUploadList])
+  }, [enqueue, fileList, setCheckingStatus, setUploadList])
 
   const uploadedFileIds = new Set(
     uploadList
@@ -66,12 +66,12 @@ const UploadPage = ({ current, setCurrent, fileDataList, uploadList, setUploadLi
       .map(upload => upload.fileId)
   )
 
-  const allUploaded = fileDataList.length > 0 &&
-    fileDataList.map(data => data.fileId).every(fileId => uploadedFileIds.has(fileId))
+  const allUploaded = fileList.length > 0 &&
+    fileList.map(data => data.fileId).every(fileId => uploadedFileIds.has(fileId))
 
   const allChecked =
-    fileDataList.length > 0 &&
-    fileDataList.map(data => data.fileId).every(fileId => checkedFileIds.has(fileId))
+    fileList.length > 0 &&
+    fileList.map(data => data.fileId).every(fileId => checkedFileIds.has(fileId))
 
   return (
     <>
@@ -84,12 +84,12 @@ const UploadPage = ({ current, setCurrent, fileDataList, uploadList, setUploadLi
         Either way, you'll need to check for your uploads by clicking the button below.
       </Paragraph3>
       <UploadList
-        fileDataList={fileDataList} checkedFileIds={checkedFileIds}
+        fileList={fileList} checkedFileIds={checkedFileIds}
         uploadList={uploadList} setUploadList={setUploadList}
       />
       <Button
         style={{ marginTop: '10px' }}
-        size={SIZE.compact} disabled={fileDataList.length === 0}
+        size={SIZE.compact} disabled={fileList.length === 0}
         isLoading={checkingStatus}
         kind={allChecked ? KIND.secondary : KIND.primary}
         onClick={checkUploadStatus}

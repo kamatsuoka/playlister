@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import FileDataList from './FileDataList'
+import FileList from './FileList'
 import MediaReader from './MediaReader'
 import { Modal } from 'baseui/modal'
 import TimeOffset from './TimeOffset'
@@ -12,15 +12,15 @@ import prevNextButtons from './PrevNextButtons'
  * Adjust time on file metadata in case camera doesn't have time zone
  * or has time set incorrectly
  */
-const FileDataPage = ({
+const FilePage = ({
   current, setCurrent,
   mediaList, setMediaList,
-  fileDataList, setFileDataList,
+  fileList, setFileList,
   timeAdjust, setTimeAdjust,
   eventData, setEventData
 }) => {
   /**
-   * fileDataList items:
+   * fileList items:
    * - fileId
    * - name
    * - startTime
@@ -31,7 +31,7 @@ const FileDataPage = ({
   const [overrideTimeZone, setOverrideTimeZone] = useState(true)
   const [previewUrl, setPreviewUrl] = React.useState(null)
 
-  const startDates = getStartDates(fileDataList)
+  const startDates = getStartDates(fileList)
   const defaultDate = startDates[0]
   useEffect(() => {
     setEventData(({ ...eventData, defaultDate: defaultDate }))
@@ -75,10 +75,10 @@ const FileDataPage = ({
   function filesAndOffset () {
     return (
       <>
-        <FileDataList
+        <FileList
           mediaList={mediaList} setMediaList={setMediaList}
           overrideTimeZone={overrideTimeZone} timeAdjust={timeAdjust}
-          fileDataList={fileDataList} setFileDataList={setFileDataList}
+          fileList={fileList} setFileList={setFileList}
           setPreviewUrl={setPreviewUrl} eventData={eventData} setEventData={setEventData}
         />
         <TimeOffset
@@ -106,4 +106,4 @@ const FileDataPage = ({
   )
 }
 
-export default FileDataPage
+export default FilePage

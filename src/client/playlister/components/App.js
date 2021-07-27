@@ -10,7 +10,7 @@ import VideoPage from './VideoPage'
 import { StyledLink } from 'baseui/link'
 import { ProgressSteps, Step } from 'baseui/progress-steps'
 import PlaylistPage from './PlaylistPage'
-import FileDataPage from './FileDataPage'
+import FilePage from './FilePage'
 import { SnackbarProvider } from 'baseui/snackbar'
 import { DEFAULT_DATE } from './EventDate'
 import PreferencePage from './PreferencePage'
@@ -30,7 +30,7 @@ function App () {
   const [mediaList, setMediaList] = useState([])
   // list of videos uploaded to youtube
   const [uploadList, setUploadList] = useState([])
-  const [fileDataList, setFileDataList] = useState([])
+  const [fileList, setFileList] = useState([])
   // attributes of event where the videos were recorded
   const [eventData, setEventData] = useState({
     defaultDate: '',
@@ -91,11 +91,11 @@ function App () {
               />
               {prevNextButtons({ current: 0, setCurrent })}
             </Step>
-            <Step title='File Data'>
-              <FileDataPage
+            <Step title='Files'>
+              <FilePage
                 current={1} setCurrent={setCurrent}
                 mediaList={mediaList} setMediaList={setMediaList}
-                fileDataList={fileDataList} setFileDataList={setFileDataList}
+                fileList={fileList} setFileList={setFileList}
                 timeAdjust={timeAdjust} setTimeAdjust={setTimeAdjust}
                 eventData={eventData} setEventData={setEventData}
               />
@@ -103,7 +103,7 @@ function App () {
             <Step title='Uploads'>
               <UploadPage
                 current={2} setCurrent={setCurrent}
-                fileDataList={fileDataList} uploadList={uploadList} setUploadList={setUploadList}
+                fileList={fileList} uploadList={uploadList} setUploadList={setUploadList}
               />
             </Step>
             <Step title='Choose Playlist'>
