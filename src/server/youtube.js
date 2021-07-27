@@ -40,6 +40,20 @@ export const findMyPlaylist = (title, nextPageToken = '') => {
 }
 
 /**
+ * Lists my (hopefully recent) playlists
+ */
+export const listPlaylists = () => {
+  const MAX_RESULTS = 50
+  const part = ['id', 'snippet', 'contentDetails']
+  const optionalArgs = {
+    maxResults: MAX_RESULTS,
+    mine: true
+  }
+  const response = YouTube.Playlists.list(part, optionalArgs)
+  return response.items
+}
+
+/**
  * Inserts (creates) a new playlist
  */
 export function insertPlaylist (title, description) {

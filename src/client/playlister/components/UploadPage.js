@@ -3,16 +3,16 @@ import { Button, KIND, SIZE } from 'baseui/button'
 import UploadList from './UploadList'
 import dayjs from 'dayjs'
 import { findUploads } from '../youtube/api'
-import { useStyletron } from 'baseui'
 import { StyledLink } from 'baseui/link'
 import { Paragraph3 } from 'baseui/typography'
 import { useSnackbar } from 'baseui/snackbar'
 import { showError } from '../util/showError'
+import prevNextButtons from './PrevNextButtons'
 
 /**
  * Page for uploading videos, or finding previously-uploaded videos for same files
  */
-const UploadPage = ({ fileDataList, uploadList, setUploadList, current, prevButton, nextButton }) => {
+const UploadPage = ({ current, setCurrent, fileDataList, uploadList, setUploadList }) => {
   /**
    * uploadList items:
    * - videoId
@@ -24,8 +24,6 @@ const UploadPage = ({ fileDataList, uploadList, setUploadList, current, prevButt
    * - endTime
    */
 
-  const [, theme] = useStyletron()
-  // const [allUploaded, setAllUploaded] = useState(false)
   // used to show spinner on 'Check Upload Status' button
   const [checkingStatus, setCheckingStatus] = useState(false)
   // file ids that have been checked
@@ -99,11 +97,11 @@ const UploadPage = ({ fileDataList, uploadList, setUploadList, current, prevButt
       >
         Check Upload Status
       </Button>
-      <div align='right' style={{ marginTop: theme.sizing.scale600 }}>
-        {prevButton({ current })}
-        &nbsp;
-        {nextButton({ current, kind: allUploaded ? KIND.primary : KIND.secondary })}
-      </div>
+      {prevNextButtons({
+        current,
+        setCurrent,
+        nextProps: { kind: allUploaded ? KIND.primary : KIND.secondary }
+      })}
     </>
   )
 }

@@ -22,8 +22,9 @@ const PlaylistTitle = ({ suggestedTitle, playlistTitle, setPlaylistTitle }) => {
 
   const radioOverrides = {
     Root: {
-      style: () => ({
-        alignItems: 'start'
+      style: ({ $theme }) => ({
+        alignItems: 'start',
+        marginRight: $theme.sizing.scale600
       })
     },
     RadioMarkOuter: {
@@ -45,6 +46,18 @@ const PlaylistTitle = ({ suggestedTitle, playlistTitle, setPlaylistTitle }) => {
       })
     }
   }
+
+  const suggestedInputOverrides = {
+    ...inputOverrides,
+    Input: {
+      props: {
+        spellCheck: 'false'
+      },
+      style: ({
+        caretColor: 'transparent'
+      })
+    }
+  }
   return (
     <ThemeProvider
       theme={createTheme(lightThemePrimitives, themeOverrides())}
@@ -56,16 +69,16 @@ const PlaylistTitle = ({ suggestedTitle, playlistTitle, setPlaylistTitle }) => {
         align={ALIGN.horizontal}
       >
         <Radio value={SUGGESTED} overrides={radioOverrides}>
-          <FormControl caption='suggested'>
+          <FormControl caption='suggested title'>
             <Input
               value={suggestedTitle}
               readOnly
-              overrides={inputOverrides}
+              overrides={suggestedInputOverrides}
             />
           </FormControl>
         </Radio>
         <Radio value={CUSTOM} overrides={radioOverrides}>
-          <FormControl caption='custom'>
+          <FormControl caption='custom title'>
             <Input
               value={playlistTitle.customTitle || ''}
               placeholder='custom title'

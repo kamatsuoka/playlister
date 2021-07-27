@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
 import VideoNaming from './VideoNaming'
 import VideoList from './VideoList'
+import prevNextButtons from './PrevNextButtons'
 
-const VideoPage = ({ uploadList, setUploadList, playlistData, newTitles, setNewTitles }) => {
+const VideoPage = ({ current, setCurrent, uploadList, setUploadList, playlistData, newTitles, setNewTitles }) => {
   const [videoNaming, setVideoNaming] = useState({
     prefix: 'fcs', cameraView: 'chorus', nextIndex: 1, indexOffset: 0
   })
@@ -15,7 +16,7 @@ const VideoPage = ({ uploadList, setUploadList, playlistData, newTitles, setNewT
         playlistData={playlistData} videoNaming={videoNaming}
         newTitles={newTitles} setNewTitles={setNewTitles}
       />
-
+      {prevNextButtons({ current, setCurrent, nextProps: { last: true } })}
     </>
   )
 }

@@ -31,6 +31,45 @@ const findPlaylist = (title, onSuccess, onFailure) => {
   }
 }
 
+const samplePlaylist = (id, title, description, itemCount, publishedAt) => ({
+  id: id,
+  snippet: {
+    publishedAt: publishedAt,
+    title: title,
+    description: description
+  },
+  contentDetails: {
+    itemCount: itemCount
+  }
+})
+
+/**
+ * Lists my (hopefully recent) playlists
+ *
+ * @param onSuccess success handler: (playlist) => {}
+ * @param onFailure failure handler: (error) => {}
+ * @returns {Promise<*>}
+ */
+const listPlaylists = (onSuccess, onFailure) => {
+  const run = getAppsScriptRun()
+  if (run) {
+    return run
+      .withSuccessHandler(onSuccess)
+      .withFailureHandler(onFailure)
+      .listPlaylists()
+  } else {
+    // for testing
+    const playlists = [
+      samplePlaylist('asdf', 'recent playlist 1', 'sample playlist 1', 0, '2021-06-26T00:12:34Z'),
+      samplePlaylist('jklm', 'recent playlist 2 with longer title', 'sample playlist 2', 2, '2021-05-25T00:12:34Z'),
+      samplePlaylist('zxcv', 'short title', 'sample playlist 1', 3, '2021-03-25T00:12:34Z')
+    ]
+    return new Promise((resolve, reject) => {
+      return resolve(playlists)
+    }).then(onSuccess).catch(onFailure)
+  }
+}
+
 /**
  * Finds existing item with same name
  */
@@ -167,4 +206,4 @@ const updateTitle = (videoId, title, onSuccess, onFailure) => {
   }
 }
 
-export { findPlaylist, insertPlaylist, findUploads, youtubeTitle, updateTitle }
+export { findPlaylist, listPlaylists, insertPlaylist, findUploads, youtubeTitle, updateTitle }

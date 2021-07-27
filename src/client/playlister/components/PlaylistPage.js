@@ -3,15 +3,17 @@ import { Button, KIND, SIZE } from 'baseui/button'
 import { KIND as NKind, Notification } from 'baseui/notification'
 import * as youtube from '../youtube/api'
 import PlaylistTitle, { CUSTOM, SUGGESTED } from './PlaylistTitle'
-import { Label2, Paragraph3 } from 'baseui/typography'
 import { useSnackbar } from 'baseui/snackbar'
 import { errorMessage, showError } from '../util/showError'
 import { DEFAULT_DATE } from './EventDate'
 import { useStyletron } from 'baseui'
+import { Tab, Tabs } from 'baseui/tabs-motion'
+import { FormControl } from 'baseui/form-control'
+import { Select } from 'baseui/select'
+import prevNextButtons from './PrevNextButtons'
 
-const ACTION_FIND = 'find'
 const ACTION_CREATE = 'create'
-const NOT_FOUND = 'not_found'
+const ACTION_LIST = 'list'
 
 /**
  * Shows event data form:
@@ -19,11 +21,11 @@ const NOT_FOUND = 'not_found'
  * Shows suggested playlist as [inferred date] + [event type]
  */
 const PlaylistPage = ({
-  orgInfo, uploadList,
-  eventData,
+  current, setCurrent,
+  orgInfo, cameraInfo,
+  eventData, uploadList,
   playlistTitle, setPlaylistTitle,
-  playlistData, setPlaylistData,
-  cameraInfo
+  playlistData, setPlaylistData
 }) => {
   /**
    * playlistData:
@@ -32,105 +34,96 @@ const PlaylistPage = ({
    * - itemCount
    * - publishedAt
    * - description
-   * - eventDate
    */
   const [css, theme] = useStyletron()
-  const [findStatus, setFindStatus] = useState({ message: '' })
-  const [createStatus, setCreateStatus] = useState({ message: '' })
-  const [finding, setFinding] = useState(false)
+  const [listing, setListing] = useState(false)
   const [creating, setCreating] = useState(false)
-  const [adding, setAdding] = useState(false)
+  const [playlists, setPlaylists] = useState([])
+  /**
+   * selectedPlaylist is an array of 0 - 1 elements b/c of
+   * Select api -- https://baseweb.design/components/select/#select-basic-usage
+   */
+  const [selectedPlaylist, setSelectedPlaylist] = useState([])
+  /**
+   * Playlist created by clicking Create
+   */
+  const [createdPlaylist, setCreatedPlaylist] = useState({})
+
   const { enqueue } = useSnackbar()
 
-  const eventDate =
-    (eventData.dateChoice === DEFAULT_DATE ? eventData.defaultDate : eventData.customDate) || 'date?'
+  const eventDate = eventData.dateChoice === DEFAULT_DATE ? eventData.defaultDate : eventData.customDate
 
-  const suggestedTitle =
-    `${orgInfo.orgName || 'unknown org'} ${eventDate} ${eventData.eventType} cam ${cameraInfo.cameraNumber}`
-
+  const titleParts = [orgInfo.orgName, eventDate, eventData.eventType, 'cam', cameraInfo.cameraNumber]
+  const suggestedTitle = titleParts.filter(p => p).join(' ')
   const desiredTitle = playlistTitle.titleChoice === CUSTOM ? playlistTitle.customTitle : suggestedTitle
 
-  const foundOrCreatedPlaylist = playlistData.title && playlistData.title === desiredTitle
-
-  const storePlaylist = (playlist, eventDate, msgIntro) => {
-    // eslint-disable-next-line no-prototype-builtins
-    if (playlist.hasOwnProperty(['id'])) {
-      return setPlaylistData({
-        ...playlistData,
-        playlistId: playlist.id,
-        title: playlist.snippet.title,
-        itemCount: playlist.contentDetails.itemCount,
-        publishedAt: playlist.snippet.publishedAt,
-        description: playlist.snippet.description,
-        msgIntro: msgIntro
-      })
-    } else {
-      return setPlaylistData({})
-    }
-  }
+  /**
+   * Gets properties of interest from youtube Playlist resource
+   *
+   * https://developers.google.com/youtube/v3/docs/playlists#resource
+   */
+  const playlistResource = playlist => ({
+    playlistId: playlist.id,
+    title: playlist.snippet.title,
+    itemCount: playlist.contentDetails.itemCount,
+    publishedAt: playlist.snippet.publishedAt,
+    description: playlist.snippet.description
+  })
 
   /**
-   * Success handler for creating or finding a playlist
+   * Success handler for creating a playlist
    */
-  const playlistSuccess = (eventDate, action) => playlist => {
-    const msgIntro = action === ACTION_FIND ? 'Found existing' : 'Created'
-    storePlaylist(playlist, eventDate, msgIntro)
-    const statusFn = action === ACTION_FIND ? setFindStatus : setCreateStatus
-    statusFn(values => ({
-      ...values,
-      result: `${action} success`,
-      title: playlist.snippet.title,
-      message: `${msgIntro} playlist "${playlist.snippet.title}"`,
-      isError: false
-    }))
-    if (action === ACTION_FIND) {
-      console.log('findStatus: ', findStatus)
-      setFinding(false)
+  const playlistSuccess = playlist => {
+    // eslint-disable-next-line no-prototype-builtins
+    if (playlist.hasOwnProperty(['id'])) {
+      const created = playlistResource(playlist)
+      setCreatedPlaylist(created)
+      setPlaylistData(created)
+      console.log('created: ', created)
     } else {
-      console.log('createStatus: ', createStatus)
-      setCreating(false)
+      showError(enqueue, 'Unexpected response: ' + JSON.stringify(playlist))
     }
+    setCreating(false)
   }
 
   /**
    * Failure handler for creating or finding a playlist
    */
   const playlistFailure = action => err => {
-    const msgIntro = action === ACTION_FIND ? 'Error finding' : 'Error creating'
-    showError(enqueue, `${msgIntro} playlist: ${errorMessage(err)}`)
-    if (action === ACTION_FIND) {
-      setFinding(false)
-    } else {
+    let verb = ''
+    if (action === ACTION_CREATE) {
       setCreating(false)
+      verb = 'creating'
+    } else if (action === ACTION_LIST) {
+      setListing(false)
+      verb = 'listing'
+    } else {
+      console.log(`playlistFailure: unexpected action: ${action}`)
+      return
     }
+    showError(enqueue, `Error ${verb} playlist: ${errorMessage(err)}`)
   }
 
-  function findPlaylist () {
-    setFindStatus({}) // clear message, if any, first
-    storePlaylist({}) // clear existing found playlist, if any
-    setFinding(true)
-
-    const title = desiredTitle
-
-    const successHandler = playlist => {
-      if (playlist) {
-        playlistSuccess(eventDate, ACTION_FIND)(playlist)
-      } else {
-        setFinding(false)
-        setFindStatus({ title: title, result: NOT_FOUND })
-      }
+  /**
+   * Find list of (hopefully recent) playlists
+   */
+  function listPlaylists () {
+    setListing(true)
+    const successHandler = playlists => {
+      setPlaylists(playlists.map(playlistResource))
+      setListing(false)
     }
-
+    const failureHandler = playlistFailure(ACTION_LIST)
     try {
-      return youtube.findPlaylist(title, successHandler, playlistFailure(ACTION_FIND))
+      return youtube.listPlaylists(successHandler, failureHandler)
     } catch (e) {
-      playlistFailure(ACTION_FIND)(e)
+      failureHandler(e)
     }
   }
 
   function createPlaylist () {
-    setCreateStatus({})
-    storePlaylist({}) // clear existing found / created playlist, if any
+    setCreatedPlaylist({})
+    setPlaylistData({})
     setCreating(true)
     try {
       youtube.insertPlaylist(
@@ -144,14 +137,6 @@ const PlaylistPage = ({
     }
   }
 
-  const addToPlaylist = async () => {
-    setAdding(true)
-    // TODO: onsuccess, onfailure, display results for each video
-    for (const upload of uploadList) {
-      await youtube.insertPlaylistItem(upload.videoId, playlistData.playlistId)
-    }
-  }
-
   const isValidTitle = () => {
     if (playlistTitle.titleChoice === SUGGESTED) {
       return suggestedTitle !== ''
@@ -160,63 +145,25 @@ const PlaylistPage = ({
     }
   }
 
-  const playlistWasFound = () => {
-    return playlistData.title && findStatus.title === playlistData.title &&
-      foundOrCreatedPlaylist && findStatus.result !== NOT_FOUND
-  }
-
-  const playlistWasNotFound = () => {
-    return findStatus.title === desiredTitle && !foundOrCreatedPlaylist && findStatus.result === NOT_FOUND
-  }
-
-  const playlistWasCreated = () => {
-    return playlistData.title && createStatus.title === playlistData.title && foundOrCreatedPlaylist
-  }
-
-  const playlistWasNotCreated = () => {
-    return createStatus.title === desiredTitle && !foundOrCreatedPlaylist
-  }
+  const playlistWasCreated = () =>
+    playlistData.title && createdPlaylist.title === playlistData.title &&
+    playlistData.title === desiredTitle
 
   const notifOverrides = {
     Body: {
-      style: ({ $theme }) => ({
-        marginLeft: $theme.sizing.scale600,
+      style: ({
+        marginLeft: theme.sizing.scale600,
         width: 'auto',
         alignItems: 'center'
       })
     }
   }
 
-  const showFindStatus = () => {
-    if (playlistWasFound()) {
-      return (
-        <Notification kind={NKind.positive} overrides={notifOverrides}>
-          Playlist found: {playlistData.title}
-        </Notification>
-      )
-    }
-    if (playlistWasNotFound()) {
-      return (
-        <Notification kind={NKind.neutral} overrides={notifOverrides}>
-          Playlist not found: {findStatus.title}
-        </Notification>
-      )
-    }
-    return null
-  }
-
   const showCreateStatus = () => {
-    if (playlistWasCreated()) {
+    if (playlistTitle.playlistChoice === '0' && playlistWasCreated()) {
       return (
         <Notification kind={NKind.positive} overrides={notifOverrides}>
-          Playlist created: {playlistData.title}
-        </Notification>
-      )
-    }
-    if (playlistWasNotCreated()) {
-      return (
-        <Notification kind={NKind.negative} overrides={notifOverrides}>
-          Playlist not created: {findStatus.title}
+          Playlist created: {createdPlaylist.title}
         </Notification>
       )
     }
@@ -225,84 +172,87 @@ const PlaylistPage = ({
 
   const buttonOverrides = {
     Root: {
-      style: ({ $theme }) => ({
-        marginTop: $theme.sizing.scale600,
-        marginBottom: $theme.sizing.scale600
+      style: ({
+        marginTop: theme.sizing.scale600,
+        marginBottom: theme.sizing.scale600
       })
     }
   }
 
-  const showFindButton = () => (
+  const showList = () => (
     <>
-      <Label2>2a. Check</Label2>
+      <FormControl label='recent playlists'>
+        <Select
+          value={selectedPlaylist}
+          onChange={({ value }) => {
+            console.log('in recent playlists onChange: value = ', value)
+            setSelectedPlaylist(value)
+          }}
+          isLoading={listing}
+          options={playlists}
+          valueKey='playlistId'
+          labelKey='title'
+          clearable={false}
+        />
+      </FormControl>
       <div className={css({ display: 'inline-flex', alignItems: 'center' })}>
         <Button
-          onClick={() => findPlaylist()}
+          onClick={listPlaylists}
           size={SIZE.small}
-          kind={playlistWasCreated() || playlistWasFound() || playlistWasNotFound() ? KIND.secondary : KIND.primary}
-          isLoading={finding}
-          disabled={uploadList.length === 0 || !isValidTitle()}
+          isLoading={listing}
           overrides={buttonOverrides}
         >
-          Check for Existing Playlist
+          Refresh
         </Button>
-        {showFindStatus()}
       </div>
     </>
   )
 
-  const showCreateButton = () =>
-    (
-      <>
-        <Label2>2b. Create</Label2>
-        <div className={css({ display: 'inline-flex', alignItems: 'center' })}>
-          <Button
-            onClick={() => createPlaylist()}
-            size={SIZE.small}
-            kind={playlistWasCreated() ? KIND.secondary : KIND.primary}
-            isLoading={creating}
-            disabled={uploadList.length === 0 || !isValidTitle()}
-            overrides={buttonOverrides}
-          >
-            Create New Playlist
-          </Button>
-          {showCreateStatus()}
-        </div>
-      </>
-    )
-
-  /**
-   * Adds videos to playlist
-   */
-  const showAddButton = () =>
-    (
-      <>
-        <Label2>3. Add</Label2>
-        <Button
-          onClick={addToPlaylist}
-          size={SIZE.small}
-          isLoading={adding}
-          overrides={buttonOverrides}
-        >
-          Add Videos to Playlist
-        </Button>
-      </>
-    )
-
-  return (
+  const showCreate = () => (
     <>
-      <Paragraph3>
-        Choose an existing playlist to add your videos to, or create a new one.
-      </Paragraph3>
-      <Label2>1. Choose Title</Label2>
       <PlaylistTitle
         eventData={eventData}
         fileDataList={uploadList} suggestedTitle={suggestedTitle}
         playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
       />
-      {showFindButton()}
-      {findStatus.result === NOT_FOUND ? showCreateButton() : null}
-      {foundOrCreatedPlaylist ? showAddButton() : null}
+      <Button
+        onClick={() => createPlaylist()}
+        size={SIZE.small}
+        kind={playlistWasCreated() ? KIND.secondary : KIND.primary}
+        isLoading={creating}
+        disabled={uploadList.length === 0 || !isValidTitle()}
+        overrides={buttonOverrides}
+      >
+        Create
+      </Button>
+      {showCreateStatus()}
+    </>
+  )
+
+  return (
+    <>
+      <Tabs
+        activeKey={playlistTitle.playlistChoice}
+        onChange={({ activeKey }) => {
+          setPlaylistTitle({ ...playlistTitle, playlistChoice: activeKey })
+          if (activeKey === '1' && playlists.length === 0) {
+            return listPlaylists()
+          }
+        }}
+      >
+        <Tab title='Create new playlist'>
+          {showCreate()}
+        </Tab>
+        <Tab title='Use existing playlist'>
+          {showList()}
+        </Tab>
+      </Tabs>
+      {showCreateStatus()}
+      {prevNextButtons({
+        current,
+        setCurrent,
+        nextProps: { kind: playlistData.playlistId ? KIND.primary : KIND.secondary }
+      })}
     </>
   )
 }
