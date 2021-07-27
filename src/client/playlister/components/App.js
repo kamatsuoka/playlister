@@ -21,7 +21,7 @@ const engine = new Styletron()
 
 function App () {
   // index of currently selected step
-  const [current, setCurrent] = useState(3)
+  const [current, setCurrent] = useState(1)
   // info about the organization
   const [orgInfo, setOrgInfo] = useState({ orgName: 'fcs' })
   // info about the camera
@@ -40,7 +40,7 @@ function App () {
   })
   // playlist title settings for finding / creating a playlist
   const [playlistTitle, setPlaylistTitle] = useState({
-    playlistChoice: 0,
+    tabIndex: 0,
     titleChoice: 'suggested',
     customTitle: ''
   })

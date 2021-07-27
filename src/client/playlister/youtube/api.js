@@ -126,22 +126,21 @@ function insertPlaylist (title, eventDate, onSuccess, onFailure) {
       .withFailureHandler(onFailure)
       .insertPlaylist(title, description)
   } else {
-    const playlistProps = {
-      part: [
-        'snippet,contentDetails,status'
-      ],
-      resource: {
-        snippet: {
-          title: title,
-          description: `created by playlister for event on ${eventDate}`
-        },
-        status: {
-          privacyStatus: 'unlisted'
-        }
+    // for testing
+    const playlist = {
+      id: 'asdf',
+      snippet: {
+        title: title,
+        description: description,
+        publishedAt: dayjs().toISOString()
+      },
+      contentDetails: {
+        itemCount: 0
       }
     }
-    return gapi.client.youtube.playlists.insert(playlistProps)
-      .then(response => onSuccess(response.result), err => onFailure(err))
+    return new Promise((resolve, reject) => {
+      return resolve(playlist)
+    }).then(onSuccess).catch(onFailure)
   }
 }
 
@@ -178,7 +177,17 @@ const findUploads = (fileDataList, onSuccess, onFailure) => {
       .withFailureHandler(onFailure)
       .findUploads(fileData)
   } else {
-    throw Error('findUploads not implemented outside Apps Script')
+    const uploads = fileDataList.map(fd => ({
+      videoId: Math.random().toString(36).substr(2, 9),
+      title: youtubeTitle(fd.filename),
+      publishedAt: dayjs().toISOString(),
+      filename: fd.filename,
+      duration: fd.duration,
+      fileData: fd
+    }))
+    return new Promise((resolve, reject) => {
+      return resolve(uploads)
+    }).then(onSuccess).catch(onFailure)
   }
 }
 

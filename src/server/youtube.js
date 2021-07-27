@@ -79,6 +79,7 @@ export function insertPlaylist (title, description) {
  * 4. Returning videos that match one of the given filenames / titles
  *
  * @param {Object} files - map of filename to { title, fileData }
+ * @return Array of { videoId, title, publishedAt, filename, duration }
  */
 export function findUploads (files) {
   Logger.log(`files = ${JSON.stringify(files)}`)

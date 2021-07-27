@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { Button, KIND, SIZE } from 'baseui/button'
 import { KIND as NKind, Notification } from 'baseui/notification'
 import * as youtube from '../youtube/api'
@@ -74,8 +74,7 @@ const PlaylistPage = ({
    * Success handler for creating a playlist
    */
   const playlistSuccess = playlist => {
-    // eslint-disable-next-line no-prototype-builtins
-    if (playlist.hasOwnProperty(['id'])) {
+    if (playlist.id) {
       const created = playlistResource(playlist)
       setCreatedPlaylist(created)
       setPlaylistData(created)
@@ -129,7 +128,7 @@ const PlaylistPage = ({
       youtube.insertPlaylist(
         desiredTitle,
         eventDate,
-        playlistSuccess(eventDate, ACTION_CREATE),
+        playlistSuccess,
         playlistFailure(ACTION_CREATE)
       )
     } catch (e) {
@@ -145,9 +144,12 @@ const PlaylistPage = ({
     }
   }
 
-  const playlistWasCreated = () =>
-    playlistData.title && createdPlaylist.title === playlistData.title &&
-    playlistData.title === desiredTitle
+  const playlistWasCreated = () => {
+    const created = playlistData.title && createdPlaylist.title === playlistData.title &&
+      playlistData.title === desiredTitle
+    console.log(`playlistWasCreated: ${created}`)
+    return created
+  }
 
   const notifOverrides = {
     Body: {
@@ -160,7 +162,7 @@ const PlaylistPage = ({
   }
 
   const showCreateStatus = () => {
-    if (playlistTitle.playlistChoice === '0' && playlistWasCreated()) {
+    if (playlistTitle.tabIndex === 0 && playlistWasCreated()) {
       return (
         <Notification kind={NKind.positive} overrides={notifOverrides}>
           Playlist created: {createdPlaylist.title}
@@ -225,16 +227,17 @@ const PlaylistPage = ({
       >
         Create
       </Button>
-      {showCreateStatus()}
     </>
   )
+
+  const storeSelected = useCallback(playlist => setPlaylistData(playlist), [playlistData])
 
   return (
     <>
       <Tabs
-        activeKey={playlistTitle.playlistChoice}
+        activeKey={playlistTitle.tabIndex}
         onChange={({ activeKey }) => {
-          setPlaylistTitle({ ...playlistTitle, playlistChoice: activeKey })
+          setPlaylistTitle({ ...playlistTitle, tabIndex: parseInt(activeKey) })
           if (activeKey === '1' && playlists.length === 0) {
             return listPlaylists()
           }
@@ -251,7 +254,15 @@ const PlaylistPage = ({
       {prevNextButtons({
         current,
         setCurrent,
-        nextProps: { kind: playlistData.playlistId ? KIND.primary : KIND.secondary }
+        nextProps: {
+          kind: playlistData.playlistId ? KIND.primary : KIND.secondary,
+          onClick: () => {
+            if (playlistTitle.tabIndex === 1 && selectedPlaylist[0]) {
+              storeSelected(selectedPlaylist[0])
+            }
+            setCurrent(current + 1)
+          }
+        }
       })}
     </>
   )
