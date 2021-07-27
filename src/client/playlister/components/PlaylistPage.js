@@ -140,12 +140,9 @@ const PlaylistPage = ({
     }
   }
 
-  const playlistWasCreated = () => {
-    const created = playlistData.title && createdPlaylist.title === playlistData.title &&
-      playlistData.title === desiredTitle
-    console.log(`playlistWasCreated: ${created}`)
-    return created
-  }
+  const playlistWasCreated = () =>
+    playlistData.title && createdPlaylist.title === playlistData.title &&
+    playlistData.title === desiredTitle
 
   const notifOverrides = {
     Body: {

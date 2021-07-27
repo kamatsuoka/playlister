@@ -86,7 +86,6 @@ const UploadPage = ({ current, setCurrent, fileDataList, uploadList, setUploadLi
       <UploadList
         fileDataList={fileDataList} checkedFileIds={checkedFileIds}
         uploadList={uploadList} setUploadList={setUploadList}
-        // setAllUploaded={setAllUploaded}
       />
       <Button
         style={{ marginTop: '10px' }}

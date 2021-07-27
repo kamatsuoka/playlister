@@ -12,4 +12,8 @@ const durationSeconds = seconds =>
 
 const prettyDuration = duration => duration.toISOString().toLowerCase().replace(/^pt/, '')
 
-export {durationSeconds, prettyDuration}
+const displayTemplate = 'YYYY-MM-DD HH:mm:ss z'
+
+const displayDate = date => dayjs(date).format(displayTemplate)
+
+export { durationSeconds, prettyDuration, displayDate }

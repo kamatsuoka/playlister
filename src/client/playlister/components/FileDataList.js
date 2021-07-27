@@ -10,7 +10,7 @@ import { TableBuilder, TableBuilderColumn } from 'baseui/table-semantic'
 import { Button, KIND, SIZE } from 'baseui/button'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlay, faTimes } from '@fortawesome/free-solid-svg-icons'
-import { durationSeconds } from '../util/dates'
+import { displayDate, durationSeconds } from '../util/dates'
 
 dayjs.extend(localizedFormat)
 dayjs.extend(advancedFormat)
@@ -78,9 +78,6 @@ const FileDataList = ({
       ).sort((s1, s2) => s1.startTime > s2.startTime ? 1 : -1)
     setFileDataList(fileDatas)
   }, [mediaList, overrideTimeZone, setFileDataList, timeAdjust])
-
-  // .sort((s1, s2) => s1.startTime > s2.startTime ? 1 : -1)
-  const displayTemplate = 'YYYY-MM-DD HH:mm:ss z'
 
   const removeHeader = () => {
     if (mediaList.length === 0) {
@@ -171,13 +168,13 @@ const FileDataList = ({
           {row => row.filename}
         </TableBuilderColumn>
         <TableBuilderColumn overrides={columnOverrides} header='Start Time'>
-          {row => dayjs(row.startTime).format(displayTemplate)}
+          {row => displayDate(row.startTime)}
         </TableBuilderColumn>
         <TableBuilderColumn overrides={durationOverrides} header='Duration' numeric>
           {row => durationSeconds(row.duration)}
         </TableBuilderColumn>
         <TableBuilderColumn overrides={columnOverrides} header='End Time'>
-          {row => dayjs(row.endTime).format(displayTemplate)}
+          {row => displayDate(row.endTime)}
         </TableBuilderColumn>
         <TableBuilderColumn
           overrides={{ ...columnOverrides, ...removeColumnOverrides }}

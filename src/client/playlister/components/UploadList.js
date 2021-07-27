@@ -5,6 +5,7 @@ import { faQuestion } from '@fortawesome/free-solid-svg-icons'
 import { tableOverrides } from './TableOverrides'
 import { Button, KIND, SIZE } from 'baseui/button'
 import resumableUpload from '../youtube/youtube-uploader'
+import { displayDate } from '../util/dates'
 
 const UPLOADING = 'uploading'
 const ERROR = 'error'
@@ -37,11 +38,11 @@ const UploadList = ({ fileDataList, checkedFileIds, uploadList, setUploadList })
     }
     const completeHandler = uploaded => {
       console.log('completeHandler: uploaded = ', uploaded)
-      return setUploadList(
+      return setUploadList(uploadList =>
         uploadList
           .filter(status => status.fileId !== fileId)
           .concat(uploaded)
-          .sort((a, b) => a.filename > b.filename ? 1 : -1)
+          .sort((a, b) => a.startTime > b.startTime ? 1 : -1)
       )
     }
     resumableUpload(file, fileId, progressHandler, completeHandler, errorHandler)
@@ -71,7 +72,7 @@ const UploadList = ({ fileDataList, checkedFileIds, uploadList, setUploadList })
    */
   const uploadButton = row => {
     if (uploadData[row.fileId] && uploadData[row.fileId].publishedAt) {
-      return `published ${uploadData[row.fileId].publishedAt}`
+      return displayDate(uploadData[row.fileId].publishedAt)
     }
     if (uploadProgress[row.fileId]) {
       return `${uploadProgress[row.fileId]}%`
@@ -93,7 +94,7 @@ const UploadList = ({ fileDataList, checkedFileIds, uploadList, setUploadList })
         </Button>
       )
     } else {
-      return <FontAwesomeIcon icon={faQuestion} size='sm' title='Check upload status' />
+      return <FontAwesomeIcon icon={faQuestion} size='sm' title='Check status' />
     }
   }
 
@@ -119,7 +120,10 @@ const UploadList = ({ fileDataList, checkedFileIds, uploadList, setUploadList })
         <TableBuilderColumn overrides={columnOverrides} header='Filename'>
           {row => row.filename}
         </TableBuilderColumn>
-        <TableBuilderColumn header='Upload Status' overrides={columnOverrides}>
+        <TableBuilderColumn overrides={columnOverrides} header='Start Time'>
+          {row => displayDate(row.startTime)}
+        </TableBuilderColumn>
+        <TableBuilderColumn header='Uploaded' overrides={columnOverrides}>
           {row => uploadButton(row)}
         </TableBuilderColumn>
         <TableBuilderColumn overrides={columnOverrides} header='YouTube Title'>

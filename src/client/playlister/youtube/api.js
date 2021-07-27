@@ -203,7 +203,6 @@ export const insertPlaylistItem = (videoId, playlistId, position, onSuccess, onF
     const item = {
       snippet: {
         playlistId: playlistId,
-        position: position,
         resourceId: {
           videoId: videoId
         }
