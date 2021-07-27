@@ -44,6 +44,13 @@ function App () {
     titleChoice: 'suggested',
     customTitle: ''
   })
+  // list of (hopefully) recent playlists
+  const [playlists, setPlaylists] = useState([])
+  /**
+   * selectedPlaylist is an array of 0 - 1 elements b/c of
+   * Select api -- https://baseweb.design/components/select/#select-basic-usage
+   */
+  const [selectedPlaylist, setSelectedPlaylist] = useState([])
   // metadata about found / created playlist
   const [playlistData, setPlaylistData] = useState({})
   // adjustments to video start/end time, in case camera doesn't record time zone etc.
@@ -52,6 +59,8 @@ function App () {
   })
   // map of video id to new title
   const [newTitles, setNewTitles] = useState({})
+  // map of video id to playlist
+  const [videoPlaylist, setVideoPlaylist] = useState({})
 
   return (
     <StyletronProvider value={engine}>
@@ -97,19 +106,22 @@ function App () {
                 fileDataList={fileDataList} uploadList={uploadList} setUploadList={setUploadList}
               />
             </Step>
-            <Step title='Playlist'>
+            <Step title='Choose Playlist'>
               <PlaylistPage
                 current={3} setCurrent={setCurrent}
                 orgInfo={orgInfo} cameraInfo={cameraInfo}
                 uploadList={uploadList} eventData={eventData}
                 playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
+                playlists={playlists} setPlaylists={setPlaylists}
+                selectedPlaylist={selectedPlaylist} setSelectedPlaylist={setSelectedPlaylist}
                 playlistData={playlistData} setPlaylistData={setPlaylistData}
               />
             </Step>
-            <Step title='Move'>
+            <Step title='Add to Playlist'>
               <AddToPlaylistPage
                 current={4} setCurrent={setCurrent}
                 uploadList={uploadList} playlistData={playlistData}
+                videoPlaylist={videoPlaylist} setVideoPlaylist={setVideoPlaylist}
               />
             </Step>
             <Step title='Rename'>

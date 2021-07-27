@@ -25,6 +25,8 @@ const PlaylistPage = ({
   orgInfo, cameraInfo,
   eventData, uploadList,
   playlistTitle, setPlaylistTitle,
+  playlists, setPlaylists,
+  selectedPlaylist, setSelectedPlaylist,
   playlistData, setPlaylistData
 }) => {
   /**
@@ -38,12 +40,6 @@ const PlaylistPage = ({
   const [css, theme] = useStyletron()
   const [listing, setListing] = useState(false)
   const [creating, setCreating] = useState(false)
-  const [playlists, setPlaylists] = useState([])
-  /**
-   * selectedPlaylist is an array of 0 - 1 elements b/c of
-   * Select api -- https://baseweb.design/components/select/#select-basic-usage
-   */
-  const [selectedPlaylist, setSelectedPlaylist] = useState([])
   /**
    * Playlist created by clicking Create
    */
@@ -232,6 +228,9 @@ const PlaylistPage = ({
 
   const storeSelected = useCallback(playlist => setPlaylistData(playlist), [playlistData])
 
+  const nextOkay = (playlistTitle.tabIndex === 0 && createdPlaylist.title) ||
+    (playlistTitle.tabIndex === 1 && selectedPlaylist[0] && selectedPlaylist[0].title)
+
   return (
     <>
       <Tabs
@@ -255,7 +254,7 @@ const PlaylistPage = ({
         current,
         setCurrent,
         nextProps: {
-          kind: playlistData.playlistId ? KIND.primary : KIND.secondary,
+          kind: nextOkay ? KIND.primary : KIND.secondary,
           onClick: () => {
             if (playlistTitle.tabIndex === 1 && selectedPlaylist[0]) {
               storeSelected(selectedPlaylist[0])

@@ -16,7 +16,7 @@ import dayjs from 'dayjs'
  * @param onFailure failure handler: (error) => {}
  * @returns {Promise<*>}
  */
-const findPlaylist = (title, onSuccess, onFailure) => {
+export const findPlaylist = (title, onSuccess, onFailure) => {
   console.log(`findPlaylist: searching for ${title}`)
   const run = getAppsScriptRun()
   if (run) {
@@ -50,7 +50,7 @@ const samplePlaylist = (id, title, description, itemCount, publishedAt) => ({
  * @param onFailure failure handler: (error) => {}
  * @returns {Promise<*>}
  */
-const listPlaylists = (onSuccess, onFailure) => {
+export const listPlaylists = (onSuccess, onFailure) => {
   const run = getAppsScriptRun()
   if (run) {
     return run
@@ -117,7 +117,7 @@ const searchPlaylists = (title, pageToken = '') => {
  * I think that means we can't let the app create a playlist on our behalf
  * unless we're signed in as the account owner.
  */
-function insertPlaylist (title, eventDate, onSuccess, onFailure) {
+export function insertPlaylist (title, eventDate, onSuccess, onFailure) {
   const description = `created by playlister on ${dayjs().format()}`
   const run = getAppsScriptRun()
   if (run) {
@@ -148,7 +148,7 @@ function insertPlaylist (title, eventDate, onSuccess, onFailure) {
  * Gets title as munged from filename by youtube:
  * extension removed, any non-alnum character replaced with space
  */
-const youtubeTitle = filename => {
+export const youtubeTitle = filename => {
   const parts = filename.split('.')
   const noExt = parts.length > 1 ? (parts.pop(), parts.join('.')) : filename
   return noExt.replace(/[^a-z0-9]/gi, ' ')
@@ -162,7 +162,7 @@ const youtubeTitle = filename => {
  * @param onFailure failure handler: (error) => {}
  * @returns {Promise<*>}
  */
-const findUploads = (fileDataList, onSuccess, onFailure) => {
+export const findUploads = (fileDataList, onSuccess, onFailure) => {
   const fileData = Object.fromEntries(
     fileDataList.map(fileData => [fileData.filename, {
       title: youtubeTitle(fileData.filename),
@@ -191,19 +191,31 @@ const findUploads = (fileDataList, onSuccess, onFailure) => {
   }
 }
 
-const insertPlaylistItem = (videoId, playlistId, onSuccess, onFailure) => {
+export const insertPlaylistItem = (videoId, playlistId, position, onSuccess, onFailure) => {
   const run = getAppsScriptRun()
   if (run) {
     return run
       .withSuccessHandler(onSuccess)
       .withFailureHandler(onFailure)
-      .insertPlaylistItem(videoId, playlistId)
+      .insertPlaylistItem(videoId, playlistId, position)
   } else {
-    throw Error('insertPlaylistItem not implented outside Apps Script')
+    // for testing
+    const item = {
+      snippet: {
+        playlistId: playlistId,
+        position: position,
+        resourceId: {
+          videoId: videoId
+        }
+      }
+    }
+    return new Promise((resolve, reject) => {
+      return resolve(item)
+    }).then(onSuccess).catch(onFailure)
   }
 }
 
-const updateTitle = (videoId, title, onSuccess, onFailure) => {
+export const updateTitle = (videoId, title, onSuccess, onFailure) => {
   const run = getAppsScriptRun()
   if (run) {
     return run
@@ -214,5 +226,3 @@ const updateTitle = (videoId, title, onSuccess, onFailure) => {
     throw Error('updateTitle not implented outside Apps Script')
   }
 }
-
-export { findPlaylist, listPlaylists, insertPlaylist, findUploads, youtubeTitle, updateTitle }
