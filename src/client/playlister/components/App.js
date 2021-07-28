@@ -14,14 +14,13 @@ import FilePage from './FilePage'
 import { SnackbarProvider } from 'baseui/snackbar'
 import { DEFAULT_DATE } from './EventDate'
 import PreferencePage from './PreferencePage'
-import AddToPlaylistPage from './AddToPlaylistPage'
 import prevNextButtons from './PrevNextButtons'
 
 const engine = new Styletron()
 
 function App () {
   // index of currently selected step
-  const [current, setCurrent] = useState(3)
+  const [current, setCurrent] = useState(1)
   // info about the organization
   const [orgInfo, setOrgInfo] = useState({ orgName: 'fcs' })
   // info about the camera
@@ -53,7 +52,7 @@ function App () {
   const [createdPlaylist, setCreatedPlaylist] = useState({})
   /**
    * selectedPlaylist is an array of 0 - 1 elements b/c of
-   * Select api -- https://baseweb.design/components/select/#select-basic-usage
+   * baseui select api -- https://baseweb.design/components/select/#select-basic-usage
    */
   const [selectedPlaylist, setSelectedPlaylist] = useState([])
   // metadata about found / created playlist
@@ -111,7 +110,7 @@ function App () {
                 files={files} uploads={uploads} setUploads={setUploads}
               />
             </Step>
-            <Step title='Choose Playlist'>
+            <Step title='Playlist'>
               <PlaylistPage
                 current={3} setCurrent={setCurrent}
                 orgInfo={orgInfo} cameraInfo={cameraInfo}
@@ -121,12 +120,6 @@ function App () {
                 selectedPlaylist={selectedPlaylist} setSelectedPlaylist={setSelectedPlaylist}
                 createdPlaylist={createdPlaylist} setCreatedPlaylist={setCreatedPlaylist}
                 playlistData={playlistData} setPlaylistData={setPlaylistData}
-              />
-            </Step>
-            <Step title='Add to Playlist'>
-              <AddToPlaylistPage
-                current={4} setCurrent={setCurrent} files={files}
-                uploads={uploads} playlistData={playlistData}
                 videoPlaylist={videoPlaylist} setVideoPlaylist={setVideoPlaylist}
               />
             </Step>

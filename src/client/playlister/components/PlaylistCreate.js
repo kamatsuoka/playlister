@@ -7,7 +7,7 @@ import { Button, KIND, SIZE } from 'baseui/button'
 import * as youtube from '../youtube/api'
 import { errorMessage, showError } from '../util/showError'
 import { useSnackbar } from 'baseui/snackbar'
-import { KIND as NKind, Notification } from 'baseui/notification'
+// import { KIND as NKind, Notification } from 'baseui/notification'
 import { DEFAULT_DATE } from './EventDate'
 import { Block } from 'baseui/block'
 
@@ -53,6 +53,7 @@ const PlaylistCreate = ({
       const created = playlistResource(playlist)
       setCreatedPlaylist(created)
       setPlaylistData(created)
+      enqueue({ message: `created playlist: ${created.title}` })
       console.log('created: ', created)
     } else {
       showError(enqueue, 'Unexpected response: ' + JSON.stringify(playlist))
@@ -99,6 +100,7 @@ const PlaylistCreate = ({
     }
   }
 
+/*
   const showCreateStatus = () => {
     if (playlistTitle.tabIndex === 0 && playlistWasCreated()) {
       return (
@@ -109,6 +111,7 @@ const PlaylistCreate = ({
     }
     return null
   }
+*/
 
   const buttonOverrides = {
     Root: {
@@ -200,7 +203,6 @@ const PlaylistCreate = ({
           </Radio>
         </RadioGroup>
       </Block>
-      {showCreateStatus()}
     </>
   )
 }

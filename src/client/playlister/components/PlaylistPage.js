@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useState } from 'react'
 import { KIND } from 'baseui/button'
 import * as youtube from '../youtube/api'
 import { useSnackbar } from 'baseui/snackbar'
@@ -7,6 +7,7 @@ import { Tab, Tabs } from 'baseui/tabs-motion'
 import prevNextButtons from './PrevNextButtons'
 import PlaylistCreate from './PlaylistCreate'
 import PlaylistSelect from './PlaylistSelect'
+import AddToPlaylist from './AddToPlaylist'
 
 /**
  * Shows event data form:
@@ -21,7 +22,8 @@ const PlaylistPage = ({
   playlists, setPlaylists,
   selectedPlaylist, setSelectedPlaylist,
   createdPlaylist, setCreatedPlaylist,
-  playlistData, setPlaylistData
+  playlistData, setPlaylistData,
+  videoPlaylist, setVideoPlaylist
 }) => {
   /**
    * playlistData:
@@ -72,9 +74,7 @@ const PlaylistPage = ({
     }
   }
 
-  const storeSelected = useCallback(playlist => setPlaylistData(playlist), [playlistData])
-
-  const nextOkay = (playlistTitle.tabIndex === 0 && createdPlaylist.title) ||
+  const playlistOkay = (playlistTitle.tabIndex === 0 && createdPlaylist.title) ||
     (playlistTitle.tabIndex === 1 && selectedPlaylist[0] && selectedPlaylist[0].title)
 
   const tabOverrides = {
@@ -96,6 +96,11 @@ const PlaylistPage = ({
           if (activeKey === '1' && playlists.length === 0) {
             return listPlaylists()
           }
+          if (activeKey === '0' && Object.keys(createdPlaylist).length > 0) {
+            setPlaylistData(createdPlaylist)
+          } else if (activeKey === '1' && Object.keys(selectedPlaylist[0]).length > 0) {
+            setPlaylistData(selectedPlaylist[0])
+          }
         }}
       >
         <Tab title='Create new playlist' overrides={tabOverrides}>
@@ -109,23 +114,23 @@ const PlaylistPage = ({
         </Tab>
         <Tab title='Use existing playlist' overrides={tabOverrides}>
           <PlaylistSelect
-            playlists={playlists} selectedPlaylist={selectedPlaylist} setSelectedPlaylist={setSelectedPlaylist}
-            listPlaylists={listPlaylists} listing={listing}
+            playlists={playlists}
+            selectedPlaylist={selectedPlaylist} setSelectedPlaylist={setSelectedPlaylist}
+            setPlaylistData={setPlaylistData} listPlaylists={listPlaylists} listing={listing}
           />
         </Tab>
       </Tabs>
+      {playlistOkay
+        ? <AddToPlaylist
+            files={files} uploads={uploads} playlistData={playlistData}
+            videoPlaylist={videoPlaylist} setVideoPlaylist={setVideoPlaylist}
+          />
+        : null}
+
       {prevNextButtons({
         current,
         setCurrent,
-        nextProps: {
-          kind: nextOkay ? KIND.primary : KIND.secondary,
-          onClick: () => {
-            if (playlistTitle.tabIndex === 1 && selectedPlaylist[0]) {
-              storeSelected(selectedPlaylist[0])
-            }
-            setCurrent(current + 1)
-          }
-        }
+        nextProps: { kind: playlistOkay ? KIND.primary : KIND.secondary }
       })}
     </>
   )

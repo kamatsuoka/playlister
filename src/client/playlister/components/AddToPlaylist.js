@@ -5,7 +5,6 @@ import { Label1 } from 'baseui/typography'
 import { useSnackbar } from 'baseui/snackbar'
 import { showError } from '../util/showError'
 import { useStyletron } from 'baseui'
-import prevNextButtons from './PrevNextButtons'
 import { TableBuilder, TableBuilderColumn } from 'baseui/table-semantic'
 import { tableOverrides } from './TableOverrides'
 import { displayDate } from '../util/dates'
@@ -13,8 +12,8 @@ import { displayDate } from '../util/dates'
 /**
  * Adds videos to playlist
  */
-const AddToPlaylistPage = ({
-  current, setCurrent, playlistData, files, uploads, videoPlaylist, setVideoPlaylist
+const AddToPlaylist = ({
+  playlistData, files, uploads, videoPlaylist, setVideoPlaylist
 }) => {
   const [, theme] = useStyletron()
   const [adding, setAdding] = useState(false)
@@ -75,7 +74,9 @@ const AddToPlaylistPage = ({
 
   return (
     <>
-      <Label1>{playlistData.title}</Label1>
+      <Label1 paddingLeft={theme.sizing.scale200} style={{ textAlign: 'center', textDecoration: 'underline' }}>
+        {playlistData.title}
+      </Label1>
       <TableBuilder data={files} overrides={tableOverrides}>
         <TableBuilderColumn overrides={columnOverrides} header='Title'>
           {row => uploads[row.fileId].title}
@@ -97,9 +98,8 @@ const AddToPlaylistPage = ({
         </TableBuilderColumn>
       </TableBuilder>
       {showAddButton()}
-      {prevNextButtons({ current, setCurrent })}
     </>
   )
 }
 
-export default AddToPlaylistPage
+export default AddToPlaylist

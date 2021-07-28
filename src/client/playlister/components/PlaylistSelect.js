@@ -5,7 +5,10 @@ import { faSyncAlt } from '@fortawesome/free-solid-svg-icons'
 import { Select } from 'baseui/select'
 import React from 'react'
 
-const PlaylistSelect = ({ playlists, selectedPlaylist, setSelectedPlaylist, listPlaylists, listing }) => {
+const PlaylistSelect = ({
+  playlists, selectedPlaylist, setSelectedPlaylist,
+  setPlaylistData, listPlaylists, listing
+}) => {
   const syncButtonOverrides = {
     Root: {
       style: ({ $theme }) => ({
@@ -38,7 +41,7 @@ const PlaylistSelect = ({ playlists, selectedPlaylist, setSelectedPlaylist, list
       flexGridColumnGap='scale100'
       flexGridRowGap='scale800'
       marginTop='scale600'
-      marginBottom='scale2400'
+      marginBottom='scale1200'
     >
       <FlexGridItem {...itemProps} style={{ flexGrow: 0, flexShrink: 1, flexBasis: '0%' }}>
         <Button
@@ -58,6 +61,8 @@ const PlaylistSelect = ({ playlists, selectedPlaylist, setSelectedPlaylist, list
           onChange={({ value }) => {
             console.log('in recent playlists onChange: value = ', value)
             setSelectedPlaylist(value)
+            // recall that selected value is actually an array (baseui...)
+            setPlaylistData(value[0])
           }}
           isLoading={listing}
           options={playlists}
