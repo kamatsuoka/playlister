@@ -7,7 +7,7 @@ import React from 'react'
 
 const PlaylistSelect = ({
   playlists, selectedPlaylist, setSelectedPlaylist,
-  setPlaylistData, listPlaylists, listing
+  setPlaylist, listPlaylists, listing
 }) => {
   const syncButtonOverrides = {
     Root: {
@@ -62,7 +62,7 @@ const PlaylistSelect = ({
             console.log('in recent playlists onChange: value = ', value)
             setSelectedPlaylist(value)
             // recall that selected value is actually an array (baseui...)
-            setPlaylistData(value[0])
+            setPlaylist(value[0])
           }}
           isLoading={listing}
           options={playlists}

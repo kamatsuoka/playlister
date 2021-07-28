@@ -17,8 +17,8 @@ const CUSTOM = 'custom'
 const PlaylistCreate = ({
   eventData, orgInfo, cameraInfo,
   createdPlaylist, setCreatedPlaylist,
-  playlistResource, uploadedFileIds,
-  playlistData, setPlaylistData,
+  resourceToPlaylist, uploadedFileIds,
+  playlist, setPlaylist,
   playlistTitle, setPlaylistTitle
 }) => {
   const [css, theme] = useStyletron()
@@ -48,15 +48,15 @@ const PlaylistCreate = ({
   /**
    * Success handler for creating/finding a playlist
    */
-  const playlistSuccess = verb => playlist => {
-    if (playlist.id) {
-      const created = playlistResource(playlist)
+  const playlistSuccess = verb => plist => {
+    if (plist.id) {
+      const created = resourceToPlaylist(plist)
       setCreatedPlaylist(created)
-      setPlaylistData(created)
+      setPlaylist(created)
       enqueue({ message: `${verb} playlist: ${created.title}` })
       console.log(`${verb} playlist: `, created)
     } else {
-      showError(enqueue, 'Unexpected response: ' + JSON.stringify(playlist))
+      showError(enqueue, 'Unexpected response: ' + JSON.stringify(plist))
     }
     setCreating(false)
   }
@@ -78,12 +78,12 @@ const PlaylistCreate = ({
    */
   function findOrCreatePlaylist () {
     setCreatedPlaylist({})
-    setPlaylistData({})
+    setPlaylist({})
     setCreating(true)
     const title = desiredTitle
-    const successHandler = playlist => {
-      if (playlist) {
-        return playlistSuccess('found')(playlist)
+    const successHandler = plist => {
+      if (plist) {
+        return playlistSuccess('found')(plist)
       } else {
         return createPlaylist(title)
       }
@@ -105,8 +105,8 @@ const PlaylistCreate = ({
   }
 
   const playlistWasCreated = () =>
-    playlistData.title && createdPlaylist.title === playlistData.title &&
-    playlistData.title === desiredTitle
+    playlist.title && createdPlaylist.title === playlist.title &&
+    playlist.title === desiredTitle
 
   const buttonOverrides = {
     Root: {

@@ -10,9 +10,8 @@ import PlaylistSelect from './PlaylistSelect'
 import AddToPlaylist from './AddToPlaylist'
 
 /**
- * Shows event data form:
- * - event date (defaults to date inferred from video start time)
- * Shows suggested playlist as [inferred date] + [event type]
+ * Create new or find existing playlist.
+ * Add uploaded videos to playlist.
  */
 const PlaylistPage = ({
   current, setCurrent,
@@ -22,11 +21,11 @@ const PlaylistPage = ({
   playlists, setPlaylists,
   selectedPlaylist, setSelectedPlaylist,
   createdPlaylist, setCreatedPlaylist,
-  playlistData, setPlaylistData,
+  playlist, setPlaylist,
   videoPlaylist, setVideoPlaylist
 }) => {
   /**
-   * playlistData:
+   * playlist:
    * - id
    * - title
    * - itemCount
@@ -38,16 +37,16 @@ const PlaylistPage = ({
   const { enqueue } = useSnackbar()
 
   /**
-   * Gets properties of interest from youtube Playlist resource
+   * Gets playlist properties of interest from youtube Playlist resource
    *
    * https://developers.google.com/youtube/v3/docs/playlists#resource
    */
-  const playlistResource = playlist => ({
-    playlistId: playlist.id,
-    title: playlist.snippet.title,
-    itemCount: playlist.contentDetails.itemCount,
-    publishedAt: playlist.snippet.publishedAt,
-    description: playlist.snippet.description
+  const resourceToPlaylist = plist => ({
+    playlistId: plist.id,
+    title: plist.snippet.title,
+    itemCount: plist.contentDetails.itemCount,
+    publishedAt: plist.snippet.publishedAt,
+    description: plist.snippet.description
   })
 
   /**
@@ -64,7 +63,7 @@ const PlaylistPage = ({
   function listPlaylists () {
     setListing(true)
     const successHandler = playlists => {
-      setPlaylists(playlists.map(playlistResource))
+      setPlaylists(playlists.map(resourceToPlaylist))
       setListing(false)
     }
     try {
@@ -97,9 +96,9 @@ const PlaylistPage = ({
             return listPlaylists()
           }
           if (activeKey === '0' && Object.keys(createdPlaylist).length > 0) {
-            setPlaylistData(createdPlaylist)
+            setPlaylist(createdPlaylist)
           } else if (activeKey === '1' && Object.keys(selectedPlaylist[0]).length > 0) {
-            setPlaylistData(selectedPlaylist[0])
+            setPlaylist(selectedPlaylist[0])
           }
         }}
       >
@@ -107,8 +106,8 @@ const PlaylistPage = ({
           <PlaylistCreate
             eventData={eventData} orgInfo={orgInfo} cameraInfo={cameraInfo}
             createdPlaylist={createdPlaylist} setCreatedPlaylist={setCreatedPlaylist}
-            playlistResource={playlistResource} uploadedFileIds={uploadedFileIds}
-            playlistData={playlistData} setPlaylistData={setPlaylistData}
+            resourceToPlaylist={resourceToPlaylist} uploadedFileIds={uploadedFileIds}
+            playlist={playlist} setPlaylist={setPlaylist}
             playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
           />
         </Tab>
@@ -116,13 +115,13 @@ const PlaylistPage = ({
           <PlaylistSelect
             playlists={playlists}
             selectedPlaylist={selectedPlaylist} setSelectedPlaylist={setSelectedPlaylist}
-            setPlaylistData={setPlaylistData} listPlaylists={listPlaylists} listing={listing}
+            setPlaylist={setPlaylist} listPlaylists={listPlaylists} listing={listing}
           />
         </Tab>
       </Tabs>
       {playlistOkay
         ? <AddToPlaylist
-            files={files} uploads={uploads} playlistData={playlistData}
+            files={files} uploads={uploads} playlist={playlist}
             videoPlaylist={videoPlaylist} setVideoPlaylist={setVideoPlaylist}
           />
         : null}

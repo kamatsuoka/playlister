@@ -24,13 +24,13 @@ dayjs.extend(utc)
 /**
  * List of videos with old and new titles
  */
-const VideoList = ({ uploads, setUploads, playlistData, videoNaming }) => {
+const VideoList = ({ uploads, setUploads, playlist, videoNaming }) => {
   const [cameraViews, setCameraViews] = useState({})
   const [renaming, setRenaming] = useState(new Set())
   const { enqueue } = useSnackbar()
 
-  const date = playlistData.eventDate
-  const startIndex = parseInt(playlistData.itemCount || 0) + 1 + parseInt(videoNaming.indexOffset)
+  const date = playlist.eventDate
+  const startIndex = parseInt(playlist.itemCount || 0) + 1 + parseInt(videoNaming.indexOffset)
   const pad = (n) => n < 10 ? `0${n}` : `${n}`
 
   const getNewTitle = (row, index) => {

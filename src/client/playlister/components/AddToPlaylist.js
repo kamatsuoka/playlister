@@ -16,7 +16,7 @@ import { displayDate } from '../util/dates'
  * The insert api seems to ignore the 'position' param.
  */
 const AddToPlaylist = ({
-  playlistData, files, uploads, videoPlaylist, setVideoPlaylist
+  playlist, files, uploads, videoPlaylist, setVideoPlaylist
 }) => {
   const [, theme] = useStyletron()
   const [adding, setAdding] = useState(false)
@@ -40,7 +40,7 @@ const AddToPlaylist = ({
       showError(enqueue, err)
     }
     youtube.insertPlaylistItem(
-      videoId, playlistData.playlistId, successHandler, failureHandler
+      videoId, playlist.playlistId, successHandler, failureHandler
     )
   }
 
@@ -80,7 +80,7 @@ const AddToPlaylist = ({
   return (
     <>
       <Label1 paddingLeft={theme.sizing.scale200} style={{ textAlign: 'center', textDecoration: 'underline' }}>
-        {playlistData.title}
+        {playlist.title}
       </Label1>
       <TableBuilder data={files} overrides={tableOverrides}>
         <TableBuilderColumn overrides={columnOverrides} header='Title'>
@@ -92,7 +92,7 @@ const AddToPlaylist = ({
         <TableBuilderColumn overrides={columnOverrides} header='Added'>
           {row => {
             const playlistId = videoPlaylist[uploads[row.fileId].videoId]
-            if (playlistId === playlistData.playlistId) {
+            if (playlistId === playlist.playlistId) {
               return 'Yes'
             }
             return null

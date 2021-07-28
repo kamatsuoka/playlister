@@ -55,8 +55,8 @@ function App () {
    * baseui select api -- https://baseweb.design/components/select/#select-basic-usage
    */
   const [selectedPlaylist, setSelectedPlaylist] = useState([])
-  // metadata about found / created playlist
-  const [playlistData, setPlaylistData] = useState({})
+  // found / created playlist
+  const [playlist, setPlaylist] = useState({})
   // adjustments to video start/end time, in case camera doesn't record time zone etc.
   const [timeAdjust, setTimeAdjust] = useState({
     year: 0, month: 0, day: 0, hour: 0, minute: 0, second: 0
@@ -119,7 +119,7 @@ function App () {
                 playlists={playlists} setPlaylists={setPlaylists}
                 selectedPlaylist={selectedPlaylist} setSelectedPlaylist={setSelectedPlaylist}
                 createdPlaylist={createdPlaylist} setCreatedPlaylist={setCreatedPlaylist}
-                playlistData={playlistData} setPlaylistData={setPlaylistData}
+                playlist={playlist} setPlaylist={setPlaylist}
                 videoPlaylist={videoPlaylist} setVideoPlaylist={setVideoPlaylist}
               />
             </Step>
@@ -127,7 +127,7 @@ function App () {
               <VideoPage
                 current={5} setCurrent={setCurrent} files={files}
                 uploads={uploads} setUploads={setUploads}
-                playlistData={playlistData} setActiveKey={setCurrent}
+                playlist={playlist} setActiveKey={setCurrent}
                 newTitles={newTitles} setNewTitles={setNewTitles}
               />
             </Step>
