@@ -48,6 +48,10 @@ function App () {
   // list of (hopefully) recent playlists
   const [playlists, setPlaylists] = useState([])
   /**
+   * Playlist created by clicking Create
+   */
+  const [createdPlaylist, setCreatedPlaylist] = useState({})
+  /**
    * selectedPlaylist is an array of 0 - 1 elements b/c of
    * Select api -- https://baseweb.design/components/select/#select-basic-usage
    */
@@ -111,10 +115,11 @@ function App () {
               <PlaylistPage
                 current={3} setCurrent={setCurrent}
                 orgInfo={orgInfo} cameraInfo={cameraInfo}
-                uploads={uploads} eventData={eventData}
+                files={files} uploads={uploads} eventData={eventData}
                 playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
                 playlists={playlists} setPlaylists={setPlaylists}
                 selectedPlaylist={selectedPlaylist} setSelectedPlaylist={setSelectedPlaylist}
+                createdPlaylist={createdPlaylist} setCreatedPlaylist={setCreatedPlaylist}
                 playlistData={playlistData} setPlaylistData={setPlaylistData}
               />
             </Step>

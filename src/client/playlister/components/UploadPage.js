@@ -85,7 +85,7 @@ const UploadPage = ({ current, setCurrent, files, uploads, setUploads }) => {
       />
       <Button
         style={{ marginTop: '10px' }}
-        size={SIZE.compact} disabled={files.length === 0}
+        size={SIZE.small} disabled={files.length === 0}
         isLoading={checkingStatus}
         kind={allChecked ? KIND.secondary : KIND.primary}
         onClick={checkUploadStatus}

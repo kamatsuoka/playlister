@@ -1,21 +1,12 @@
 import React, { useCallback, useState } from 'react'
-import { Button, KIND, SIZE } from 'baseui/button'
-import { KIND as NKind, Notification } from 'baseui/notification'
+import { KIND } from 'baseui/button'
 import * as youtube from '../youtube/api'
-import PlaylistTitle, { CUSTOM, SUGGESTED } from './PlaylistTitle'
 import { useSnackbar } from 'baseui/snackbar'
 import { errorMessage, showError } from '../util/showError'
-import { DEFAULT_DATE } from './EventDate'
-import { useStyletron } from 'baseui'
 import { Tab, Tabs } from 'baseui/tabs-motion'
-import { Select } from 'baseui/select'
 import prevNextButtons from './PrevNextButtons'
-import { faSyncAlt } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { FlexGrid, FlexGridItem } from 'baseui/flex-grid'
-
-const ACTION_CREATE = 'create'
-const ACTION_LIST = 'list'
+import PlaylistCreate from './PlaylistCreate'
+import PlaylistSelect from './PlaylistSelect'
 
 /**
  * Shows event data form:
@@ -25,10 +16,11 @@ const ACTION_LIST = 'list'
 const PlaylistPage = ({
   current, setCurrent,
   orgInfo, cameraInfo,
-  eventData, uploads,
+  eventData, files, uploads,
   playlistTitle, setPlaylistTitle,
   playlists, setPlaylists,
   selectedPlaylist, setSelectedPlaylist,
+  createdPlaylist, setCreatedPlaylist,
   playlistData, setPlaylistData
 }) => {
   /**
@@ -39,21 +31,9 @@ const PlaylistPage = ({
    * - publishedAt
    * - description
    */
-  const [css, theme] = useStyletron()
   const [listing, setListing] = useState(false)
-  const [creating, setCreating] = useState(false)
-  /**
-   * Playlist created by clicking Create
-   */
-  const [createdPlaylist, setCreatedPlaylist] = useState({})
 
   const { enqueue } = useSnackbar()
-
-  const eventDate = eventData.dateChoice === DEFAULT_DATE ? eventData.defaultDate : eventData.customDate
-
-  const titleParts = [orgInfo.orgName, eventDate, eventData.eventType, 'cam', cameraInfo.cameraNumber]
-  const suggestedTitle = titleParts.filter(p => p).join(' ')
-  const desiredTitle = playlistTitle.titleChoice === CUSTOM ? playlistTitle.customTitle : suggestedTitle
 
   /**
    * Gets properties of interest from youtube Playlist resource
@@ -69,36 +49,11 @@ const PlaylistPage = ({
   })
 
   /**
-   * Success handler for creating a playlist
+   * Failure handler for listing playlists
    */
-  const playlistSuccess = playlist => {
-    if (playlist.id) {
-      const created = playlistResource(playlist)
-      setCreatedPlaylist(created)
-      setPlaylistData(created)
-      console.log('created: ', created)
-    } else {
-      showError(enqueue, 'Unexpected response: ' + JSON.stringify(playlist))
-    }
-    setCreating(false)
-  }
-
-  /**
-   * Failure handler for creating or finding a playlist
-   */
-  const playlistFailure = action => err => {
-    let verb = ''
-    if (action === ACTION_CREATE) {
-      setCreating(false)
-      verb = 'creating'
-    } else if (action === ACTION_LIST) {
-      setListing(false)
-      verb = 'listing'
-    } else {
-      console.log(`playlistFailure: unexpected action: ${action}`)
-      return
-    }
-    showError(enqueue, `Error ${verb} playlist: ${errorMessage(err)}`)
+  const playlistFailure = err => {
+    setListing(false)
+    showError(enqueue, `Error listing playlists: ${errorMessage(err)}`)
   }
 
   /**
@@ -110,156 +65,12 @@ const PlaylistPage = ({
       setPlaylists(playlists.map(playlistResource))
       setListing(false)
     }
-    const failureHandler = playlistFailure(ACTION_LIST)
     try {
-      return youtube.listPlaylists(successHandler, failureHandler)
+      return youtube.listPlaylists(successHandler, playlistFailure)
     } catch (e) {
-      failureHandler(e)
+      playlistFailure(e)
     }
   }
-
-  function createPlaylist () {
-    setCreatedPlaylist({})
-    setPlaylistData({})
-    setCreating(true)
-    try {
-      youtube.insertPlaylist(
-        desiredTitle,
-        eventDate,
-        playlistSuccess,
-        playlistFailure(ACTION_CREATE)
-      )
-    } catch (e) {
-      playlistFailure(ACTION_CREATE)(e)
-    }
-  }
-
-  const isValidTitle = () => {
-    if (playlistTitle.titleChoice === SUGGESTED) {
-      return suggestedTitle !== ''
-    } else {
-      return playlistTitle.customTitle !== ''
-    }
-  }
-
-  const playlistWasCreated = () =>
-    playlistData.title && createdPlaylist.title === playlistData.title &&
-    playlistData.title === desiredTitle
-
-  const notifOverrides = {
-    Body: {
-      style: ({
-        marginLeft: theme.sizing.scale600,
-        width: 'auto',
-        alignItems: 'center'
-      })
-    }
-  }
-
-  const showCreateStatus = () => {
-    if (playlistTitle.tabIndex === 0 && playlistWasCreated()) {
-      return (
-        <Notification kind={NKind.positive} overrides={notifOverrides}>
-          Playlist created: {createdPlaylist.title}
-        </Notification>
-      )
-    }
-    return null
-  }
-
-  const buttonOverrides = {
-    Root: {
-      style: ({
-        marginTop: theme.sizing.scale100,
-        marginBottom: theme.sizing.scale600
-      })
-    }
-  }
-
-  const syncButtonOverrides = {
-    Root: {
-      style: ({
-        paddingLeft: theme.sizing.scale200,
-        paddingRight: theme.sizing.scale200
-      })
-    }
-  }
-
-  //       <div className={css({ display: 'inline-flex', alignItems: 'center' })}>
-
-  const itemProps = {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center'
-  }
-
-  const wideItemProps = {
-    ...itemProps,
-    overrides: {
-      Block: {
-        style: ({ $theme }) => ({
-          width: `calc((150% - ${$theme.sizing.scale800}) / 4)`
-        })
-      }
-    }
-  }
-
-  const showList = () => (
-    <FlexGrid
-      flexGridColumnCount={2}
-      flexGridColumnGap='scale100'
-      flexGridRowGap='scale800'
-      marginTop='scale600'
-      marginBottom='scale2400'
-    >
-      <FlexGridItem {...itemProps} style={{ flexGrow: 0, flexShrink: 1, flexBasis: '0%' }}>
-        <Button
-          onClick={listPlaylists}
-          size={SIZE.small}
-          kind={KIND.minimal}
-          isLoading={listing}
-          overrides={syncButtonOverrides}
-          style={{ verticalAlign: 'middle' }}
-        >
-          <FontAwesomeIcon className='fa-padded' icon={faSyncAlt} size='lg' style={{ paddingRight: '5px' }} />
-        </Button>
-      </FlexGridItem>
-      <FlexGridItem {...wideItemProps}>
-        <Select
-          value={selectedPlaylist}
-          onChange={({ value }) => {
-            console.log('in recent playlists onChange: value = ', value)
-            setSelectedPlaylist(value)
-          }}
-          isLoading={listing}
-          options={playlists}
-          valueKey='playlistId'
-          labelKey='title'
-          clearable={false}
-        />
-      </FlexGridItem>
-    </FlexGrid>
-  )
-
-  const showCreate = () => (
-    <div className={css({ marginTop: theme.sizing.scale400 })}>
-      <PlaylistTitle
-        eventData={eventData}
-        files={uploads} suggestedTitle={suggestedTitle}
-        playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
-      />
-      <Button
-        onClick={() => createPlaylist()}
-        size={SIZE.compact}
-        kind={playlistWasCreated() ? KIND.secondary : KIND.primary}
-        isLoading={creating}
-        disabled={uploads.length === 0 || !isValidTitle()}
-        overrides={buttonOverrides}
-      >
-        Create
-      </Button>
-    </div>
-  )
 
   const storeSelected = useCallback(playlist => setPlaylistData(playlist), [playlistData])
 
@@ -274,6 +85,8 @@ const PlaylistPage = ({
     }
   }
 
+  const uploadedFileIds = files.map(file => file.fileId).filter(fileId => uploads[fileId])
+
   return (
     <>
       <Tabs
@@ -286,13 +99,21 @@ const PlaylistPage = ({
         }}
       >
         <Tab title='Create new playlist' overrides={tabOverrides}>
-          {showCreate()}
+          <PlaylistCreate
+            eventData={eventData} orgInfo={orgInfo} cameraInfo={cameraInfo}
+            createdPlaylist={createdPlaylist} setCreatedPlaylist={setCreatedPlaylist}
+            playlistResource={playlistResource} uploadedFileIds={uploadedFileIds}
+            playlistData={playlistData} setPlaylistData={setPlaylistData}
+            playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
+          />
         </Tab>
         <Tab title='Use existing playlist' overrides={tabOverrides}>
-          {showList()}
+          <PlaylistSelect
+            playlists={playlists} selectedPlaylist={selectedPlaylist} setSelectedPlaylist={setSelectedPlaylist}
+            listPlaylists={listPlaylists} listing={listing}
+          />
         </Tab>
       </Tabs>
-      {showCreateStatus()}
       {prevNextButtons({
         current,
         setCurrent,
