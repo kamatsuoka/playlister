@@ -8,9 +8,11 @@ import { errorMessage, showError } from '../util/showError'
 import { DEFAULT_DATE } from './EventDate'
 import { useStyletron } from 'baseui'
 import { Tab, Tabs } from 'baseui/tabs-motion'
-import { FormControl } from 'baseui/form-control'
 import { Select } from 'baseui/select'
 import prevNextButtons from './PrevNextButtons'
+import { faSyncAlt } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { FlexGrid, FlexGridItem } from 'baseui/flex-grid'
 
 const ACTION_CREATE = 'create'
 const ACTION_LIST = 'list'
@@ -168,15 +170,61 @@ const PlaylistPage = ({
   const buttonOverrides = {
     Root: {
       style: ({
-        marginTop: theme.sizing.scale600,
+        marginTop: theme.sizing.scale100,
         marginBottom: theme.sizing.scale600
       })
     }
   }
 
+  const syncButtonOverrides = {
+    Root: {
+      style: ({
+        paddingLeft: theme.sizing.scale200,
+        paddingRight: theme.sizing.scale200
+      })
+    }
+  }
+
+  //       <div className={css({ display: 'inline-flex', alignItems: 'center' })}>
+
+  const itemProps = {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+  }
+
+  const wideItemProps = {
+    ...itemProps,
+    overrides: {
+      Block: {
+        style: ({ $theme }) => ({
+          width: `calc((150% - ${$theme.sizing.scale800}) / 4)`
+        })
+      }
+    }
+  }
+
   const showList = () => (
-    <>
-      <FormControl label='recent playlists'>
+    <FlexGrid
+      flexGridColumnCount={2}
+      flexGridColumnGap='scale100'
+      flexGridRowGap='scale800'
+      marginTop='scale600'
+      marginBottom='scale2400'
+    >
+      <FlexGridItem {...itemProps} style={{ flexGrow: 0, flexShrink: 1, flexBasis: '0%' }}>
+        <Button
+          onClick={listPlaylists}
+          size={SIZE.small}
+          kind={KIND.minimal}
+          isLoading={listing}
+          overrides={syncButtonOverrides}
+          style={{ verticalAlign: 'middle' }}
+        >
+          <FontAwesomeIcon className='fa-padded' icon={faSyncAlt} size='lg' style={{ paddingRight: '5px' }} />
+        </Button>
+      </FlexGridItem>
+      <FlexGridItem {...wideItemProps}>
         <Select
           value={selectedPlaylist}
           onChange={({ value }) => {
@@ -189,22 +237,12 @@ const PlaylistPage = ({
           labelKey='title'
           clearable={false}
         />
-      </FormControl>
-      <div className={css({ display: 'inline-flex', alignItems: 'center' })}>
-        <Button
-          onClick={listPlaylists}
-          size={SIZE.compact}
-          isLoading={listing}
-          overrides={buttonOverrides}
-        >
-          Refresh
-        </Button>
-      </div>
-    </>
+      </FlexGridItem>
+    </FlexGrid>
   )
 
   const showCreate = () => (
-    <>
+    <div className={css({ marginTop: theme.sizing.scale400 })}>
       <PlaylistTitle
         eventData={eventData}
         files={uploads} suggestedTitle={suggestedTitle}
@@ -220,7 +258,7 @@ const PlaylistPage = ({
       >
         Create
       </Button>
-    </>
+    </div>
   )
 
   const storeSelected = useCallback(playlist => setPlaylistData(playlist), [playlistData])

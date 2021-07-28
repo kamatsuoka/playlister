@@ -69,7 +69,7 @@ const PlaylistTitle = ({ suggestedTitle, playlistTitle, setPlaylistTitle }) => {
         align={ALIGN.horizontal}
       >
         <Radio value={SUGGESTED} overrides={radioOverrides}>
-          <FormControl caption='suggested title'>
+          <FormControl caption='suggested'>
             <Input
               value={suggestedTitle}
               readOnly
@@ -78,7 +78,7 @@ const PlaylistTitle = ({ suggestedTitle, playlistTitle, setPlaylistTitle }) => {
           </FormControl>
         </Radio>
         <Radio value={CUSTOM} overrides={radioOverrides}>
-          <FormControl caption='custom title'>
+          <FormControl caption='custom'>
             <Input
               value={playlistTitle.customTitle || ''}
               placeholder='custom title'
