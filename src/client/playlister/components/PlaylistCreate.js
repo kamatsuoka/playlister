@@ -46,15 +46,15 @@ const PlaylistCreate = ({
   }
 
   /**
-   * Success handler for creating a playlist
+   * Success handler for creating/finding a playlist
    */
-  const playlistSuccess = playlist => {
+  const playlistSuccess = verb => playlist => {
     if (playlist.id) {
       const created = playlistResource(playlist)
       setCreatedPlaylist(created)
       setPlaylistData(created)
-      enqueue({ message: `created playlist: ${created.title}` })
-      console.log('created: ', created)
+      enqueue({ message: `${verb} playlist: ${created.title}` })
+      console.log(`${verb} playlist: `, created)
     } else {
       showError(enqueue, 'Unexpected response: ' + JSON.stringify(playlist))
     }
@@ -62,56 +62,51 @@ const PlaylistCreate = ({
   }
 
   /**
-   * Failure handler for creating playlist
+   * Failure handler for creating/finding playlist
    */
-  const playlistFailure = err => {
+  const playlistFailure = verb => err => {
     setCreating(false)
-    showError(enqueue, `Error creating playlist: ${errorMessage(err)}`)
+    showError(enqueue, `Error ${verb} playlist: ${errorMessage(err)}`)
   }
 
   const desiredTitle = playlistTitle.titleChoice === CUSTOM ? playlistTitle.customTitle : suggestedTitle
 
-  function createPlaylist () {
+  /**
+   * Checks for existing playlist with desired name.
+   * If found, store it as the 'created' playlist.
+   * If not, create a new playlist and store it.
+   */
+  function findOrCreatePlaylist () {
     setCreatedPlaylist({})
     setPlaylistData({})
     setCreating(true)
+    const title = desiredTitle
+    const successHandler = playlist => {
+      if (playlist) {
+        return playlistSuccess('found')(playlist)
+      } else {
+        return createPlaylist(title)
+      }
+    }
     try {
-      youtube.insertPlaylist(
-        desiredTitle,
-        eventDate,
-        playlistSuccess,
-        playlistFailure
+      return youtube.findPlaylist(title, successHandler, playlistFailure('finding'))
+    } catch (e) {
+      playlistFailure('finding')(e)
+    }
+  }
+
+  function createPlaylist (title) {
+    try {
+      return youtube.insertPlaylist(title, playlistSuccess('created'), playlistFailure('creating')
       )
     } catch (e) {
-      playlistFailure(e)
+      playlistFailure('creating')(e)
     }
   }
 
   const playlistWasCreated = () =>
     playlistData.title && createdPlaylist.title === playlistData.title &&
     playlistData.title === desiredTitle
-
-  const notifOverrides = {
-    Body: {
-      style: ({
-        width: 'fit-content',
-        alignItems: 'center'
-      })
-    }
-  }
-
-/*
-  const showCreateStatus = () => {
-    if (playlistTitle.tabIndex === 0 && playlistWasCreated()) {
-      return (
-        <Notification kind={NKind.positive} overrides={notifOverrides}>
-          Playlist created: {createdPlaylist.title}
-        </Notification>
-      )
-    }
-    return null
-  }
-*/
 
   const buttonOverrides = {
     Root: {
@@ -143,8 +138,8 @@ const PlaylistCreate = ({
 
   const inputOverrides = {
     Root: {
-      style: ({ $theme }) => ({
-        minWidth: '250px' // $theme.sizing.scale4800
+      style: ({
+        minWidth: '250px'
       })
     }
   }
@@ -164,7 +159,7 @@ const PlaylistCreate = ({
     <>
       <Block className={css({ alignItems: 'start', display: 'flex', marginTop: theme.sizing.scale200 })}>
         <Button
-          onClick={() => createPlaylist()}
+          onClick={() => findOrCreatePlaylist()}
           size={SIZE.small}
           kind={playlistWasCreated() ? KIND.secondary : KIND.primary}
           isLoading={creating}

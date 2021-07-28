@@ -5,7 +5,7 @@
  * gapi.client.youtube.* functions if we're running as a regular web app.
  */
 
-import { gapi, getAppsScriptRun } from '../util/auth'
+import { getAppsScriptRun } from '../util/auth'
 import dayjs from 'dayjs'
 
 /**
@@ -25,9 +25,9 @@ export const findPlaylist = (title, onSuccess, onFailure) => {
       .withFailureHandler(onFailure)
       .findMyPlaylist(title)
   } else {
-    return searchPlaylists(title)
-      .then(onSuccess)
-      .catch(onFailure)
+    return new Promise(resolve => {
+      return resolve(undefined)
+    }).then(onSuccess).catch(onFailure)
   }
 }
 
@@ -64,51 +64,10 @@ export const listPlaylists = (onSuccess, onFailure) => {
       samplePlaylist('jklm', 'recent playlist 2 with longer title', 'sample playlist 2', 2, '2021-05-25T00:12:34Z'),
       samplePlaylist('zxcv', 'short title', 'sample playlist 1', 3, '2021-03-25T00:12:34Z')
     ]
-    return new Promise((resolve, reject) => {
+    return new Promise(resolve => {
       return resolve(playlists)
     }).then(onSuccess).catch(onFailure)
   }
-}
-
-/**
- * Finds existing item with same name
- */
-const findMatchingItem = (response, title) => {
-  console.log('findMatchingItem: response', response)
-  const items = response && response.result ? response.result.items : []
-  const matchingPlaylists = items.filter(i => i.snippet.title === title)
-  if (matchingPlaylists && matchingPlaylists[0]) {
-    return matchingPlaylists[0]
-  }
-  return null
-}
-
-/**
- * Searches my channel playlist with a given title,
- * optionally using a page token to continue an earlier search.
- *
- * @returns Promise
- */
-const searchPlaylists = (title, pageToken = '') => {
-  const request = {
-    part: 'snippet,contentDetails',
-    mine: true,
-    maxResults: 50
-  }
-  if (pageToken !== '') { request.pageToken = pageToken }
-
-  return gapi.client.youtube.playlists.list(request).then(
-    response => {
-      const playlist = findMatchingItem(response, title)
-      if (playlist) {
-        return playlist
-      } else if (response.result.nextPageToken) {
-        return searchPlaylists(title, response.result.nextPageToken)
-      } else {
-        return null
-      }
-    }
-  )
 }
 
 /**
@@ -117,7 +76,7 @@ const searchPlaylists = (title, pageToken = '') => {
  * I think that means we can't let the app create a playlist on our behalf
  * unless we're signed in as the account owner.
  */
-export function insertPlaylist (title, eventDate, onSuccess, onFailure) {
+export function insertPlaylist (title, onSuccess, onFailure) {
   const description = `created by playlister on ${dayjs().format()}`
   const run = getAppsScriptRun()
   if (run) {
@@ -138,7 +97,7 @@ export function insertPlaylist (title, eventDate, onSuccess, onFailure) {
         itemCount: 0
       }
     }
-    return new Promise((resolve, reject) => {
+    return new Promise(resolve => {
       return resolve(playlist)
     }).then(onSuccess).catch(onFailure)
   }
@@ -185,7 +144,7 @@ export const findUploads = (fileList, onSuccess, onFailure) => {
       duration: fd.duration,
       fileData: fd
     }))
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       return resolve(uploads)
     }).then(onSuccess).catch(onFailure)
   }
@@ -208,7 +167,7 @@ export const insertPlaylistItem = (videoId, playlistId, position, onSuccess, onF
         }
       }
     }
-    return new Promise((resolve, reject) => {
+    return new Promise(resolve => {
       return resolve(item)
     }).then(onSuccess).catch(onFailure)
   }
