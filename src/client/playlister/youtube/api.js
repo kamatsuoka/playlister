@@ -150,13 +150,13 @@ export const findUploads = (fileList, onSuccess, onFailure) => {
   }
 }
 
-export const insertPlaylistItem = (videoId, playlistId, position, onSuccess, onFailure) => {
+export const insertPlaylistItem = (videoId, playlistId, onSuccess, onFailure) => {
   const run = getAppsScriptRun()
   if (run) {
     return run
       .withSuccessHandler(onSuccess)
       .withFailureHandler(onFailure)
-      .insertPlaylistItem(videoId, playlistId, position)
+      .insertPlaylistItem(videoId, playlistId)
   } else {
     // for testing
     const item = {

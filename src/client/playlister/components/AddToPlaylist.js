@@ -10,7 +10,10 @@ import { tableOverrides } from './TableOverrides'
 import { displayDate } from '../util/dates'
 
 /**
- * Adds videos to playlist
+ * Adds videos to playlist.
+ *
+ * Youtube (as of July 2021) adds new playlist items to the end of the playlist.
+ * The insert api seems to ignore the 'position' param.
  */
 const AddToPlaylist = ({
   playlistData, files, uploads, videoPlaylist, setVideoPlaylist
@@ -21,13 +24,13 @@ const AddToPlaylist = ({
 
   const addToPlaylist = (videoIds, position) => {
     console.log(`addToPlaylist: ${videoIds.length} uploads, position ${position}`)
-    const videoId = videoIds.pop()
+    const videoId = videoIds.shift() // pop off head of array
     const successHandler = playlistItem => {
       const videoId = playlistItem.snippet.resourceId.videoId
       const playlistId = playlistItem.snippet.playlistId
       setVideoPlaylist(videoPlaylist => ({ ...videoPlaylist, [videoId]: playlistId }))
       if (videoIds.length > 0) {
-        addToPlaylist(videoIds, position + 1)
+        addToPlaylist(videoIds)
       } else {
         setAdding(false)
       }
@@ -37,13 +40,15 @@ const AddToPlaylist = ({
       showError(enqueue, err)
     }
     youtube.insertPlaylistItem(
-      videoId, playlistData.playlistId, position, successHandler, failureHandler
+      videoId, playlistData.playlistId, successHandler, failureHandler
     )
   }
 
   const addAllToPlaylist = () => {
     setAdding(true)
-    addToPlaylist(files.map(file => uploads[file.fileId].videoId), playlistData.itemCount)
+    // in the happy path, we insert all the videos into the playlist
+    // in the correct order and never have to go back and add more later
+    addToPlaylist(files.map(file => uploads[file.fileId].videoId))
   }
 
   const buttonOverrides = {

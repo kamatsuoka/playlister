@@ -197,11 +197,10 @@ export function updateTitle (videoId, title) {
  * @returns  YouTube.Schema.PlaylistItem
  * @see https://developers.google.com/youtube/v3/docs/playlistItems#resource
  */
-export function insertPlaylistItem (videoId, playlistId, position) {
+export function insertPlaylistItem (videoId, playlistId) {
   const resource = {
     snippet: {
       playlistId: playlistId,
-      position: position,
       resourceId: {
         kind: 'youtube#video',
         videoId: videoId
