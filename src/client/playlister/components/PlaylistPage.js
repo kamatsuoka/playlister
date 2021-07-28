@@ -23,7 +23,7 @@ const ACTION_LIST = 'list'
 const PlaylistPage = ({
   current, setCurrent,
   orgInfo, cameraInfo,
-  eventData, uploadList,
+  eventData, uploads,
   playlistTitle, setPlaylistTitle,
   playlists, setPlaylists,
   selectedPlaylist, setSelectedPlaylist,
@@ -207,7 +207,7 @@ const PlaylistPage = ({
     <>
       <PlaylistTitle
         eventData={eventData}
-        fileList={uploadList} suggestedTitle={suggestedTitle}
+        files={uploads} suggestedTitle={suggestedTitle}
         playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
       />
       <Button
@@ -215,7 +215,7 @@ const PlaylistPage = ({
         size={SIZE.compact}
         kind={playlistWasCreated() ? KIND.secondary : KIND.primary}
         isLoading={creating}
-        disabled={uploadList.length === 0 || !isValidTitle()}
+        disabled={uploads.length === 0 || !isValidTitle()}
         overrides={buttonOverrides}
       >
         Create

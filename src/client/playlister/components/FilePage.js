@@ -15,12 +15,12 @@ import prevNextButtons from './PrevNextButtons'
 const FilePage = ({
   current, setCurrent,
   mediaList, setMediaList,
-  fileList, setFileList,
+  files, setFiles,
   timeAdjust, setTimeAdjust,
   eventData, setEventData
 }) => {
   /**
-   * fileList items:
+   * files items:
    * - fileId
    * - name
    * - startTime
@@ -31,7 +31,7 @@ const FilePage = ({
   const [overrideTimeZone, setOverrideTimeZone] = useState(true)
   const [previewUrl, setPreviewUrl] = React.useState(null)
 
-  const startDates = getStartDates(fileList)
+  const startDates = getStartDates(files)
   const defaultDate = startDates[0]
   useEffect(() => {
     setEventData(({ ...eventData, defaultDate: defaultDate }))
@@ -78,7 +78,7 @@ const FilePage = ({
         <FileList
           mediaList={mediaList} setMediaList={setMediaList}
           overrideTimeZone={overrideTimeZone} timeAdjust={timeAdjust}
-          fileList={fileList} setFileList={setFileList}
+          files={files} setFiles={setFiles}
           setPreviewUrl={setPreviewUrl} eventData={eventData} setEventData={setEventData}
         />
         <TimeOffset

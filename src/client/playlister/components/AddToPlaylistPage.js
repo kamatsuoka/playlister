@@ -14,7 +14,7 @@ import { displayDate } from '../util/dates'
  * Adds videos to playlist
  */
 const AddToPlaylistPage = ({
-  current, setCurrent, playlistData, uploadList, videoPlaylist, setVideoPlaylist
+  current, setCurrent, playlistData, files, uploads, videoPlaylist, setVideoPlaylist
 }) => {
   const [, theme] = useStyletron()
   const [adding, setAdding] = useState(false)
@@ -44,7 +44,7 @@ const AddToPlaylistPage = ({
 
   const addAllToPlaylist = () => {
     setAdding(true)
-    addToPlaylist(uploadList.map(upload => upload.videoId), playlistData.itemCount)
+    addToPlaylist(files.map(file => uploads[file.fileId].videoId), playlistData.itemCount)
   }
 
   const buttonOverrides = {
@@ -76,16 +76,16 @@ const AddToPlaylistPage = ({
   return (
     <>
       <Label1>{playlistData.title}</Label1>
-      <TableBuilder data={uploadList} overrides={tableOverrides}>
+      <TableBuilder data={files} overrides={tableOverrides}>
         <TableBuilderColumn overrides={columnOverrides} header='Title'>
-          {row => row.title}
+          {row => uploads[row.fileId].title}
         </TableBuilderColumn>
         <TableBuilderColumn overrides={columnOverrides} header='Start Time'>
           {row => displayDate(row.startTime)}
         </TableBuilderColumn>
         <TableBuilderColumn overrides={columnOverrides} header='Added'>
           {row => {
-            const playlistId = videoPlaylist[row.videoId]
+            const playlistId = videoPlaylist[uploads[row.fileId].videoId]
             if (playlistId === playlistData.playlistId) {
               return 'Yes'
             }

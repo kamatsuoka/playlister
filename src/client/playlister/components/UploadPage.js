@@ -12,9 +12,9 @@ import prevNextButtons from './PrevNextButtons'
 /**
  * Page for uploading videos, or finding previously-uploaded videos for same files
  */
-const UploadPage = ({ current, setCurrent, fileList, uploadList, setUploadList }) => {
+const UploadPage = ({ current, setCurrent, files, uploads, setUploads }) => {
   /**
-   * uploadList items:
+   * uploads items, keyed by file id:
    * - videoId
    * - title
    * - publishedAt
@@ -31,19 +31,20 @@ const UploadPage = ({ current, setCurrent, fileList, uploadList, setUploadList }
   const { enqueue } = useSnackbar()
 
   const checkUploadStatus = useCallback(() => {
-    const fileIds = fileList.map(data => data.fileId)
+    const fileIds = files.map(data => data.fileId)
     setCheckingStatus(true)
-    const onSuccess = uploads => {
+    const onSuccess = foundUploads => {
       const dateNow = dayjs()
-      const recentUploads = uploads.filter(upload =>
+      const recentUploads = foundUploads.filter(upload =>
         dateNow.diff(dayjs(upload.publishedAt), 'days') < 30
-      ).map(upload => ({
-        videoId: upload.videoId,
-        title: upload.title,
-        publishedAt: upload.publishedAt,
-        ...upload.fileData
-      }))
-      setUploadList(recentUploads)
+      ).map(upload => [
+        upload.fileData.fileId, {
+          videoId: upload.videoId,
+          title: upload.title,
+          publishedAt: upload.publishedAt,
+          ...upload.fileData
+        }])
+      setUploads(Object.fromEntries(recentUploads))
       setCheckedFileIds(new Set(fileIds))
       setCheckingStatus(false)
     }
@@ -54,24 +55,19 @@ const UploadPage = ({ current, setCurrent, fileList, uploadList, setUploadList }
     }
 
     try {
-      return findUploads(fileList, onSuccess, onFailure)
+      return findUploads(files, onSuccess, onFailure)
     } catch (e) {
       onFailure(e)
     }
-  }, [enqueue, fileList, setCheckingStatus, setUploadList])
+  }, [enqueue, files, setCheckingStatus, setUploads])
 
-  const uploadedFileIds = new Set(
-    uploadList
-      .filter(upload => upload.videoId)
-      .map(upload => upload.fileId)
-  )
+  const uploadedFileIds = new Set(Object.keys(uploads).filter(fileId => uploads[fileId].videoId))
 
-  const allUploaded = fileList.length > 0 &&
-    fileList.map(data => data.fileId).every(fileId => uploadedFileIds.has(fileId))
+  const allUploaded = files.length > 0 &&
+    files.map(file => file.fileId).every(fileId => uploadedFileIds.has(fileId))
 
-  const allChecked =
-    fileList.length > 0 &&
-    fileList.map(data => data.fileId).every(fileId => checkedFileIds.has(fileId))
+  const allChecked = files.length > 0 &&
+    files.map(file => file.fileId).every(fileId => checkedFileIds.has(fileId))
 
   return (
     <>
@@ -84,12 +80,12 @@ const UploadPage = ({ current, setCurrent, fileList, uploadList, setUploadList }
         Either way, you'll need to check for your uploads by clicking the button below.
       </Paragraph3>
       <UploadList
-        fileList={fileList} checkedFileIds={checkedFileIds}
-        uploadList={uploadList} setUploadList={setUploadList}
+        files={files} checkedFileIds={checkedFileIds}
+        uploads={uploads} setUploads={setUploads}
       />
       <Button
         style={{ marginTop: '10px' }}
-        size={SIZE.compact} disabled={fileList.length === 0}
+        size={SIZE.compact} disabled={files.length === 0}
         isLoading={checkingStatus}
         kind={allChecked ? KIND.secondary : KIND.primary}
         onClick={checkUploadStatus}

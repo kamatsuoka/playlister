@@ -28,9 +28,10 @@ function App () {
   const [cameraInfo, setCameraInfo] = useState({ cameraNumber: 1, cameraName: '' })
   // media info as detected by mediainfo.js
   const [mediaList, setMediaList] = useState([])
-  // list of videos uploaded to youtube
-  const [uploadList, setUploadList] = useState([])
-  const [fileList, setFileList] = useState([])
+  // videos uploaded to youtube, keyed by file id
+  const [uploads, setUploads] = useState({})
+  // list of local files with video start/end times, sorted by start time
+  const [files, setFiles] = useState([])
   // attributes of event where the videos were recorded
   const [eventData, setEventData] = useState({
     defaultDate: '',
@@ -95,7 +96,7 @@ function App () {
               <FilePage
                 current={1} setCurrent={setCurrent}
                 mediaList={mediaList} setMediaList={setMediaList}
-                fileList={fileList} setFileList={setFileList}
+                files={files} setFiles={setFiles}
                 timeAdjust={timeAdjust} setTimeAdjust={setTimeAdjust}
                 eventData={eventData} setEventData={setEventData}
               />
@@ -103,14 +104,14 @@ function App () {
             <Step title='Uploads'>
               <UploadPage
                 current={2} setCurrent={setCurrent}
-                fileList={fileList} uploadList={uploadList} setUploadList={setUploadList}
+                files={files} uploads={uploads} setUploads={setUploads}
               />
             </Step>
             <Step title='Choose Playlist'>
               <PlaylistPage
                 current={3} setCurrent={setCurrent}
                 orgInfo={orgInfo} cameraInfo={cameraInfo}
-                uploadList={uploadList} eventData={eventData}
+                uploads={uploads} eventData={eventData}
                 playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
                 playlists={playlists} setPlaylists={setPlaylists}
                 selectedPlaylist={selectedPlaylist} setSelectedPlaylist={setSelectedPlaylist}
@@ -119,15 +120,15 @@ function App () {
             </Step>
             <Step title='Add to Playlist'>
               <AddToPlaylistPage
-                current={4} setCurrent={setCurrent}
-                uploadList={uploadList} playlistData={playlistData}
+                current={4} setCurrent={setCurrent} files={files}
+                uploads={uploads} playlistData={playlistData}
                 videoPlaylist={videoPlaylist} setVideoPlaylist={setVideoPlaylist}
               />
             </Step>
             <Step title='Rename'>
               <VideoPage
-                current={5} setCurrent={setCurrent}
-                uploadList={uploadList} setUploadList={setUploadList}
+                current={5} setCurrent={setCurrent} files={files}
+                uploads={uploads} setUploads={setUploads}
                 playlistData={playlistData} setActiveKey={setCurrent}
                 newTitles={newTitles} setNewTitles={setNewTitles}
               />

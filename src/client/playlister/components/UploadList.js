@@ -6,6 +6,8 @@ import { tableOverrides } from './TableOverrides'
 import { Button, KIND, SIZE } from 'baseui/button'
 import resumableUpload from '../youtube/youtube-uploader'
 import { displayDate } from '../util/dates'
+import { useSnackbar } from 'baseui/snackbar'
+import { showError } from '../util/showError'
 
 const UPLOADING = 'uploading'
 const ERROR = 'error'
@@ -13,20 +15,23 @@ const ERROR = 'error'
 /**
  * List of file upload status
  */
-const UploadList = ({ fileList, checkedFileIds, uploadList, setUploadList }) => {
+const UploadList = ({ files, checkedFileIds, uploads, setUploads }) => {
   // map of fileId to upload button state
   const [uploadButtonState, setUploadButtonState] = useState({})
   // map of fileId to upload progress
   const [uploadProgress, setUploadProgress] = useState({})
+  const { enqueue } = useSnackbar()
 
+  /*
   const uploadData = Object.fromEntries(
-    uploadList.map(upload =>
+    uploads.map(upload =>
       [upload.fileId, {
         videoId: upload.videoId,
         title: upload.title,
         publishedAt: upload.publishedAt
       }]
     ))
+*/
 
   const uploadFile = (fileId, file) => {
     const progressHandler = percent => {
@@ -34,16 +39,11 @@ const UploadList = ({ fileList, checkedFileIds, uploadList, setUploadList }) => 
     }
     const errorHandler = error => {
       setUploadButtonState({ ...uploadButtonState, [fileId]: ERROR })
-      console.log(error) // todo: show in UI
+      showError(enqueue, error)
     }
     const completeHandler = uploaded => {
       console.log('completeHandler: uploaded = ', uploaded)
-      return setUploadList(uploadList =>
-        uploadList
-          .filter(status => status.fileId !== fileId)
-          .concat(uploaded)
-          .sort((a, b) => a.startTime > b.startTime ? 1 : -1)
-      )
+      return setUploads(uploads => ({ ...uploads, [fileId]: uploaded }))
     }
     resumableUpload(file, fileId, progressHandler, completeHandler, errorHandler)
   }
@@ -71,8 +71,8 @@ const UploadList = ({ fileList, checkedFileIds, uploadList, setUploadList }) => 
    * @returns {JSX.Element|string}
    */
   const uploadButton = row => {
-    if (uploadData[row.fileId] && uploadData[row.fileId].publishedAt) {
-      return displayDate(uploadData[row.fileId].publishedAt)
+    if (uploads[row.fileId] && uploads[row.fileId].publishedAt) {
+      return displayDate(uploads[row.fileId].publishedAt)
     }
     if (uploadProgress[row.fileId]) {
       return `${uploadProgress[row.fileId]}%`
@@ -116,7 +116,7 @@ const UploadList = ({ fileList, checkedFileIds, uploadList, setUploadList }) => 
 
   return (
     <div>
-      <TableBuilder data={fileList} overrides={tableOverrides}>
+      <TableBuilder data={files} overrides={tableOverrides}>
         <TableBuilderColumn overrides={columnOverrides} header='Filename'>
           {row => row.filename}
         </TableBuilderColumn>
@@ -127,7 +127,7 @@ const UploadList = ({ fileList, checkedFileIds, uploadList, setUploadList }) => 
           {row => uploadButton(row)}
         </TableBuilderColumn>
         <TableBuilderColumn overrides={columnOverrides} header='YouTube Title'>
-          {row => uploadData[row.fileId] ? uploadData[row.fileId].title : null}
+          {row => uploads[row.fileId] ? uploads[row.fileId].title : null}
         </TableBuilderColumn>
       </TableBuilder>
     </div>

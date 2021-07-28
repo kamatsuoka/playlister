@@ -24,7 +24,7 @@ dayjs.extend(utc)
 /**
  * List of videos with old and new titles
  */
-const VideoList = ({ uploadList, setUploadList, playlistData, videoNaming }) => {
+const VideoList = ({ uploads, setUploads, playlistData, videoNaming }) => {
   const [cameraViews, setCameraViews] = useState({})
   const [renaming, setRenaming] = useState(new Set())
   const { enqueue } = useSnackbar()
@@ -62,7 +62,7 @@ const VideoList = ({ uploadList, setUploadList, playlistData, videoNaming }) => 
     }
   }
 
-  const allRenamed = uploadList.every((video, index) => video.newTitle === getNewTitle(video, index))
+  const allRenamed = uploads.every((video, index) => video.newTitle === getNewTitle(video, index))
 
   const renameVideo = (video, newTitle) => {
     setRenaming(renaming => renaming.add(video.videoId))
@@ -71,8 +71,8 @@ const VideoList = ({ uploadList, setUploadList, playlistData, videoNaming }) => 
         renaming.delete(video.videoId)
         return renaming
       })
-      return setUploadList(
-        uploadList.map(upload => {
+      return setUploads(
+        uploads.map(upload => {
           if (upload.videoId === updatedVideo.videoId) {
             upload.newTitle = updatedVideo.title
           }
@@ -94,7 +94,7 @@ const VideoList = ({ uploadList, setUploadList, playlistData, videoNaming }) => 
   }
 
   const renameVideos = () => {
-    uploadList.forEach((video, index) => {
+    uploads.forEach((video, index) => {
       const newTitle = getNewTitle(video, index)
       if (video.title !== newTitle) {
         renameVideo(video, newTitle)
@@ -104,7 +104,7 @@ const VideoList = ({ uploadList, setUploadList, playlistData, videoNaming }) => 
 
   return (
     <>
-      <TableBuilder data={uploadList}>
+      <TableBuilder data={uploads}>
         <TableBuilderColumn overrides={columnOverrides} header='Filename'>
           {row => row.filename}
         </TableBuilderColumn>
@@ -138,9 +138,9 @@ const VideoList = ({ uploadList, setUploadList, playlistData, videoNaming }) => 
       <Button
         onClick={() => renameVideos()}
         size={SIZE.compact}
-        kind={uploadList.length && !allRenamed ? KIND.primary : KIND.secondary}
+        kind={uploads.length && !allRenamed ? KIND.primary : KIND.secondary}
         isLoading={renaming.size !== 0}
-        disabled={uploadList.length === 0}
+        disabled={uploads.length === 0}
         overrides={{
           Root: { style: ({ $theme }) => ({ marginBottom: $theme.sizing.scale600 }) }
         }}

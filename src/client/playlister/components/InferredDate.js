@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 
-const inferDate = uploadList => {
-  const dateSet = startTimeSet(uploadList)
+const inferDate = uploads => {
+  const dateSet = startTimeSet(uploads)
   return dateSet.size > 0 ? dateSet.values().next().value : ''
 }
 

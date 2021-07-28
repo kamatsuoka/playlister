@@ -6,7 +6,7 @@ import { Input } from 'baseui/input'
 import inferDate from './InferredDate'
 import { Combobox } from 'baseui/combobox'
 
-const EventData = ({ fileList, eventData, setEventData }) => {
+const EventData = ({ files, eventData, setEventData }) => {
   const handleChange = (evt) => {
     setEventData({
       ...eventData,
@@ -24,7 +24,7 @@ const EventData = ({ fileList, eventData, setEventData }) => {
         <FlexGridItem>
           <FormControl label='event date'>
             <Input
-              value={eventData.eventDate || inferDate(fileList)}
+              value={eventData.eventDate || inferDate(files)}
               name='eventDate'
               onChange={handleChange}
             />
