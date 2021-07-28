@@ -63,8 +63,8 @@ function App () {
   })
   // map of video id to new title
   const [newTitles, setNewTitles] = useState({})
-  // map of video id to playlist
-  const [videoPlaylist, setVideoPlaylist] = useState({})
+  // items in current playlist - map of videoId to { playlistId, position, etc. }
+  const [playlistItems, setPlaylistItems] = useState({})
 
   return (
     <StyletronProvider value={engine}>
@@ -120,7 +120,7 @@ function App () {
                 selectedPlaylist={selectedPlaylist} setSelectedPlaylist={setSelectedPlaylist}
                 createdPlaylist={createdPlaylist} setCreatedPlaylist={setCreatedPlaylist}
                 playlist={playlist} setPlaylist={setPlaylist}
-                videoPlaylist={videoPlaylist} setVideoPlaylist={setVideoPlaylist}
+                playlistItems={playlistItems} setPlaylistItems={setPlaylistItems}
               />
             </Step>
             <Step title='Rename'>

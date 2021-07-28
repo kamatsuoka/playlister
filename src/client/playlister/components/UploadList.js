@@ -7,7 +7,7 @@ import { Button, KIND, SIZE } from 'baseui/button'
 import resumableUpload from '../youtube/youtube-uploader'
 import { displayDate } from '../util/dates'
 import { useSnackbar } from 'baseui/snackbar'
-import { showError } from '../util/showError'
+import { enqueueError } from '../util/enqueueError'
 
 const UPLOADING = 'uploading'
 const ERROR = 'error'
@@ -21,6 +21,7 @@ const UploadList = ({ files, checkedFileIds, uploads, setUploads }) => {
   // map of fileId to upload progress
   const [uploadProgress, setUploadProgress] = useState({})
   const { enqueue } = useSnackbar()
+  const showError = enqueueError(enqueue)
 
   /*
   const uploadData = Object.fromEntries(
@@ -39,7 +40,7 @@ const UploadList = ({ files, checkedFileIds, uploads, setUploads }) => {
     }
     const errorHandler = error => {
       setUploadButtonState({ ...uploadButtonState, [fileId]: ERROR })
-      showError(enqueue, error)
+      showError(error)
     }
     const completeHandler = uploaded => {
       console.log('completeHandler: uploaded = ', uploaded)

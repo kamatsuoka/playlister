@@ -13,7 +13,7 @@ import { faCheck } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { useSnackbar } from 'baseui/snackbar'
-import { showError } from '../util/showError'
+import { enqueueError } from '../util/enqueueError'
 
 dayjs.extend(localizedFormat)
 dayjs.extend(advancedFormat)
@@ -28,6 +28,7 @@ const VideoList = ({ uploads, setUploads, playlist, videoNaming }) => {
   const [cameraViews, setCameraViews] = useState({})
   const [renaming, setRenaming] = useState(new Set())
   const { enqueue } = useSnackbar()
+  const showError = enqueueError(enqueue)
 
   const date = playlist.eventDate
   const startIndex = parseInt(playlist.itemCount || 0) + 1 + parseInt(videoNaming.indexOffset)
@@ -84,7 +85,7 @@ const VideoList = ({ uploads, setUploads, playlist, videoNaming }) => {
         renaming.delete(video.videoId)
         return renaming
       })
-      showError(enqueue, err)
+      showError(err)
     }
     try {
       updateTitle(video.videoId, newTitle, onSuccess, onFailure)

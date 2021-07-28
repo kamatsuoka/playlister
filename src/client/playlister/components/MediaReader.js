@@ -5,7 +5,7 @@ import { FileUploader } from 'baseui/file-uploader'
 // eslint-disable-next-line camelcase
 import en_US from 'baseui/locale/en_US'
 import { useSnackbar } from 'baseui/snackbar'
-import { showError } from '../util/showError'
+import { enqueueError } from '../util/enqueueError'
 
 // import MediaInfo from 'mediainfo.js'
 // // using MediaInfo through npm/react didn't work,
@@ -31,6 +31,7 @@ const MediaReader = ({ setMediaList }) => {
   const [analyzing, setAnalyzing] = useState(false)
 
   const { enqueue } = useSnackbar()
+  const showError = enqueueError(enqueue)
 
   /**
    * Check if the mediainfo data contains a video
@@ -64,7 +65,7 @@ const MediaReader = ({ setMediaList }) => {
         const reader = new FileReader()
         reader.onload = event => {
           if (event.target.error) {
-            showError(enqueue, event.target.error)
+            showError(event.target.error)
             reject(event.target.error)
           }
           resolve(new Uint8Array(event.target.result))
@@ -88,10 +89,10 @@ const MediaReader = ({ setMediaList }) => {
               file: file
             })
           } catch (e) {
-            showError(enqueue, `${file.name} — no video detected`)
+            showError(`${file.name} — no video detected`)
           }
-        }, err => showError(enqueue, err)
-        )
+        })
+        .catch(showError)
     }
 
     if (files) {

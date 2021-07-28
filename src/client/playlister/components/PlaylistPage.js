@@ -1,13 +1,13 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { KIND } from 'baseui/button'
 import * as youtube from '../youtube/api'
 import { useSnackbar } from 'baseui/snackbar'
-import { errorMessage, showError } from '../util/showError'
+import { enqueueError, errorMessage } from '../util/enqueueError'
 import { Tab, Tabs } from 'baseui/tabs-motion'
 import prevNextButtons from './PrevNextButtons'
 import PlaylistCreate from './PlaylistCreate'
 import PlaylistSelect from './PlaylistSelect'
-import AddToPlaylist from './AddToPlaylist'
+import PlaylistItems, { resourceToPlaylistItem } from './PlaylistItems'
 
 /**
  * Create new or find existing playlist.
@@ -22,7 +22,7 @@ const PlaylistPage = ({
   selectedPlaylist, setSelectedPlaylist,
   createdPlaylist, setCreatedPlaylist,
   playlist, setPlaylist,
-  videoPlaylist, setVideoPlaylist
+  playlistItems, setPlaylistItems
 }) => {
   /**
    * playlist:
@@ -35,6 +35,29 @@ const PlaylistPage = ({
   const [listing, setListing] = useState(false)
 
   const { enqueue } = useSnackbar()
+  const showError = enqueueError(enqueue)
+
+  /**
+   * Fetches the list of items (videos) in the current playlist
+   */
+  useEffect(() => {
+    const onSuccess = resources => {
+      console.log('Got playlistItem resources from listPlaylistItems: ', resources)
+      return setPlaylistItems(
+        resources && resources.length > 0
+          ? Object.fromEntries(
+            resources.map(resourceToPlaylistItem).map(item => [item.videoId, item])
+          )
+          : null
+      )
+    }
+    if (playlist.playlistId) {
+      console.log('calling youtube.listPlaylistItems ...')
+      youtube.listPlaylistItems(playlist.playlistId, onSuccess, showError)
+    }
+  }, [playlist.playlistId])
+
+  console.log('playlistItems', playlistItems)
 
   /**
    * Gets playlist properties of interest from youtube Playlist resource
@@ -54,7 +77,7 @@ const PlaylistPage = ({
    */
   const playlistFailure = err => {
     setListing(false)
-    showError(enqueue, `Error listing playlists: ${errorMessage(err)}`)
+    showError(`Error listing playlists: ${errorMessage(err)}`)
   }
 
   /**
@@ -62,8 +85,8 @@ const PlaylistPage = ({
    */
   function listPlaylists () {
     setListing(true)
-    const successHandler = playlists => {
-      setPlaylists(playlists.map(resourceToPlaylist))
+    const successHandler = resources => {
+      setPlaylists(resources.map(resourceToPlaylist))
       setListing(false)
     }
     try {
@@ -97,7 +120,7 @@ const PlaylistPage = ({
           }
           if (activeKey === '0' && Object.keys(createdPlaylist).length > 0) {
             setPlaylist(createdPlaylist)
-          } else if (activeKey === '1' && Object.keys(selectedPlaylist[0]).length > 0) {
+          } else if (activeKey === '1' && selectedPlaylist[0] && Object.keys(selectedPlaylist[0]).length > 0) {
             setPlaylist(selectedPlaylist[0])
           }
         }}
@@ -120,9 +143,9 @@ const PlaylistPage = ({
         </Tab>
       </Tabs>
       {playlistOkay
-        ? <AddToPlaylist
+        ? <PlaylistItems
             files={files} uploads={uploads} playlist={playlist}
-            videoPlaylist={videoPlaylist} setVideoPlaylist={setVideoPlaylist}
+            playlistItems={playlistItems} setPlaylistItems={setPlaylistItems}
           />
         : null}
 

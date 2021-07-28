@@ -162,6 +162,8 @@ export const insertPlaylistItem = (videoId, playlistId, onSuccess, onFailure) =>
     const item = {
       snippet: {
         playlistId: playlistId,
+        title: `title for ${videoId}`,
+        position: Math.max(1, Math.round(Math.random() * 5)),
         resourceId: {
           videoId: videoId
         }
@@ -182,5 +184,31 @@ export const updateTitle = (videoId, title, onSuccess, onFailure) => {
       .updateTitle(videoId, title)
   } else {
     throw Error('updateTitle not implented outside Apps Script')
+  }
+}
+
+export const listPlaylistItems = (playlistId, onSuccess, onFailure) => {
+  const run = getAppsScriptRun()
+  if (run) {
+    return run
+      .withSuccessHandler(onSuccess)
+      .withFailureHandler(onFailure)
+      .listPlaylistItems(playlistId)
+  } else {
+    // for testing
+    const numItems = Math.max(1, Math.round(Math.random() * 5))
+    const resources = Array.from({ length: numItems }, (x, i) => ({
+      snippet: {
+        playlistId: playlistId,
+        title: `video ${i}`,
+        position: i,
+        resourceId: {
+          videoId: i
+        }
+      }
+    }))
+    return new Promise(resolve => {
+      return resolve(resources)
+    }).then(onSuccess).catch(onFailure)
   }
 }

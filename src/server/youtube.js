@@ -194,7 +194,7 @@ export function updateTitle (videoId, title) {
 /**
  * Inserts a video into a playlist
  *
- * @returns  YouTube.Schema.PlaylistItem
+ * @returns  GoogleAppsScript.YouTube.Schema.PlaylistItem
  * @see https://developers.google.com/youtube/v3/docs/playlistItems#resource
  */
 export function insertPlaylistItem (videoId, playlistId) {
@@ -207,6 +207,19 @@ export function insertPlaylistItem (videoId, playlistId) {
       }
     }
   }
-  const part = ['snippet']
-  return YouTube.PlaylistItems.insert(resource, part)
+  return YouTube.PlaylistItems.insert(resource, 'snippet')
+}
+
+/**
+ * Lists items in a playlist.
+ *
+ * @returns Array[GoogleAppsScript.YouTube.Schema.PlaylistItem]
+ */
+export function listPlaylistItems (playlistId) {
+  const optionalArgs = {
+    playlistId: playlistId,
+    maxResults: 50,
+    fields: 'items(id, snippet(title, playlistId, position, resourceId(videoId)))'
+  }
+  return YouTube.PlaylistItems.list('snippet', optionalArgs).items
 }

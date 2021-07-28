@@ -3,32 +3,38 @@ import { Button, SIZE } from 'baseui/button'
 import * as youtube from '../youtube/api'
 import { Label1 } from 'baseui/typography'
 import { useSnackbar } from 'baseui/snackbar'
-import { showError } from '../util/showError'
+import { enqueueError } from '../util/enqueueError'
 import { useStyletron } from 'baseui'
 import { TableBuilder, TableBuilderColumn } from 'baseui/table-semantic'
 import { tableOverrides } from './TableOverrides'
 import { displayDate } from '../util/dates'
 
+export const resourceToPlaylistItem = resource => ({
+  playlistId: resource.snippet.playlistId,
+  videoId: resource.snippet.resourceId.videoId,
+  title: resource.snippet.title,
+  position: resource.snippet.position
+})
+
 /**
- * Adds videos to playlist.
+ * List of items (videos) in playlist
+ * with button to add videos to playlist.
  *
  * Youtube (as of July 2021) adds new playlist items to the end of the playlist.
  * The insert api seems to ignore the 'position' param.
  */
-const AddToPlaylist = ({
-  playlist, files, uploads, videoPlaylist, setVideoPlaylist
-}) => {
+const PlaylistItems = ({ playlist, files, uploads, playlistItems, setPlaylistItems }) => {
   const [, theme] = useStyletron()
   const [adding, setAdding] = useState(false)
   const { enqueue } = useSnackbar()
+  const showError = enqueueError(enqueue)
 
-  const addToPlaylist = (videoIds, position) => {
-    console.log(`addToPlaylist: ${videoIds.length} uploads, position ${position}`)
+  const addToPlaylist = videoIds => {
+    console.log(`addToPlaylist: ${videoIds.length} videos`)
     const videoId = videoIds.shift() // pop off head of array
-    const successHandler = playlistItem => {
-      const videoId = playlistItem.snippet.resourceId.videoId
-      const playlistId = playlistItem.snippet.playlistId
-      setVideoPlaylist(videoPlaylist => ({ ...videoPlaylist, [videoId]: playlistId }))
+    const successHandler = resource => {
+      const item = resourceToPlaylistItem(resource)
+      setPlaylistItems(playlistItems => ({ ...playlistItems, [item.videoId]: item }))
       if (videoIds.length > 0) {
         addToPlaylist(videoIds)
       } else {
@@ -37,7 +43,7 @@ const AddToPlaylist = ({
     }
     const failureHandler = err => {
       setAdding(false)
-      showError(enqueue, err)
+      showError(err)
     }
     youtube.insertPlaylistItem(
       videoId, playlist.playlistId, successHandler, failureHandler
@@ -91,15 +97,18 @@ const AddToPlaylist = ({
         </TableBuilderColumn>
         <TableBuilderColumn overrides={columnOverrides} header='Added'>
           {row => {
-            const playlistId = videoPlaylist[uploads[row.fileId].videoId]
-            if (playlistId === playlist.playlistId) {
+            const plist = playlistItems[uploads[row.fileId].videoId]
+            if (plist && plist.playlistId === playlist.playlistId) {
               return 'Yes'
             }
             return null
           }}
         </TableBuilderColumn>
         <TableBuilderColumn overrides={columnOverrides} header='Position'>
-          {row => null}
+          {row => {
+            const plist = playlistItems[uploads[row.fileId].videoId]
+            return plist ? plist.position : null
+          }}
         </TableBuilderColumn>
       </TableBuilder>
       {showAddButton()}
@@ -107,4 +116,4 @@ const AddToPlaylist = ({
   )
 }
 
-export default AddToPlaylist
+export default PlaylistItems

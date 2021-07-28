@@ -6,7 +6,7 @@ import { findUploads } from '../youtube/api'
 import { StyledLink } from 'baseui/link'
 import { Paragraph3 } from 'baseui/typography'
 import { useSnackbar } from 'baseui/snackbar'
-import { showError } from '../util/showError'
+import { enqueueError } from '../util/enqueueError'
 import prevNextButtons from './PrevNextButtons'
 
 /**
@@ -29,6 +29,7 @@ const UploadPage = ({ current, setCurrent, files, uploads, setUploads }) => {
   // file ids that have been checked
   const [checkedFileIds, setCheckedFileIds] = useState(new Set())
   const { enqueue } = useSnackbar()
+  const showError = enqueueError(enqueue)
 
   const checkUploadStatus = useCallback(() => {
     const fileIds = files.map(data => data.fileId)
@@ -49,8 +50,7 @@ const UploadPage = ({ current, setCurrent, files, uploads, setUploads }) => {
       setCheckingStatus(false)
     }
     const onFailure = err => {
-      showError(enqueue, err)
-      console.log(err)
+      showError(err)
       setCheckingStatus(false)
     }
 

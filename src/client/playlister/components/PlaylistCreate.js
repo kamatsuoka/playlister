@@ -5,7 +5,7 @@ import { useStyletron } from 'baseui'
 import { FormControl } from 'baseui/form-control'
 import { Button, KIND, SIZE } from 'baseui/button'
 import * as youtube from '../youtube/api'
-import { errorMessage, showError } from '../util/showError'
+import { enqueueError, errorMessage } from '../util/enqueueError'
 import { useSnackbar } from 'baseui/snackbar'
 // import { KIND as NKind, Notification } from 'baseui/notification'
 import { DEFAULT_DATE } from './EventDate'
@@ -24,6 +24,7 @@ const PlaylistCreate = ({
   const [css, theme] = useStyletron()
   const [creating, setCreating] = useState(false)
   const { enqueue } = useSnackbar()
+  const showError = enqueueError(enqueue)
 
   const eventDate = eventData.dateChoice === DEFAULT_DATE ? eventData.defaultDate : eventData.customDate
 
@@ -56,7 +57,7 @@ const PlaylistCreate = ({
       enqueue({ message: `${verb} playlist: ${created.title}` })
       console.log(`${verb} playlist: `, created)
     } else {
-      showError(enqueue, 'Unexpected response: ' + JSON.stringify(plist))
+      showError('Unexpected response: ' + JSON.stringify(plist))
     }
     setCreating(false)
   }
@@ -66,7 +67,7 @@ const PlaylistCreate = ({
    */
   const playlistFailure = verb => err => {
     setCreating(false)
-    showError(enqueue, `Error ${verb} playlist: ${errorMessage(err)}`)
+    showError(`Error ${verb} playlist: ${errorMessage(err)}`)
   }
 
   const desiredTitle = playlistTitle.titleChoice === CUSTOM ? playlistTitle.customTitle : suggestedTitle

@@ -19,7 +19,7 @@ export function errorMessage (err) {
  * @param enqueue snackbar enqueue function
  * @param err error message or object
  */
-export function showError (enqueue, err) {
+export const enqueueError = enqueue => err => {
   console.log('ERROR: ', err)
   enqueue({ message: errorMessage(err) })
 }
