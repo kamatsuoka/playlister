@@ -113,6 +113,8 @@ export const youtubeTitle = filename => {
   return noExt.replace(/[^a-z0-9]/gi, ' ')
 }
 
+const randomId = () => Math.random().toString(36).substr(2, 9)
+
 /**
  * Finds uploads given local file metadata
  *
@@ -137,7 +139,7 @@ export const findUploads = (fileList, onSuccess, onFailure) => {
       .findUploads(fileData)
   } else {
     const uploads = fileList.map(fd => ({
-      videoId: Math.random().toString(36).substr(2, 9),
+      videoId: randomId(),
       title: youtubeTitle(fd.filename),
       publishedAt: dayjs().toISOString(),
       filename: fd.filename,
@@ -175,6 +177,32 @@ export const insertPlaylistItem = (videoId, playlistId, onSuccess, onFailure) =>
   }
 }
 
+export const updatePlaylistItem = ({ playlistItemId, videoId, playlistId, position, onSuccess, onFailure }) => {
+  const run = getAppsScriptRun()
+  if (run) {
+    return run
+      .withSuccessHandler(onSuccess)
+      .withFailureHandler(onFailure)
+      .updatePlaylistItem({ playlistItemId, videoId, playlistId, position })
+  } else {
+    // for testing
+    const item = {
+      id: playlistItemId,
+      snippet: {
+        playlistId: playlistId,
+        title: `title for ${videoId}`,
+        position: position,
+        resourceId: {
+          videoId: videoId
+        }
+      }
+    }
+    return new Promise(resolve => {
+      return resolve(item)
+    }).then(onSuccess).catch(onFailure)
+  }
+}
+
 export const updateTitle = (videoId, title, onSuccess, onFailure) => {
   const run = getAppsScriptRun()
   if (run) {
@@ -198,12 +226,16 @@ export const listPlaylistItems = (playlistId, onSuccess, onFailure) => {
     // for testing
     const numItems = Math.max(1, Math.round(Math.random() * 5))
     const resources = Array.from({ length: numItems }, (x, i) => ({
+      id: randomId(),
       snippet: {
         playlistId: playlistId,
         title: `video ${i}`,
         position: i,
         resourceId: {
           videoId: i
+        },
+        recordingDetails: {
+          recordingDate: dayjs().toISOString()
         }
       }
     }))

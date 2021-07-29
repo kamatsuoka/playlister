@@ -23,17 +23,6 @@ const UploadList = ({ files, checkedFileIds, uploads, setUploads }) => {
   const { enqueue } = useSnackbar()
   const showError = enqueueError(enqueue)
 
-  /*
-  const uploadData = Object.fromEntries(
-    uploads.map(upload =>
-      [upload.fileId, {
-        videoId: upload.videoId,
-        title: upload.title,
-        publishedAt: upload.publishedAt
-      }]
-    ))
-*/
-
   const uploadFile = (fileId, file) => {
     const progressHandler = percent => {
       setUploadProgress({ ...uploadProgress, [fileId]: percent })

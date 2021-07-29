@@ -79,7 +79,7 @@ export function insertPlaylist (title, description) {
  * 4. Returning videos that match one of the given filenames / titles
  *
  * @param {Object} files - map of filename to { title, fileData }
- * @return Array of { videoId, title, publishedAt, filename, duration }
+ * @return Array of { videoId, title, publishedAt, filename, duration, recordingDate }
  */
 export function findUploads (files) {
   Logger.log(`files = ${JSON.stringify(files)}`)
@@ -102,7 +102,7 @@ export function findUploads (files) {
     const playlistResponse = YouTube.PlaylistItems.list('snippet', {
       playlistId: playlistId,
       maxResults: 50,
-      fields: 'items(snippet(publishedAt,title,thumbnails(default(url)),resourceId(videoId)))'
+      fields: 'items(snippet(publishedAt,title,resourceId(videoId)))'
     })
 
     // Although it's not documented, playlist items seem to come back in reverse
@@ -133,8 +133,8 @@ export function findUploads (files) {
         return []
       })
       for (const match of matches) {
-        const videos = YouTube.Videos.list('snippet,contentDetails', {
-          id: match.videoId, fields: 'items(id,snippet(title),contentDetails(duration))'
+        const videos = YouTube.Videos.list('snippet,contentDetails,recordingDetails', {
+          id: match.videoId, fields: 'items(id,snippet(title),contentDetails(duration),recordingDetails(recordingDate))'
         })
         const video = videos.items[0]
         if (!video) {
@@ -157,6 +157,7 @@ export function findUploads (files) {
           continue
         }
         match.duration = video.contentDetails.duration
+        match.recordingDate = video.recordingDetails.recordingDate
         matchingVideos[match.filename] = match
         Logger.log(`matching video: ${JSON.stringify(match)}`)
       }
@@ -211,9 +212,30 @@ export function insertPlaylistItem (videoId, playlistId) {
 }
 
 /**
- * Lists items in a playlist.
+ * Updates a playlist item
  *
- * @returns Array[GoogleAppsScript.YouTube.Schema.PlaylistItem]
+ * @returns  GoogleAppsScript.YouTube.Schema.PlaylistItem
+ * @see https://developers.google.com/youtube/v3/docs/playlistItems#resource
+ */
+export function updatePlaylistItem ({ playlistItemId, videoId, playlistId, position }) {
+  const resource = {
+    id: playlistItemId,
+    snippet: {
+      playlistId: playlistId,
+      position: position,
+      resourceId: {
+        kind: 'youtube#video',
+        videoId: videoId
+      }
+    }
+  }
+  return YouTube.PlaylistItems.update(resource, 'snippet')
+}
+
+/**
+ * Lists items in a playlist. Adds in recordingDate for each video.
+ *
+ * @returns Array[{ id, snippet: { title, playlistId, position }, resourceId: { videoId }, recordingDetails: { recordingDate } ]
  */
 export function listPlaylistItems (playlistId) {
   const optionalArgs = {
@@ -221,5 +243,15 @@ export function listPlaylistItems (playlistId) {
     maxResults: 50,
     fields: 'items(id, snippet(title, playlistId, position, resourceId(videoId)))'
   }
-  return YouTube.PlaylistItems.list('snippet', optionalArgs).items
+  const items = YouTube.PlaylistItems.list('snippet', optionalArgs).items
+  for (const item of items) {
+    const videos = YouTube.Videos.list('recordingDetails', {
+      id: item.videoId, maxResults: 1, fields: 'items(recordingDetails(recordingDate))'
+    })
+    const video = videos.items[0]
+    if (video) {
+      item.recordingDetails = video.recordingDetails
+    }
+  }
+  return items
 }

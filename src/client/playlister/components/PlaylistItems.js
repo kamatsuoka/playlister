@@ -10,10 +10,12 @@ import { tableOverrides } from './TableOverrides'
 import { displayDate } from '../util/dates'
 
 export const resourceToPlaylistItem = resource => ({
+  playlistItemId: resource.id,
   playlistId: resource.snippet.playlistId,
   videoId: resource.snippet.resourceId.videoId,
   title: resource.snippet.title,
-  position: resource.snippet.position
+  position: resource.snippet.position,
+  recordingDate: resource.recordingDetails.recordingDate
 })
 
 /**
@@ -29,32 +31,51 @@ const PlaylistItems = ({ playlist, files, uploads, playlistItems, setPlaylistIte
   const { enqueue } = useSnackbar()
   const showError = enqueueError(enqueue)
 
-  const addToPlaylist = videoIds => {
-    console.log(`addToPlaylist: ${videoIds.length} videos`)
+  const addToPlaylist = (videoIds, position) => {
+    console.log(`addToPlaylist: ${videoIds.length} videos, position ${position}`)
+    if (videoIds.length === 0) {
+      setAdding(false)
+      return
+    }
     const videoId = videoIds.shift() // pop off head of array
     const successHandler = resource => {
       const item = resourceToPlaylistItem(resource)
       setPlaylistItems(playlistItems => ({ ...playlistItems, [item.videoId]: item }))
-      if (videoIds.length > 0) {
-        addToPlaylist(videoIds)
-      } else {
-        setAdding(false)
-      }
+      addToPlaylist(videoIds, position + 1)
     }
     const failureHandler = err => {
       setAdding(false)
       showError(err)
     }
-    youtube.insertPlaylistItem(
-      videoId, playlist.playlistId, successHandler, failureHandler
-    )
+    // if video is already in playlist
+    const existingItem = playlistItems[videoId]
+    if (existingItem && existingItem.playlistId === playlist.playlistId) {
+      // update its position if necessary
+      if (existingItem.position !== position) {
+        youtube.updatePlaylistItem({
+          playlistItemId: existingItem.playlistItemId,
+          videoId,
+          playlistId: playlist.playlistId,
+          position,
+          successHandler,
+          failureHandler
+        })
+      } else {
+        addToPlaylist(videoIds, position + 1)
+      }
+    } else {
+      youtube.insertPlaylistItem(
+        videoId, playlist.playlistId, successHandler, failureHandler
+      )
+    }
   }
 
   const addAllToPlaylist = () => {
     setAdding(true)
     // in the happy path, we insert all the videos into the playlist
     // in the correct order and never have to go back and add more later
-    addToPlaylist(files.map(file => uploads[file.fileId].videoId))
+    // TODO: update playlist after items inserted
+    addToPlaylist(files.map(file => uploads[file.fileId].videoId), playlist.itemCount)
   }
 
   const buttonOverrides = {

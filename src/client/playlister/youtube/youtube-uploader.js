@@ -1,27 +1,28 @@
-const { youtubeTitle } = require('./api')
 import axios from 'axios'
 
+const { youtubeTitle } = require('./api')
+
 class RetryHandler {
-  constructor() {
+  constructor () {
     this.interval = 1e3
     this.maxInterval = 6e4
   }
 
-  retry(f) {
+  retry (f) {
     setTimeout(f, this.interval)
     this.interval = this.nextInterval()
   }
 
-  reset() {
+  reset () {
     this.interval = 1e3
   }
 
-  nextInterval() {
+  nextInterval () {
     const interval = 2 * this.interval + this.getRandomInt(1e3)
     return Math.min(interval, this.maxInterval)
   }
 
-  getRandomInt(maxVal) {
+  getRandomInt (maxVal) {
     return Math.floor(Math.random() * (maxVal + 1))
   }
 }
@@ -31,28 +32,27 @@ class RetryHandler {
  * See https://cloud.google.com/storage/docs/performing-resumable-uploads
  */
 class ResumableUploader {
-  constructor({
-                baseUrl,
-                file,
-                contentType,
-                videoResource,
-                token,
-                onComplete,
-                onProgress,
-                onError,
-                offset = 0,
-                chunkSize = 0,
-                params = {},
-              }) {
+  constructor ({
+    baseUrl,
+    file,
+    contentType,
+    videoResource,
+    token,
+    onComplete,
+    onProgress,
+    onError,
+    offset = 0,
+    chunkSize = 0,
+    params = {}
+  }) {
     Object.assign(this, { file, videoResource, token, onComplete, onProgress, onError, offset, chunkSize })
     this.contentType = contentType || file.type || 'application/octet-stream'
-    this.retryHandler = new RetryHandler
+    this.retryHandler = new RetryHandler()
     params.uploadType = 'resumable'
     this.url = this.buildUrl(baseUrl, params)
     this.onContentUploadSuccess = response => this.onComplete && this.onComplete(response)
     this.onContentUploadError = error => {
       if (error.response && error.response.status) {
-        status = error.response.status
         if (error.response.status === 308) { // google uses 308 to mean "Resume Incomplete"
           this.onResumeIncomplete(error.response)
         } else if (error.response.status < 500) {
@@ -71,12 +71,12 @@ class ResumableUploader {
     }
 
     this.resume = () => {
-      axios.put(this.url, {},  {
+      axios.put(this.url, {}, {
         headers: {
           'Content-Range': 'bytes */' + this.file.size,
-          'X-Upload-Content-Type': this.file.type,
+          'X-Upload-Content-Type': this.file.type
         },
-        onUploadProgress: this.onProgress,
+        onUploadProgress: this.onProgress
       })
         .then(this.onContentUploadSuccess)
         .catch(this.onContentUploadError)
@@ -90,9 +90,9 @@ class ResumableUploader {
         headers: {
           'Content-Type': this.contentType,
           'Content-Range': 'bytes ' + this.offset + '-' + (size - 1) + '/' + this.file.size,
-          'X-Upload-Content-Type': this.file.type,
+          'X-Upload-Content-Type': this.file.type
         },
-        onUploadProgress: this.onProgress,
+        onUploadProgress: this.onProgress
       })
         .then(this.onContentUploadSuccess)
         .catch(this.onContentUploadError)
@@ -103,7 +103,7 @@ class ResumableUploader {
       this.sendFile()
     }
     this.extractRange = response => {
-      const range = response.headers['range']
+      const range = response.headers.range
       if (range) {
         this.offset = parseInt(range.match(/\d+/g).pop(), 10) + 1
       }
@@ -112,17 +112,17 @@ class ResumableUploader {
 
   axios = window.axios
 
-  upload() {
+  upload () {
     axios.post(this.url, this.videoResource, {
       headers: {
-        'Authorization': 'Bearer ' + this.token,
+        Authorization: 'Bearer ' + this.token,
         'Content-Type': 'application/json',
         'X-Upload-Content-Length': this.file.size,
-        'X-Upload-Content-Type': this.contentType,
-      },
+        'X-Upload-Content-Type': this.contentType
+      }
     }).then(response => {
       // would prefer creating a new object to mutating this object's variables
-      this.url = response.headers['location']
+      this.url = response.headers.location
       this.sendFile()
     }).catch(error => {
       if (error.response) {
@@ -136,7 +136,7 @@ class ResumableUploader {
   /**
    * Builds an url by adding query params to base url
    */
-  buildUrl(baseUrl, params) {
+  buildUrl (baseUrl, params) {
     const url = new URL(baseUrl)
     Object.entries(params).forEach(([key, value]) => url.searchParams.append(key, value))
     return url.href
@@ -154,7 +154,7 @@ class UploadWatcher {
    * @param completeHandler ({id, title, ...}) => ...
    * @param errorHandler (error: str | { error: {message: str}}) => ...
    */
-  constructor(progressHandler, completeHandler, errorHandler) {
+  constructor (progressHandler, completeHandler, errorHandler) {
     this.videoId = ''
     this.uploadStartTime = 0
     this.progressHandler = progressHandler
@@ -171,6 +171,9 @@ class UploadWatcher {
       status: {
         privacyStatus: 'unlisted',
         selfDeclaredMadeForKids: false
+      },
+      recordingDetails: {
+        recordingDate: file.startTime
       }
     }
     console.log(`uploading file with name ${file.name}, videoResource`, videoResource)
@@ -180,8 +183,8 @@ class UploadWatcher {
       token: token,
       videoResource: videoResource,
       params: {
-        part: 'snippet,status',
-        notifySubscribers: false,
+        part: 'snippet,status,recordingDetails',
+        notifySubscribers: false
       },
       onError: err => {
         let message = err
@@ -206,10 +209,10 @@ class UploadWatcher {
           fileId: fileId,
           title: video.snippet.title,
           publishedAt: video.snippet.publishedAt,
-          thumbnail: video.snippet.thumbnails.default.url,
+          recordingDate: video.recordingDetails.recordingDate,
           file: file
         })
-      },
+      }
     })
     this.uploadStartTime = Date.now()
     uploader.upload()
