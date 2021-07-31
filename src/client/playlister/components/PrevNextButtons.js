@@ -1,13 +1,18 @@
 import React from 'react'
-import { Button } from 'baseui/button'
+import { Button, KIND, SHAPE } from 'baseui/button'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons'
 
 const prevButton = (current, setCurrent, props) => {
   if (current > 0) {
     return (
       <Button
-        size='compact' {...props}
+        {...props}
+        shape={SHAPE.round}
+        kind={KIND.minimal}
         onClick={() => setCurrent(current - 1)}
-      >Prev
+      >
+        <FontAwesomeIcon icon={faArrowLeft} size='lg' />
       </Button>
     )
   } else { return null }
@@ -21,9 +26,12 @@ const nextButton = (current, setCurrent, props) => {
   } else {
     return (
       <Button
-        size='compact' {...otherProps}
+        {...otherProps}
+        shape={SHAPE.round}
+        kind={KIND.minimal}
         onClick={onClick || defaultOnClick}
-      >Next
+      >
+        <FontAwesomeIcon icon={faArrowRight} size='lg' />
       </Button>
     )
   }
