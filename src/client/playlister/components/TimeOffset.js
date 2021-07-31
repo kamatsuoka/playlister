@@ -59,6 +59,8 @@ const TimeOffset = ({
               },
               Input: {
                 style: ({
+                  paddingTop: theme.sizing.scale100,
+                  paddingBottom: theme.sizing.scale100,
                   paddingLeft: theme.sizing.scale200,
                   paddingRight: theme.sizing.scale200
                 })
@@ -80,8 +82,11 @@ const TimeOffset = ({
         overrides={{
           Content: {
             style: ({ $theme }) => ({
-              paddingBottom: $theme.sizing.scale400,
-              marginBottom: $theme.sizing.scale800
+              paddingTop: $theme.sizing.scale200,
+              paddingRight: $theme.sizing.scale600,
+              paddingBottom: $theme.sizing.scale200,
+              paddingLeft: $theme.sizing.scale600,
+              marginBottom: $theme.sizing.scale600
             })
           },
           PanelContainer: {

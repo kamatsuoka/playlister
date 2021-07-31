@@ -54,6 +54,8 @@ const EventDate = ({ eventData, setEventData }) => {
     },
     Input: {
       style: ({ $theme }) => ({
+        paddingTop: $theme.sizing.scale100,
+        paddingBottom: $theme.sizing.scale100,
         paddingLeft: $theme.sizing.scale200,
         paddingRight: $theme.sizing.scale200,
         ...inputInputStyle
@@ -63,6 +65,19 @@ const EventDate = ({ eventData, setEventData }) => {
 
   const defaultInputOverrides = inputOverrides({ caretColor: 'transparent' })
   const customInputOverrides = inputOverrides({})
+
+  const formControlOverrides = {
+    ControlContainer: {
+      style: ({
+        marginBottom: 0
+      })
+    },
+    Caption: {
+      style: ({
+        marginBottom: 0
+      })
+    }
+  }
 
   return (
     <ThemeProvider
@@ -75,7 +90,7 @@ const EventDate = ({ eventData, setEventData }) => {
         align={ALIGN.horizontal}
       >
         <Radio value={DEFAULT_DATE} overrides={radioOverrides}>
-          <FormControl caption='default'>
+          <FormControl caption='default' overrides={formControlOverrides}>
             <Input
               value={eventData.defaultDate || ''}
               placeholder='[inferred from start times]'
@@ -85,7 +100,7 @@ const EventDate = ({ eventData, setEventData }) => {
           </FormControl>
         </Radio>
         <Radio value={CUSTOM_DATE} overrides={radioOverrides}>
-          <FormControl caption='custom'>
+          <FormControl caption='custom' overrides={formControlOverrides}>
             <Input
               value={eventData.customDate || ''}
               placeholder='YYYYMMDD'

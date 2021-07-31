@@ -79,7 +79,7 @@ export function insertPlaylist (title, description) {
  * 4. Returning videos that match one of the given filenames / titles
  *
  * @param {Object} files - map of filename to { title, fileData }
- * @return Array of { videoId, title, publishedAt, filename, duration, recordingDate }
+ * @return Array of { videoId, title, publishedAt, filename, duration, startTime }
  */
 export function findUploads (files) {
   Logger.log(`files = ${JSON.stringify(files)}`)
@@ -118,6 +118,7 @@ export function findUploads (files) {
       const uploads = items.map(item => ({
         videoId: item.snippet.resourceId.videoId,
         title: item.snippet.title,
+        description: item.snippet.description,
         publishedAt: item.snippet.publishedAt
       }))
       const matches = uploads.flatMap(upload => {
@@ -133,8 +134,8 @@ export function findUploads (files) {
         return []
       })
       for (const match of matches) {
-        const videos = YouTube.Videos.list('snippet,contentDetails,recordingDetails', {
-          id: match.videoId, fields: 'items(id,snippet(title),contentDetails(duration),recordingDetails(recordingDate))'
+        const videos = YouTube.Videos.list('snippet,contentDetails', {
+          id: match.videoId, fields: 'items(id, snippet(title), contentDetails(duration))'
         })
         const video = videos.items[0]
         if (!video) {
@@ -157,7 +158,6 @@ export function findUploads (files) {
           continue
         }
         match.duration = video.contentDetails.duration
-        match.recordingDate = video.recordingDetails.recordingDate
         matchingVideos[match.filename] = match
         Logger.log(`matching video: ${JSON.stringify(match)}`)
       }
@@ -233,25 +233,15 @@ export function updatePlaylistItem ({ playlistItemId, videoId, playlistId, posit
 }
 
 /**
- * Lists items in a playlist. Adds in recordingDate for each video.
+ * Lists items in a playlist
  *
- * @returns Array[{ id, snippet: { title, playlistId, position }, resourceId: { videoId }, recordingDetails: { recordingDate } ]
+ * @returns Array[{ id, snippet: { title, description, playlistId, position }, resourceId: { videoId } } ]
  */
 export function listPlaylistItems (playlistId) {
   const optionalArgs = {
     playlistId: playlistId,
     maxResults: 50,
-    fields: 'items(id, snippet(title, playlistId, position, resourceId(videoId)))'
+    fields: 'items(id, snippet(title, description, playlistId, position, resourceId(videoId)))'
   }
-  const items = YouTube.PlaylistItems.list('snippet', optionalArgs).items
-  for (const item of items) {
-    const videos = YouTube.Videos.list('recordingDetails', {
-      id: item.videoId, maxResults: 1, fields: 'items(recordingDetails(recordingDate))'
-    })
-    const video = videos.items[0]
-    if (video) {
-      item.recordingDetails = video.recordingDetails
-    }
-  }
-  return items
+  return YouTube.PlaylistItems.list('snippet', optionalArgs).items
 }

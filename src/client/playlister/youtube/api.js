@@ -191,6 +191,7 @@ export const updatePlaylistItem = ({ playlistItemId, videoId, playlistId, positi
       snippet: {
         playlistId: playlistId,
         title: `title for ${videoId}`,
+        description: undefined,
         position: position,
         resourceId: {
           videoId: videoId
@@ -230,12 +231,10 @@ export const listPlaylistItems = (playlistId, onSuccess, onFailure) => {
       snippet: {
         playlistId: playlistId,
         title: `video ${i}`,
+        startTime: dayjs().toISOString(),
         position: i,
         resourceId: {
           videoId: i
-        },
-        recordingDetails: {
-          recordingDate: dayjs().toISOString()
         }
       }
     }))

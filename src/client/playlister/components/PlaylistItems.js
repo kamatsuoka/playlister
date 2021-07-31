@@ -9,13 +9,21 @@ import { TableBuilder, TableBuilderColumn } from 'baseui/table-semantic'
 import { tableOverrides } from './TableOverrides'
 import { displayDate } from '../util/dates'
 
+export const descriptionToStartTime = description => {
+  try {
+    return JSON.parse(description).startTime
+  } catch {
+    return undefined
+  }
+}
+
 export const resourceToPlaylistItem = resource => ({
   playlistItemId: resource.id,
   playlistId: resource.snippet.playlistId,
   videoId: resource.snippet.resourceId.videoId,
   title: resource.snippet.title,
   position: resource.snippet.position,
-  recordingDate: resource.recordingDetails.recordingDate
+  startTime: descriptionToStartTime(resource.description)
 })
 
 /**
@@ -47,8 +55,8 @@ const PlaylistItems = ({ playlist, files, uploads, playlistItems, setPlaylistIte
       setAdding(false)
       showError(err)
     }
-    // if video is already in playlist
     const existingItem = playlistItems[videoId]
+    // if video is already in playlist
     if (existingItem && existingItem.playlistId === playlist.playlistId) {
       // update its position if necessary
       if (existingItem.position !== position) {
@@ -102,7 +110,6 @@ const PlaylistItems = ({ playlist, files, uploads, playlistItems, setPlaylistIte
       </Button>
     </>
   )
-  const columnOverrides = {}
 
   return (
     <>
@@ -110,25 +117,16 @@ const PlaylistItems = ({ playlist, files, uploads, playlistItems, setPlaylistIte
         {playlist.title}
       </Label1>
       <TableBuilder data={files} overrides={tableOverrides}>
-        <TableBuilderColumn overrides={columnOverrides} header='Title'>
+        <TableBuilderColumn header='Title'>
           {row => uploads[row.fileId].title}
         </TableBuilderColumn>
-        <TableBuilderColumn overrides={columnOverrides} header='Start Time'>
+        <TableBuilderColumn header='Start Time'>
           {row => displayDate(row.startTime)}
         </TableBuilderColumn>
-        <TableBuilderColumn overrides={columnOverrides} header='Added'>
+        <TableBuilderColumn header='Position'>
           {row => {
             const plist = playlistItems[uploads[row.fileId].videoId]
-            if (plist && plist.playlistId === playlist.playlistId) {
-              return 'Yes'
-            }
-            return null
-          }}
-        </TableBuilderColumn>
-        <TableBuilderColumn overrides={columnOverrides} header='Position'>
-          {row => {
-            const plist = playlistItems[uploads[row.fileId].videoId]
-            return plist ? plist.position : null
+            return plist ? plist.position : undefined
           }}
         </TableBuilderColumn>
       </TableBuilder>

@@ -43,15 +43,13 @@ const serverEntry = './src/server/index.js'
 // define appsscript.json file path
 const copyAppscriptEntry = './appsscript.json'
 
-// define client entry points and output names
-const clientEntrypoints = [
-  {
-    name: 'CLIENT - playlister',
-    entry: './src/client/playlister/index.js',
-    filename: 'playlister',
-    template: './src/client/playlister/public/index.html'
-  }
-]
+// define client entry point and output name
+const clientEntrypoint = {
+  name: 'CLIENT - playlister',
+  entry: './src/client/playlister/index.js',
+  filename: 'index',
+  template: './src/client/playlister/public/index.html'
+}
 
 /*********************************
  *    Declare settings
@@ -82,7 +80,35 @@ const sharedClientAndServerConfig = {
   context: __dirname
 }
 
-// webpack settings used by all client entrypoints
+// DynamicCdnWebpackPlugin settings
+// these settings help us load 'react', 'react-dom' and the packages defined below from a CDN
+// see https://github.com/enuchi/React-Google-Apps-Script#adding-new-libraries-and-packages
+const DynamicCdnWebpackPluginConfig = {
+  // set "verbose" to true to print console logs on CDN usage while webpack builds
+  verbose: false,
+  resolver: (packageName, packageVersion, options) => {
+    const packageSuffix = isProd ? '.min.js' : '.js'
+    const moduleDetails = moduleToCdn(packageName, packageVersion, options)
+    if (moduleDetails) {
+      return moduleDetails
+    }
+    // "name" should match the package being imported
+    // "var" is important to get right -- this should be the exposed global. Look up "webpack externals" for info.
+    switch (packageName) {
+      case 'baseui':
+        return {
+          name: packageName,
+          var: 'BaseUI',
+          version: packageVersion,
+          url: `https://unpkg.com/baseui@${packageVersion}/dist/baseui${packageSuffix}`
+        }
+      default:
+        return null
+    }
+  }
+}
+
+// webpack settings used by each client entrypoint defined at top
 const clientConfig = {
   ...sharedClientAndServerConfig,
   mode: isProd ? 'production' : 'development',
@@ -123,59 +149,24 @@ const clientConfig = {
         use: ['style-loader', 'css-loader']
       }
     ]
-  }
+  },
+  name: clientEntrypoint.name,
+  entry: clientEntrypoint.entry,
+  plugins: [
+    new webpack.DefinePlugin({
+      'process.env': JSON.stringify(envVars)
+    }),
+    new HtmlWebpackPlugin({
+      template: clientEntrypoint.template,
+      filename: `${clientEntrypoint.filename}.html`,
+      inlineSource: '^[^(//)]+.(js|css)$' // embed all js and css inline, exclude packages with '//' for dynamic cdn insertion
+    }),
+    // add the generated js code to the html file inline
+    new HtmlWebpackInlineSourcePlugin(),
+    // this plugin allows us to add dynamically load packages from a CDN
+    new DynamicCdnWebpackPlugin(DynamicCdnWebpackPluginConfig)
+  ]
 }
-
-// DynamicCdnWebpackPlugin settings
-// these settings help us load 'react', 'react-dom' and the packages defined below from a CDN
-// see https://github.com/enuchi/React-Google-Apps-Script#adding-new-libraries-and-packages
-const DynamicCdnWebpackPluginConfig = {
-  // set "verbose" to true to print console logs on CDN usage while webpack builds
-  verbose: false,
-  resolver: (packageName, packageVersion, options) => {
-    const packageSuffix = isProd ? '.min.js' : '.js'
-    const moduleDetails = moduleToCdn(packageName, packageVersion, options)
-    if (moduleDetails) {
-      return moduleDetails
-    }
-    // "name" should match the package being imported
-    // "var" is important to get right -- this should be the exposed global. Look up "webpack externals" for info.
-    switch (packageName) {
-      case 'baseui':
-        return {
-          name: packageName,
-          var: 'BaseUI',
-          version: packageVersion,
-          url: `https://unpkg.com/baseui@${packageVersion}/dist/baseui${packageSuffix}`
-        }
-      default:
-        return null
-    }
-  }
-}
-
-// webpack settings used by each client entrypoint defined at top
-const clientConfigs = clientEntrypoints.map(clientEntrypoint => {
-  return {
-    ...clientConfig,
-    name: clientEntrypoint.name,
-    entry: clientEntrypoint.entry,
-    plugins: [
-      new webpack.DefinePlugin({
-        'process.env': JSON.stringify(envVars)
-      }),
-      new HtmlWebpackPlugin({
-        template: clientEntrypoint.template,
-        filename: `${clientEntrypoint.filename}.html`,
-        inlineSource: '^[^(//)]+.(js|css)$' // embed all js and css inline, exclude packages with '//' for dynamic cdn insertion
-      }),
-      // add the generated js code to the html file inline
-      new HtmlWebpackInlineSourcePlugin(),
-      // this plugin allows us to add dynamically load packages from a CDN
-      new DynamicCdnWebpackPlugin(DynamicCdnWebpackPluginConfig)
-    ]
-  }
-})
 
 // webpack settings for devServer https://webpack.js.org/configuration/dev-server/
 const devServer = {
@@ -232,7 +223,7 @@ const serverConfig = {
         terserOptions: {
           // ecma 5 is needed to support Rhino "DEPRECATED_ES5" runtime
           // can use ecma 6 if V8 runtime is used
-          ecma: 5,
+          ecma: 6,
           warnings: false,
           parse: {},
           compress: {
@@ -269,6 +260,6 @@ module.exports = [
   { ...copyFilesConfig, ...(isProd ? {} : { devServer }) },
   // 3. Create the server bundle
   serverConfig,
-  // 4. Create one client bundle for each client entrypoint.
-  ...clientConfigs
+  // 4. Create the client bundle
+  clientConfig
 ]

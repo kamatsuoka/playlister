@@ -162,18 +162,16 @@ class UploadWatcher {
     this.errorHandler = errorHandler
   }
 
-  uploadFile (file, fileId, token) {
+  uploadFile (file, fileId, startTime, token) {
     const videoResource = {
       snippet: {
         title: youtubeTitle(file.name),
+        description: JSON.stringify({ startTime: startTime }),
         categoryId: 10
       },
       status: {
         privacyStatus: 'unlisted',
         selfDeclaredMadeForKids: false
-      },
-      recordingDetails: {
-        recordingDate: file.startTime
       }
     }
     console.log(`uploading file with name ${file.name}, videoResource`, videoResource)
@@ -203,13 +201,19 @@ class UploadWatcher {
       onComplete: response => {
         const video = response.data
         console.log('uploaded video, response = ', response)
+        let startTime = ''
+        try {
+          startTime = JSON.parse(video.description).startTime
+        } catch {
+          // ignore
+        }
         this.completeHandler({
           videoId: video.id,
           filename: file.name,
           fileId: fileId,
           title: video.snippet.title,
+          startTime: startTime,
           publishedAt: video.snippet.publishedAt,
-          recordingDate: video.recordingDetails.recordingDate,
           file: file
         })
       }
@@ -219,9 +223,10 @@ class UploadWatcher {
   }
 }
 
-function resumableUpload (file, fileId, progressHandler, completeHandler, errorHandler) {
+function resumableUpload (file, fileId, startTime, progressHandler, completeHandler, errorHandler) {
   return google.script.run.withSuccessHandler(token =>
-    (new UploadWatcher(progressHandler, completeHandler, errorHandler)).uploadFile(file, fileId, token)
+    (new UploadWatcher(progressHandler, completeHandler, errorHandler))
+      .uploadFile(file, fileId, startTime, token)
   ).getToken()
 }
 

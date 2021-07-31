@@ -1,11 +1,30 @@
-# Prerequesites
+# Playlister
 
-- Install [Sass](https://sass-lang.com/install)
+A Google Apps Script web app for 
+- uploading event videos to youtube
+- creating a playlist for the event
+- adding videos to the playlist
+- renaming videos in a standard way
+- adding video metadata to a google sheet to keep track of highlights
 
+## Origins
 
-# Getting Started with Create React App
+- Originally I tried to implement this as a standalone app, outside of Apps Script. 
+  But eventually I found that you can't create a playlist for someone else,
+  which would mean you could only use the app if you were signed in to the 
+  account that holds the videos. Using Apps Script get around that limitation
+  by letting the account-holder grant permissions to the web app.
+- This project is based on the [https://github.com/enuchi/React-Google-Apps-Script](React-Google-Apps-Script)
+  template. At some point I chose to eject because there was something that I wasn't 
+  able to change, but I can't remember what it was.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Notes
+
+- I attempted to keep track of the video start time (as extracted by mediainfo.js) by
+  storing it in the recordingDetails.recordingDate field on insert. But somehow recordingDate
+  gets truncated down to just the date (with no time) when fetching the video later.
+  So I fell back to storing the start time in the description field. 
+
 
 ## Available Scripts
 
@@ -22,7 +41,8 @@ You will also see any lint errors in the console.
 ### `yarn test`
 
 Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+
+So far there aren't really any tests 🥲
 
 ### `yarn build`
 
@@ -33,22 +53,7 @@ The build is minified and the filenames include the hashes.\
 Your app is ready to be deployed!
 
 See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `yarn eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+(Note that this link and the links that follow may no longer apply since I ejected.)
 
 ### Code Splitting
 
