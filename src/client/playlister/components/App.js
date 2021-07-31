@@ -8,19 +8,19 @@ import { Client as Styletron } from 'styletron-engine-atomic'
 import UploadPage from './UploadPage'
 import VideoPage from './VideoPage'
 import { StyledLink } from 'baseui/link'
-import { ProgressSteps, Step } from 'baseui/progress-steps'
 import PlaylistPage from './PlaylistPage'
 import FilePage from './FilePage'
 import { SnackbarProvider } from 'baseui/snackbar'
 import { DEFAULT_DATE } from './EventDate'
 import PreferencePage from './PreferencePage'
 import prevNextButtons from './PrevNextButtons'
+import { Tab, Tabs } from 'baseui/tabs-motion'
 
 const engine = new Styletron()
 
 function App () {
   // index of currently selected step
-  const [current, setCurrent] = useState(1)
+  const [activeKey, setActiveKey] = useState(1)
   // info about the organization
   const [orgInfo, setOrgInfo] = useState({ orgName: 'fcs' })
   // info about the camera
@@ -66,53 +66,46 @@ function App () {
   // items in current playlist - map of videoId to { playlistId, position, etc. }
   const [playlistItems, setPlaylistItems] = useState({})
 
+  const tabOverrides = {
+    TabPanel: {
+      style: ({
+        width: 'fit-content',
+        minWidth: '720px'
+      })
+    }
+  }
   return (
     <StyletronProvider value={engine}>
       <BaseProvider theme={LightTheme}>
         <SnackbarProvider>
-          <ProgressSteps
-            current={current}
-            overrides={{
-              Content: {
-                style: () => ({
-                // avoid jumping widths on desktop ... not sure about mobile
-                  minWidth: '720px'
-                })
-              },
-              Description: {
-                style: () => ({
-                  marginBottom: 0 // compactify a little
-                })
-              }
-            }}
-          >
-            <Step title='Basics'>
+          <Tabs activeKey={activeKey} disabled>
+            <Tab overrides={tabOverrides} title='Basics'>
               <PreferencePage
-                current={0} setCurrent={setCurrent}
+                current={0} setCurrent={setActiveKey}
                 orgInfo={orgInfo} setOrgInfo={setOrgInfo}
                 eventData={eventData} setEventData={setEventData}
                 cameraInfo={cameraInfo} setCameraInfo={setCameraInfo}
               />
-              {prevNextButtons({ current: 0, setCurrent })}
-            </Step>
-            <Step title='Files'>
+              {prevNextButtons({ current: 0, setCurrent: setActiveKey })}
+            </Tab>
+            <Tab overrides={tabOverrides} title='Files'>
               <FilePage
-                current={1} setCurrent={setCurrent}
+                current={1} setCurrent={setActiveKey}
                 mediaList={mediaList} setMediaList={setMediaList}
                 files={files} setFiles={setFiles}
                 timeAdjust={timeAdjust} setTimeAdjust={setTimeAdjust}
                 eventData={eventData} setEventData={setEventData}
               />
-            </Step>
-            <Step title='Uploads'>
+            </Tab>
+            <Tab overrides={tabOverrides} title='Uploads'>
               <UploadPage
-                current={2} setCurrent={setCurrent}
+                current={2} setCurrent={setActiveKey}
                 files={files} uploads={uploads} setUploads={setUploads}
               />
-            </Step>
-            <Step title='Playlist'>
+            </Tab>
+            <Tab overrides={tabOverrides} title='Playlist'>
               <PlaylistPage
-                current={3} setCurrent={setCurrent}
+                current={3} setCurrent={setActiveKey}
                 orgInfo={orgInfo} cameraInfo={cameraInfo}
                 files={files} uploads={uploads} eventData={eventData}
                 playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
@@ -122,16 +115,16 @@ function App () {
                 playlist={playlist} setPlaylist={setPlaylist}
                 playlistItems={playlistItems} setPlaylistItems={setPlaylistItems}
               />
-            </Step>
-            <Step title='Rename'>
+            </Tab>
+            <Tab overrides={tabOverrides} title='Rename'>
               <VideoPage
-                current={5} setCurrent={setCurrent} files={files}
+                current={5} setCurrent={setActiveKey} files={files}
                 uploads={uploads} setUploads={setUploads}
-                playlist={playlist} setActiveKey={setCurrent}
+                playlist={playlist} setActiveKey={setActiveKey}
                 newTitles={newTitles} setNewTitles={setNewTitles}
               />
-            </Step>
-          </ProgressSteps>
+            </Tab>
+          </Tabs>
         </SnackbarProvider>
         <footer>
           <StyledLink
