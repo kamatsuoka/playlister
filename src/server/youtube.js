@@ -3,6 +3,8 @@ import duration from './dayjs/plugin/duration'
 
 dayjs.extend(duration)
 
+const CATEGORY_ID_MUSIC = 10
+
 /**
  * Searches a list of items for one with given title
  */
@@ -76,7 +78,8 @@ export function insertPlaylist (title, description) {
  * 1. Fetching the user's channels
  * 2. Fetching each channel's "uploads" playlist
  * 3. Listing videos in the uploads playlist
- * 4. Returning videos that match one of the given filenames / titles
+ * 4. Updating video's description field to contain video start/end time, if necessary
+ * 5. Returning videos that match one of the given filenames / titles
  *
  * @param {Object} files - map of filename to { title, fileData }
  * @return Array of { videoId, title, publishedAt, filename, duration, startTime }
@@ -102,7 +105,7 @@ export function findUploads (files) {
     const playlistResponse = YouTube.PlaylistItems.list('snippet', {
       playlistId: playlistId,
       maxResults: 50,
-      fields: 'items(snippet(publishedAt,title,resourceId(videoId)))'
+      fields: 'items(snippet(publishedAt, title, description, resourceId(videoId)))'
     })
 
     // Although it's not documented, playlist items seem to come back in reverse
@@ -157,6 +160,22 @@ export function findUploads (files) {
               `at ${matchingVideos[match.filename].publishedAt}, ignoring`)
           continue
         }
+        const desiredDescription = JSON.stringify({
+          startTime: match.fileData.startTime,
+          endTime: match.fileData.endTime
+        })
+        if (match.description !== desiredDescription) {
+          Logger.log(`Updating description of video ${match.videoId} to contain startTime and endTime`)
+          const updateResource = {
+            id: match.videoId,
+            snippet: {
+              title: match.title,
+              description: desiredDescription,
+              categoryId: CATEGORY_ID_MUSIC
+            }
+          }
+          YouTube.Videos.update(updateResource, 'snippet')
+        }
         match.duration = video.contentDetails.duration
         matchingVideos[match.filename] = match
         Logger.log(`matching video: ${JSON.stringify(match)}`)
@@ -171,7 +190,6 @@ export function findUploads (files) {
  *
  * @param videoId id of video to update
  * @param title new title
- * @returns {GoogleAppsScript.YouTube.Schema.Video}
  */
 export function updateTitle (videoId, title) {
   // TODO: add in update to status: unlisted once app is approved
@@ -180,7 +198,7 @@ export function updateTitle (videoId, title) {
       id: videoId,
       snippet: {
         title: title,
-        categoryId: 10
+        categoryId: CATEGORY_ID_MUSIC
       }
     },
     'snippet'

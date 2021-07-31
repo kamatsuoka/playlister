@@ -1,3 +1,3 @@
-const openPlaylister = () => HtmlService.createHtmlOutputFromFile('playlister')
+const openPlaylister = () => HtmlService.createHtmlOutputFromFile('index')
 
 export { openPlaylister }

@@ -1,7 +1,6 @@
 import React, { useCallback, useState } from 'react'
 import { Button, KIND, SIZE } from 'baseui/button'
 import UploadList from './UploadList'
-import dayjs from 'dayjs'
 import { findUploads } from '../youtube/api'
 import { StyledLink } from 'baseui/link'
 import { Paragraph3 } from 'baseui/typography'
@@ -36,18 +35,14 @@ const UploadPage = ({ current, setCurrent, files, uploads, setUploads }) => {
     const fileIds = files.map(data => data.fileId)
     setCheckingStatus(true)
     const onSuccess = foundUploads => {
-      const dateNow = dayjs()
-      const recentUploads = foundUploads.filter(upload =>
-        dateNow.diff(dayjs(upload.publishedAt), 'days') < 30
-      ).map(upload => [
+      setUploads(Object.fromEntries(foundUploads.map(upload => [
         upload.fileData.fileId, {
           videoId: upload.videoId,
           title: upload.title,
           startTime: descriptionToStartTime(upload.description),
           publishedAt: upload.publishedAt,
           ...upload.fileData
-        }])
-      setUploads(Object.fromEntries(recentUploads))
+        }])))
       setCheckedFileIds(new Set(fileIds))
       setCheckingStatus(false)
     }
