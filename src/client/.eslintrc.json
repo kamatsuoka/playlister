@@ -9,7 +9,8 @@
   ],
   "plugins": [
     "babel",
-    "react"
+    "react",
+    "jest"
   ],
   "env": {
     "browser": true,

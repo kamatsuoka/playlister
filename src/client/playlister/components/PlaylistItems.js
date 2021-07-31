@@ -7,15 +7,7 @@ import { enqueueError } from '../util/enqueueError'
 import { useStyletron } from 'baseui'
 import { TableBuilder, TableBuilderColumn } from 'baseui/table-semantic'
 import { tableOverrides } from './TableOverrides'
-import { displayDate } from '../util/dates'
-
-export const descriptionToStartTime = description => {
-  try {
-    return JSON.parse(description).startTime
-  } catch {
-    return undefined
-  }
-}
+import { displayDate, parseDescription } from '../util/dates'
 
 export const resourceToPlaylistItem = resource => ({
   playlistItemId: resource.id,
@@ -23,7 +15,7 @@ export const resourceToPlaylistItem = resource => ({
   videoId: resource.snippet.resourceId.videoId,
   title: resource.snippet.title,
   position: resource.snippet.position,
-  startTime: descriptionToStartTime(resource.description)
+  ...parseDescription(resource.description)
 })
 
 /**

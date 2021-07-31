@@ -23,7 +23,7 @@ const UploadList = ({ files, checkedFileIds, uploads, setUploads }) => {
   const { enqueue } = useSnackbar()
   const showError = enqueueError(enqueue)
 
-  const uploadFile = (file, fileId, startTime) => {
+  const uploadFile = (file, fileId, startTime, endTime) => {
     const progressHandler = percent => {
       setUploadProgress({ ...uploadProgress, [fileId]: percent })
     }
@@ -35,7 +35,7 @@ const UploadList = ({ files, checkedFileIds, uploads, setUploads }) => {
       console.log('completeHandler: uploaded = ', uploaded)
       return setUploads(uploads => ({ ...uploads, [fileId]: uploaded }))
     }
-    resumableUpload(file, fileId, startTime, progressHandler, completeHandler, errorHandler)
+    resumableUpload(file, fileId, startTime, endTime, progressHandler, completeHandler, errorHandler)
   }
 
   const getButtonContent = fileId => {
@@ -73,7 +73,7 @@ const UploadList = ({ files, checkedFileIds, uploads, setUploads }) => {
         <Button
           onClick={() => {
             setUploadButtonState({ ...uploadButtonState, [row.fileId]: UPLOADING })
-            uploadFile(row.file, row.fileId, row.startTime)
+            uploadFile(row.file, row.fileId, row.startTime, row.endTime)
           }}
           title='Upload'
           kind={KIND.tertiary}

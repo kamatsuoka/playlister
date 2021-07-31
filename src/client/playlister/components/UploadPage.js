@@ -7,7 +7,7 @@ import { Paragraph3 } from 'baseui/typography'
 import { useSnackbar } from 'baseui/snackbar'
 import { enqueueError } from '../util/enqueueError'
 import prevNextButtons from './PrevNextButtons'
-import { descriptionToStartTime } from './PlaylistItems'
+import { parseDescription } from '../util/dates'
 
 /**
  * Page for uploading videos, or finding previously-uploaded videos for same files
@@ -39,9 +39,9 @@ const UploadPage = ({ current, setCurrent, files, uploads, setUploads }) => {
         upload.fileData.fileId, {
           videoId: upload.videoId,
           title: upload.title,
-          startTime: descriptionToStartTime(upload.description),
           publishedAt: upload.publishedAt,
-          ...upload.fileData
+          ...upload.fileData,
+          ...parseDescription(upload.description)
         }])))
       setCheckedFileIds(new Set(fileIds))
       setCheckingStatus(false)
