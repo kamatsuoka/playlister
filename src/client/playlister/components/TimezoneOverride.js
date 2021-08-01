@@ -2,8 +2,8 @@ import React from 'react'
 import { Checkbox } from 'baseui/checkbox'
 import { SIZE } from 'baseui/input'
 import { useStyletron } from 'baseui'
-import { StatefulTooltip } from 'baseui/tooltip'
 import dayjs from 'dayjs'
+import Tooltip from './Tooltip'
 
 const TimezoneOverride = ({ mediaList, value, setValue }) => {
   const [css, theme] = useStyletron()
@@ -48,14 +48,9 @@ const TimezoneOverride = ({ mediaList, value, setValue }) => {
         }}
       >
         <SmallSpan>
-          <StatefulTooltip
-            accessibilityType='tooltip'
-            content={utcMessage}
-          >
-            <span className={css({ borderBottomWidth: '1px', borderBottomStyle: 'dotted' })}>
-              Interpret times
-            </span>
-          </StatefulTooltip>
+          <Tooltip tooltip={utcMessage}>
+            Interpret Times
+          </Tooltip>
           {' '} in local time zone ({dayjs.tz.guess()})
         </SmallSpan>
       </Checkbox>

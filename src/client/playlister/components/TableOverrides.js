@@ -1,5 +1,11 @@
 const tablePadding = '7px'
 const tableOverrides = {
+  TableHeadCell: {
+    style: {
+      paddingLeft: tablePadding,
+      paddingRight: tablePadding
+    }
+  },
   TableBodyRow: {
     style: ({ $theme, $rowIndex }) => ({
       backgroundColor:
@@ -10,12 +16,6 @@ const tableOverrides = {
         backgroundColor: $theme.colors.backgroundTertiary
       }
     })
-  },
-  TableHeadCell: {
-    style: {
-      paddingLeft: tablePadding,
-      paddingRight: tablePadding
-    }
   },
   TableBodyCell: {
     style: {

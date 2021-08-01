@@ -4,8 +4,6 @@ import { faGithub } from '@fortawesome/free-brands-svg-icons'
 import { BaseProvider, LightTheme } from 'baseui'
 import { Provider as StyletronProvider } from 'styletron-react'
 import { Client as Styletron } from 'styletron-engine-atomic'
-
-import UploadPage from './UploadPage'
 import VideoPage from './VideoPage'
 import { StyledLink } from 'baseui/link'
 import PlaylistPage from './PlaylistPage'
@@ -15,6 +13,7 @@ import { DEFAULT_DATE } from './EventDate'
 import PreferencePage from './PreferencePage'
 import prevNextButtons from './PrevNextButtons'
 import { Tab, Tabs } from 'baseui/tabs-motion'
+import YouTubePage from './YouTubePage'
 
 const engine = new Styletron()
 
@@ -97,8 +96,8 @@ function App () {
                 eventData={eventData} setEventData={setEventData}
               />
             </Tab>
-            <Tab overrides={tabOverrides} title='Uploads'>
-              <UploadPage
+            <Tab overrides={tabOverrides} title='YouTube'>
+              <YouTubePage
                 current={2} setCurrent={setActiveKey}
                 files={files} uploads={uploads} setUploads={setUploads}
               />

@@ -1,13 +1,16 @@
 import React, { useState } from 'react'
 import { TableBuilder, TableBuilderColumn } from 'baseui/table-semantic'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faQuestion } from '@fortawesome/free-solid-svg-icons'
+import { faQuestion, faSyncAlt } from '@fortawesome/free-solid-svg-icons'
 import { tableOverrides } from './TableOverrides'
 import { Button, KIND, SIZE } from 'baseui/button'
 import resumableUpload from '../youtube/youtube-uploader'
 import { displayDate } from '../util/dates'
 import { useSnackbar } from 'baseui/snackbar'
 import { enqueueError } from '../util/enqueueError'
+import Tooltip from './Tooltip'
+import { StyledLink } from 'baseui/link'
+import { createTheme, lightThemePrimitives, ThemeProvider } from 'baseui'
 
 const UPLOADING = 'uploading'
 const ERROR = 'error'
@@ -15,7 +18,7 @@ const ERROR = 'error'
 /**
  * List of file upload status
  */
-const UploadList = ({ files, checkedFileIds, uploads, setUploads }) => {
+const UploadList = ({ files, checkedFileIds, uploads, setUploads, checking, checkUploads }) => {
   // map of fileId to upload button state
   const [uploadButtonState, setUploadButtonState] = useState({})
   // map of fileId to upload progress
@@ -104,6 +107,54 @@ const UploadList = ({ files, checkedFileIds, uploads, setUploads }) => {
     }
   }
 
+  const uploadTooltip = (
+    <>
+      You can upload your files here or on {' '}
+      <ThemeProvider
+        theme={createTheme(lightThemePrimitives, {
+          colors: {
+            linkText: '#ffffff',
+            linkVisited: '#ffffff',
+            linkHover: '#aaaaaa'
+          }
+        })}
+      >
+        <StyledLink href='https://www.youtube.com/upload' target='_blank' rel='noopener noreferrer'>
+          YouTube
+        </StyledLink>
+      </ThemeProvider>
+      <br />
+      If you upload on YouTube, check for your uploads by clicking sync &nbsp;
+      <FontAwesomeIcon className='fa-padded' icon={faSyncAlt} size='sm' />
+    </>
+  )
+
+  const uploadDateHeader = (
+    <>
+      <Tooltip tooltip={uploadTooltip}>
+        Upload Date
+      </Tooltip>
+      {' '}
+      <Button
+        size={SIZE.small} disabled={files.length === 0}
+        kind={KIND.minimal}
+        onClick={checkUploads}
+        overrides={{
+          Root: {
+            style: ({ $theme }) => ({
+              paddingTop: 0,
+              paddingBottom: 0,
+              position: 'relative',
+              top: '3px'
+            })
+          }
+        }}
+      >
+        <FontAwesomeIcon className='fa-padded' icon={faSyncAlt} spin={checking} />
+      </Button>
+    </>
+  )
+
   return (
     <div>
       <TableBuilder data={files} overrides={tableOverrides}>
@@ -113,7 +164,7 @@ const UploadList = ({ files, checkedFileIds, uploads, setUploads }) => {
         <TableBuilderColumn overrides={columnOverrides} header='Start Time'>
           {row => displayDate(row.startTime)}
         </TableBuilderColumn>
-        <TableBuilderColumn header='Uploaded' overrides={columnOverrides}>
+        <TableBuilderColumn header={uploadDateHeader} overrides={columnOverrides}>
           {row => uploadButton(row)}
         </TableBuilderColumn>
         <TableBuilderColumn overrides={columnOverrides} header='YouTube Title'>
