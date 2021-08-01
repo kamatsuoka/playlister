@@ -46,7 +46,10 @@ const PlaylistPage = ({
       return setPlaylistItems(
         resources && resources.length > 0
           ? Object.fromEntries(
-            resources.map(resourceToPlaylistItem).map(item => [item.videoId, item])
+            resources
+              .map(resourceToPlaylistItem)
+              .sort((item1, item2) => item1.startTime > item2.startTime ? 1 : -1)
+              .map(item => [item.videoId, item])
           )
           : null
       )
@@ -125,7 +128,7 @@ const PlaylistPage = ({
           }
         }}
       >
-        <Tab title='Create new playlist' overrides={tabOverrides}>
+        <Tab title='New' overrides={tabOverrides}>
           <PlaylistCreate
             eventData={eventData} orgInfo={orgInfo} cameraInfo={cameraInfo}
             createdPlaylist={createdPlaylist} setCreatedPlaylist={setCreatedPlaylist}
@@ -134,7 +137,7 @@ const PlaylistPage = ({
             playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
           />
         </Tab>
-        <Tab title='Use existing playlist' overrides={tabOverrides}>
+        <Tab title='Existing' overrides={tabOverrides}>
           <PlaylistSelect
             playlists={playlists}
             selectedPlaylist={selectedPlaylist} setSelectedPlaylist={setSelectedPlaylist}
@@ -142,13 +145,10 @@ const PlaylistPage = ({
           />
         </Tab>
       </Tabs>
-      {playlistOkay
-        ? <PlaylistItems
-            files={files} uploads={uploads} playlist={playlist}
-            playlistItems={playlistItems} setPlaylistItems={setPlaylistItems}
-          />
-        : null}
-
+      <PlaylistItems
+        files={files} uploads={uploads} playlist={playlist}
+        playlistItems={playlistItems} setPlaylistItems={setPlaylistItems}
+      />
       {prevNextButtons({
         current,
         setCurrent,

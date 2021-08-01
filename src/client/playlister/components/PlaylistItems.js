@@ -8,6 +8,9 @@ import { useStyletron } from 'baseui'
 import { TableBuilder, TableBuilderColumn } from 'baseui/table-semantic'
 import { tableOverrides } from './TableOverrides'
 import { displayDate, parseDescription } from '../util/dates'
+import { FlexGrid, FlexGridItem } from 'baseui/flex-grid'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faAngleDoubleRight } from '@fortawesome/free-solid-svg-icons'
 
 export const resourceToPlaylistItem = resource => ({
   playlistItemId: resource.id,
@@ -15,7 +18,7 @@ export const resourceToPlaylistItem = resource => ({
   videoId: resource.snippet.resourceId.videoId,
   title: resource.snippet.title,
   position: resource.snippet.position,
-  ...parseDescription(resource.description)
+  ...parseDescription(resource.snippet.description)
 })
 
 /**
@@ -72,17 +75,33 @@ const PlaylistItems = ({ playlist, files, uploads, playlistItems, setPlaylistIte
 
   const addAllToPlaylist = () => {
     setAdding(true)
-    // in the happy path, we insert all the videos into the playlist
-    // in the correct order and never have to go back and add more later
-    // TODO: update playlist after items inserted
-    addToPlaylist(files.map(file => uploads[file.fileId].videoId), playlist.itemCount)
+    const videos = {}
+    for (const upload of files.map(file => uploads[file.fileId])) {
+      videos[upload.videoId] = { title: upload.title, startTime: upload.startTime }
+    }
+    for (const playlistItem of Object.values(playlistItems)) {
+      if (videos[playlistItem.videoId] && videos[playlistItem.videoId].startTime) {
+        continue
+      }
+      videos[playlistItem.videoId] = { title: playlistItem.title, startTime: playlistItem.startTime }
+    }
+    const orderedEntries = Object.entries(videos).sort(([, v1], [, v2]) => {
+      if (!v1.startTime && !v2.startTime) { return v1.title > v2.title ? 1 : -1 }
+      if (!v1.startTime) { return -1 }
+      if (!v2.startTime) { return 1 }
+      return v1.startTime > v2.startTime ? 1 : -1
+    })
+    console.log('orderedEntries: ', orderedEntries)
+    const orderedIds = orderedEntries.map(([id]) => id)
+    addToPlaylist(orderedIds, 0)
   }
 
   const buttonOverrides = {
     Root: {
       style: ({
-        marginTop: theme.sizing.scale600,
-        marginBottom: theme.sizing.scale600
+        height: '100%',
+        width: theme.sizing.scale1200
+        // backgroundColor: 'mono300'
       })
     }
   }
@@ -98,32 +117,70 @@ const PlaylistItems = ({ playlist, files, uploads, playlistItems, setPlaylistIte
         isLoading={adding}
         overrides={buttonOverrides}
       >
-        Add Videos to Playlist
+        <FontAwesomeIcon icon={faAngleDoubleRight} />
       </Button>
     </>
   )
 
+  const narrowItemProps = {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    overrides: {
+      Block: {
+        style: ({ $theme }) => ({
+          width: $theme.sizing.scale1200,
+          marginLeft: $theme.sizing.scale200,
+          marginRight: $theme.sizing.scale200,
+          flexGrow: 0
+        })
+      }
+    }
+  }
+
+  function showPlaylistItems () {
+    return (
+      <>
+        <Label1 paddingLeft={theme.sizing.scale200} style={{ textDecoration: 'underline' }}>
+          {playlist.title}
+        </Label1>
+        <TableBuilder data={Object.values(playlistItems)} overrides={tableOverrides}>
+          <TableBuilderColumn header='Title'>
+            {row => row.title}
+          </TableBuilderColumn>
+          <TableBuilderColumn header='Start Time'>
+            {row => displayDate(row.startTime)}
+          </TableBuilderColumn>
+          <TableBuilderColumn header='Position'>
+            {row => row.position}
+          </TableBuilderColumn>
+        </TableBuilder>
+      </>
+    )
+  }
+
   return (
-    <>
-      <Label1 paddingLeft={theme.sizing.scale200} style={{ textAlign: 'center', textDecoration: 'underline' }}>
-        {playlist.title}
-      </Label1>
-      <TableBuilder data={files} overrides={tableOverrides}>
-        <TableBuilderColumn header='Title'>
-          {row => uploads[row.fileId].title}
-        </TableBuilderColumn>
-        <TableBuilderColumn header='Start Time'>
-          {row => displayDate(row.startTime)}
-        </TableBuilderColumn>
-        <TableBuilderColumn header='Position'>
-          {row => {
-            const plist = playlistItems[uploads[row.fileId].videoId]
-            return plist ? plist.position : undefined
-          }}
-        </TableBuilderColumn>
-      </TableBuilder>
-      {showAddButton()}
-    </>
+    <FlexGrid flexGridColumnCount={3}>
+      <FlexGridItem>
+        <Label1 paddingLeft={theme.sizing.scale200} style={{ textDecoration: 'underline' }}>
+          Uploads
+        </Label1>
+        <TableBuilder data={files} overrides={tableOverrides}>
+          <TableBuilderColumn header='Title'>
+            {row => uploads[row.fileId].title}
+          </TableBuilderColumn>
+          <TableBuilderColumn header='Start Time'>
+            {row => displayDate(row.startTime)}
+          </TableBuilderColumn>
+        </TableBuilder>
+      </FlexGridItem>
+      <FlexGridItem {...narrowItemProps}>
+        {playlist.playlistId ? showAddButton() : null}
+      </FlexGridItem>
+      <FlexGridItem>
+        {playlist.playlistId ? showPlaylistItems() : null}
+      </FlexGridItem>
+    </FlexGrid>
   )
 }
 

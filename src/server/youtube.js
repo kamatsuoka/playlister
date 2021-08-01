@@ -261,5 +261,13 @@ export function listPlaylistItems (playlistId) {
     maxResults: 50,
     fields: 'items(id, snippet(title, description, playlistId, position, resourceId(videoId)))'
   }
-  return YouTube.PlaylistItems.list('snippet', optionalArgs).items
+  const items = YouTube.PlaylistItems.list('snippet', optionalArgs).items
+  let pruned = false
+  for (const item of items) {
+    if (item.snippet.title === 'Deleted video') {
+      YouTube.PlaylistItems.remove(item.id)
+      pruned = true
+    }
+  }
+  return pruned ? YouTube.PlaylistItems.list('snippet', optionalArgs).items : items
 }
