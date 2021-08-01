@@ -243,3 +243,30 @@ export const listPlaylistItems = (playlistId, onSuccess, onFailure) => {
     }).then(onSuccess).catch(onFailure)
   }
 }
+
+export const addToPlaylist = (videoIds, playlistId, onSuccess, onFailure) => {
+  const run = getAppsScriptRun()
+  if (run) {
+    return run
+      .withSuccessHandler(onSuccess)
+      .withFailureHandler(onFailure)
+      .addToPlaylist(videoIds, playlistId)
+  } else {
+    // for testing
+    const resources = videoIds.map((videoId, i) => ({
+      id: randomId(),
+      snippet: {
+        playlistId: playlistId,
+        title: `video ${i}`,
+        startTime: dayjs().toISOString(),
+        position: i,
+        resourceId: {
+          videoId: videoId
+        }
+      }
+    }))
+    return new Promise(resolve => {
+      return resolve(resources)
+    }).then(onSuccess).catch(onFailure)
+  }
+}

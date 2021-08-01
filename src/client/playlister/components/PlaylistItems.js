@@ -8,9 +8,8 @@ import { useStyletron } from 'baseui'
 import { TableBuilder, TableBuilderColumn } from 'baseui/table-semantic'
 import { tableOverrides } from './TableOverrides'
 import { displayDate, parseDescription } from '../util/dates'
-import { FlexGrid, FlexGridItem } from 'baseui/flex-grid'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faAngleDoubleRight } from '@fortawesome/free-solid-svg-icons'
+import { faAngleDoubleDown } from '@fortawesome/free-solid-svg-icons'
 
 export const resourceToPlaylistItem = resource => ({
   playlistItemId: resource.id,
@@ -34,43 +33,29 @@ const PlaylistItems = ({ playlist, files, uploads, playlistItems, setPlaylistIte
   const { enqueue } = useSnackbar()
   const showError = enqueueError(enqueue)
 
-  const addToPlaylist = (videoIds, position) => {
-    console.log(`addToPlaylist: ${videoIds.length} videos, position ${position}`)
+  /**
+   * Add videos to playlist in the position specified by their order in the array.
+   * If video is already in playlist, just put it in the correct position.
+   *
+   * @param videoIds array of video ids
+   */
+  const addToPlaylist = videoIds => {
+    console.log(`addToPlaylist: ${videoIds}`)
     if (videoIds.length === 0) {
       setAdding(false)
       return
     }
-    const videoId = videoIds.shift() // pop off head of array
-    const successHandler = resource => {
-      const item = resourceToPlaylistItem(resource)
-      setPlaylistItems(playlistItems => ({ ...playlistItems, [item.videoId]: item }))
-      addToPlaylist(videoIds, position + 1)
+    const successHandler = items => {
+      setPlaylistItems(items.map(resourceToPlaylistItem))
+      setAdding(false)
     }
     const failureHandler = err => {
       setAdding(false)
       showError(err)
     }
-    const existingItem = playlistItems[videoId]
-    // if video is already in playlist
-    if (existingItem && existingItem.playlistId === playlist.playlistId) {
-      // update its position if necessary
-      if (existingItem.position !== position) {
-        youtube.updatePlaylistItem({
-          playlistItemId: existingItem.playlistItemId,
-          videoId,
-          playlistId: playlist.playlistId,
-          position,
-          successHandler,
-          failureHandler
-        })
-      } else {
-        addToPlaylist(videoIds, position + 1)
-      }
-    } else {
-      youtube.insertPlaylistItem(
-        videoId, playlist.playlistId, successHandler, failureHandler
-      )
-    }
+    youtube.addToPlaylist(
+      videoIds, playlist.playlistId, successHandler, failureHandler
+    )
   }
 
   const addAllToPlaylist = () => {
@@ -93,15 +78,16 @@ const PlaylistItems = ({ playlist, files, uploads, playlistItems, setPlaylistIte
     })
     console.log('orderedEntries: ', orderedEntries)
     const orderedIds = orderedEntries.map(([id]) => id)
-    addToPlaylist(orderedIds, 0)
+    addToPlaylist(orderedIds)
   }
 
   const buttonOverrides = {
     Root: {
       style: ({
-        height: '100%',
-        width: theme.sizing.scale1200
-        // backgroundColor: 'mono300'
+        width: '100%',
+        height: theme.sizing.scale1200,
+        marginTop: theme.sizing.scale600,
+        marginBottom: theme.sizing.scale600
       })
     }
   }
@@ -117,26 +103,12 @@ const PlaylistItems = ({ playlist, files, uploads, playlistItems, setPlaylistIte
         isLoading={adding}
         overrides={buttonOverrides}
       >
-        <FontAwesomeIcon icon={faAngleDoubleRight} />
+        <FontAwesomeIcon icon={faAngleDoubleDown} />
+        &nbsp; Add to Playlist &nbsp;
+        <FontAwesomeIcon icon={faAngleDoubleDown} />
       </Button>
     </>
   )
-
-  const narrowItemProps = {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    overrides: {
-      Block: {
-        style: ({ $theme }) => ({
-          width: $theme.sizing.scale1200,
-          marginLeft: $theme.sizing.scale200,
-          marginRight: $theme.sizing.scale200,
-          flexGrow: 0
-        })
-      }
-    }
-  }
 
   function showPlaylistItems () {
     return (
@@ -160,27 +132,21 @@ const PlaylistItems = ({ playlist, files, uploads, playlistItems, setPlaylistIte
   }
 
   return (
-    <FlexGrid flexGridColumnCount={3}>
-      <FlexGridItem>
-        <Label1 paddingLeft={theme.sizing.scale200} style={{ textDecoration: 'underline' }}>
-          Uploads
-        </Label1>
-        <TableBuilder data={files} overrides={tableOverrides}>
-          <TableBuilderColumn header='Title'>
-            {row => uploads[row.fileId].title}
-          </TableBuilderColumn>
-          <TableBuilderColumn header='Start Time'>
-            {row => displayDate(row.startTime)}
-          </TableBuilderColumn>
-        </TableBuilder>
-      </FlexGridItem>
-      <FlexGridItem {...narrowItemProps}>
-        {playlist.playlistId ? showAddButton() : null}
-      </FlexGridItem>
-      <FlexGridItem>
-        {playlist.playlistId ? showPlaylistItems() : null}
-      </FlexGridItem>
-    </FlexGrid>
+    <>
+      <Label1 paddingLeft={theme.sizing.scale200} style={{ textDecoration: 'underline' }}>
+        Uploads
+      </Label1>
+      <TableBuilder data={files} overrides={tableOverrides}>
+        <TableBuilderColumn header='Title'>
+          {row => uploads[row.fileId].title}
+        </TableBuilderColumn>
+        <TableBuilderColumn header='Start Time'>
+          {row => displayDate(row.startTime)}
+        </TableBuilderColumn>
+      </TableBuilder>
+      {playlist.playlistId ? showAddButton() : null}
+      {playlist.playlistId ? showPlaylistItems() : null}
+    </>
   )
 }
 

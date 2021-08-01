@@ -1,17 +1,38 @@
 import * as youtube from './youtube'
 import { openPlaylister } from './ui'
 
-global.getToken = () => {
-  return ScriptApp.getOAuthToken()
+function printStackTrace (e) {
+  const stack = e.stack
+    .split('\n')
+    .slice(2)
+    .map((line) => line.replace(/\s+at\s+/, ''))
+    .join('\n')
+  Logger.log(stack)
 }
 
-global.doGet = openPlaylister
+/**
+ * Wrapper that invokes a function and print any stack trace that occurs
+ *
+ * @param f function to wrap
+ * @return wrapped function
+ */
+const trace = f => (...args) => {
+  try {
+    return f(...args)
+  } catch (e) {
+    printStackTrace(e)
+    throw e
+  }
+}
 
-global.findMyPlaylist = youtube.findMyPlaylist
-global.listPlaylists = youtube.listPlaylists
-global.findUploads = youtube.findUploads
-global.insertPlaylist = youtube.insertPlaylist
-global.insertPlaylistItem = youtube.insertPlaylistItem
-global.updatePlaylistItem = youtube.updatePlaylistItem
-global.listPlaylistItems = youtube.listPlaylistItems
-global.updateTitle = youtube.updateTitle
+global.getToken = trace(() => { return ScriptApp.getOAuthToken() })
+global.doGet = trace(openPlaylister)
+global.findMyPlaylist = trace(youtube.findMyPlaylist)
+global.listPlaylists = trace(youtube.listPlaylists)
+global.findUploads = trace(youtube.findUploads)
+global.insertPlaylist = trace(youtube.insertPlaylist)
+global.insertPlaylistItem = trace(youtube.insertPlaylistItem)
+global.updatePlaylistItem = trace(youtube.updatePlaylistItem)
+global.listPlaylistItems = trace(youtube.listPlaylistItems)
+global.addToPlaylist = trace(youtube.addToPlaylist)
+global.updateTitle = trace(youtube.updateTitle)

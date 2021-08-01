@@ -102,16 +102,10 @@ export function findUploads (files) {
     // Channel resource: https://developers.google.com/youtube/v3/docs/channels
     // each channel has a special 'uploads' playlist that's not ordinarily visible
     const playlistId = channel.contentDetails.relatedPlaylists.uploads
-    const playlistResponse = YouTube.PlaylistItems.list('snippet', {
-      playlistId: playlistId,
-      maxResults: 50,
-      fields: 'items(snippet(publishedAt, title, description, resourceId(videoId)))'
-    })
-
     // Although it's not documented, playlist items seem to come back in reverse
     // chronological order. We're going to assume our files were uploaded
     // recently enough that we don't need to look back more than 50 items.
-    const items = playlistResponse.items
+    const items = listPlaylistItems(playlistId)
     Logger.log(`for channel ${channel.id}, got ${items.length} PlaylistItems`)
     if (items.length === 0) {
       return []
@@ -259,7 +253,7 @@ export function listPlaylistItems (playlistId) {
   const optionalArgs = {
     playlistId: playlistId,
     maxResults: 50,
-    fields: 'items(id, snippet(title, description, playlistId, position, resourceId(videoId)))'
+    fields: 'items(id, snippet(publishedAt, title, description, playlistId, position, resourceId(videoId)))'
   }
   const items = YouTube.PlaylistItems.list('snippet', optionalArgs).items
   let pruned = false
@@ -270,4 +264,27 @@ export function listPlaylistItems (playlistId) {
     }
   }
   return pruned ? YouTube.PlaylistItems.list('snippet', optionalArgs).items : items
+}
+
+/**
+ * Adds an array of video ids to a playlist in the order specified,.
+ * If video is already in playlist, just set its position.
+ */
+export function addToPlaylist (videoIds, playlistId) {
+  const videoItems = new Map() // map of video id to playlist item id
+  const addVideoItem = item => videoItems.set(item.snippet.resourceId.videoId, item.id)
+  // add any existing playlist items id to videoItems
+  listPlaylistItems(playlistId).forEach(addVideoItem)
+  // add any new videos to the playlist and add their new playlist item id to videoItems
+  videoIds.filter(!videoItems.has).forEach(videoId =>
+    addVideoItem(insertPlaylistItem(videoId, playlistId))
+  )
+  // set playlist positions based on the order in videoIds and return updated playlist items
+  return videoIds.map((videoId, position) =>
+    updatePlaylistItem({
+      playlistItemId: videoItems.get(videoId),
+      videoId,
+      playlistId,
+      position
+    }))
 }
