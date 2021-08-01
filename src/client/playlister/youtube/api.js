@@ -9,6 +9,13 @@ import { getAppsScriptRun } from '../util/auth'
 import dayjs from 'dayjs'
 
 /**
+ * Sleeps for a given number of ms (for testing)
+ */
+const sleep = ms => {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+/**
  * Finds a playlist by title.
  *
  * @param title title to search for
@@ -16,7 +23,7 @@ import dayjs from 'dayjs'
  * @param onFailure failure handler: (error) => {}
  * @returns {Promise<*>}
  */
-export const findPlaylist = (title, onSuccess, onFailure) => {
+export const findPlaylist = async (title, onSuccess, onFailure) => {
   console.log(`findPlaylist: searching for ${title}`)
   const run = getAppsScriptRun()
   if (run) {
@@ -25,6 +32,8 @@ export const findPlaylist = (title, onSuccess, onFailure) => {
       .withFailureHandler(onFailure)
       .findMyPlaylist(title)
   } else {
+    // for testing
+    await sleep(1000)
     return new Promise(resolve => {
       return resolve(undefined)
     }).then(onSuccess).catch(onFailure)
@@ -50,7 +59,7 @@ const samplePlaylist = (id, title, description, itemCount, publishedAt) => ({
  * @param onFailure failure handler: (error) => {}
  * @returns {Promise<*>}
  */
-export const listPlaylists = (onSuccess, onFailure) => {
+export const listPlaylists = async (onSuccess, onFailure) => {
   const run = getAppsScriptRun()
   if (run) {
     return run
@@ -59,6 +68,7 @@ export const listPlaylists = (onSuccess, onFailure) => {
       .listPlaylists()
   } else {
     // for testing
+    await sleep(1000)
     const playlists = [
       samplePlaylist('asdf', 'recent playlist 1', 'sample playlist 1', 0, '2021-06-26T00:12:34Z'),
       samplePlaylist('jklm', 'recent playlist 2 with longer title', 'sample playlist 2', 2, '2021-05-25T00:12:34Z'),
@@ -76,7 +86,7 @@ export const listPlaylists = (onSuccess, onFailure) => {
  * I think that means we can't let the app create a playlist on our behalf
  * unless we're signed in as the account owner.
  */
-export function insertPlaylist (title, onSuccess, onFailure) {
+export const insertPlaylist = async (title, onSuccess, onFailure) => {
   const description = `created by playlister on ${dayjs().format()}`
   const run = getAppsScriptRun()
   if (run) {
@@ -86,6 +96,7 @@ export function insertPlaylist (title, onSuccess, onFailure) {
       .insertPlaylist(title, description)
   } else {
     // for testing
+    await sleep(1000)
     const playlist = {
       id: 'asdf',
       snippet: {
@@ -123,7 +134,7 @@ const randomId = () => Math.random().toString(36).substr(2, 9)
  * @param onFailure failure handler: (error) => {}
  * @returns {Promise<*>}
  */
-export const findUploads = (fileList, onSuccess, onFailure) => {
+export const findUploads = async (fileList, onSuccess, onFailure) => {
   const fileData = Object.fromEntries(
     fileList.map(fileData => [fileData.filename, {
       title: youtubeTitle(fileData.filename),
@@ -138,6 +149,7 @@ export const findUploads = (fileList, onSuccess, onFailure) => {
       .withFailureHandler(onFailure)
       .findUploads(fileData)
   } else {
+    await sleep(1000)
     const uploads = fileList.map(fd => ({
       videoId: randomId(),
       title: youtubeTitle(fd.filename),
@@ -216,7 +228,7 @@ export const updateTitle = (videoId, title, onSuccess, onFailure) => {
   }
 }
 
-export const listPlaylistItems = (playlistId, onSuccess, onFailure) => {
+export const listPlaylistItems = async (playlistId, onSuccess, onFailure) => {
   const run = getAppsScriptRun()
   if (run) {
     return run
@@ -225,6 +237,7 @@ export const listPlaylistItems = (playlistId, onSuccess, onFailure) => {
       .listPlaylistItems(playlistId)
   } else {
     // for testing
+    await sleep(1000)
     const numItems = Math.max(1, Math.round(Math.random() * 5))
     const resources = Array.from({ length: numItems }, (x, i) => ({
       id: randomId(),
@@ -244,7 +257,7 @@ export const listPlaylistItems = (playlistId, onSuccess, onFailure) => {
   }
 }
 
-export const addToPlaylist = (videoIds, playlistId, onSuccess, onFailure) => {
+export const addToPlaylist = async (videoIds, playlistId, onSuccess, onFailure) => {
   const run = getAppsScriptRun()
   if (run) {
     return run
@@ -253,6 +266,7 @@ export const addToPlaylist = (videoIds, playlistId, onSuccess, onFailure) => {
       .addToPlaylist(videoIds, playlistId)
   } else {
     // for testing
+    await sleep(1000)
     const resources = videoIds.map((videoId, i) => ({
       id: randomId(),
       snippet: {

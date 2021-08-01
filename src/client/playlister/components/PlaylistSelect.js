@@ -48,11 +48,10 @@ const PlaylistSelect = ({
           onClick={listPlaylists}
           size={SIZE.small}
           kind={KIND.minimal}
-          isLoading={listing}
           overrides={syncButtonOverrides}
           style={{ verticalAlign: 'middle' }}
         >
-          <FontAwesomeIcon className='fa-padded' icon={faSyncAlt} size='lg' style={{ paddingRight: '5px' }} />
+          <FontAwesomeIcon className='fa-padded' icon={faSyncAlt} size='lg' spin={listing} />
         </Button>
       </FlexGridItem>
       <FlexGridItem {...wideItemProps}>
