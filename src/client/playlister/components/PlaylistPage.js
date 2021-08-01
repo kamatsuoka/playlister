@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { KIND } from 'baseui/button'
 import * as youtube from '../youtube/api'
 import { useSnackbar } from 'baseui/snackbar'
@@ -8,6 +8,11 @@ import prevNextButtons from './PrevNextButtons'
 import PlaylistCreate from './PlaylistCreate'
 import PlaylistSelect from './PlaylistSelect'
 import PlaylistItems, { resourceToPlaylistItem } from './PlaylistItems'
+import { Label1 } from 'baseui/typography'
+import { TableBuilder, TableBuilderColumn } from 'baseui/table-semantic'
+import { tableOverrides } from './TableOverrides'
+import { displayDate } from '../util/dates'
+import { useStyletron } from 'baseui'
 
 /**
  * Create new or find existing playlist.
@@ -32,33 +37,30 @@ const PlaylistPage = ({
    * - publishedAt
    * - description
    */
+  const [, theme] = useStyletron()
   const [listing, setListing] = useState(false)
-
   const { enqueue } = useSnackbar()
   const showError = enqueueError(enqueue)
 
   /**
-   * Fetches the list of items (videos) in the current playlist
+   * Sets the playlist and fetches its list of videos
    */
-  useEffect(() => {
+  const setAndListPlaylist = useCallback(playlist => {
+    setPlaylist(playlist)
     const onSuccess = resources => {
       console.log('Got playlistItem resources from listPlaylistItems: ', resources)
-      return setPlaylistItems(
-        resources && resources.length > 0
-          ? Object.fromEntries(
-            resources
-              .map(resourceToPlaylistItem)
-              .sort((item1, item2) => item1.startTime > item2.startTime ? 1 : -1)
-              .map(item => [item.videoId, item])
-          )
-          : null
-      )
+      return setPlaylistItems(Object.fromEntries(
+        resources
+          .map(resourceToPlaylistItem)
+          .sort((item1, item2) => item1.startTime > item2.startTime ? 1 : -1)
+          .map(item => [item.videoId, item])
+      ))
     }
     if (playlist.playlistId) {
       console.log('calling youtube.listPlaylistItems ...')
       youtube.listPlaylistItems(playlist.playlistId, onSuccess, showError)
     }
-  }, [playlist.playlistId])
+  }, [showError, setPlaylist, setPlaylistItems])
 
   console.log('playlistItems', playlistItems)
 
@@ -122,9 +124,9 @@ const PlaylistPage = ({
             return listPlaylists()
           }
           if (activeKey === '0' && Object.keys(createdPlaylist).length > 0) {
-            setPlaylist(createdPlaylist)
+            setAndListPlaylist(createdPlaylist)
           } else if (activeKey === '1' && selectedPlaylist[0] && Object.keys(selectedPlaylist[0]).length > 0) {
-            setPlaylist(selectedPlaylist[0])
+            setAndListPlaylist(selectedPlaylist[0])
           }
         }}
       >
@@ -133,7 +135,7 @@ const PlaylistPage = ({
             eventData={eventData} orgInfo={orgInfo} cameraInfo={cameraInfo}
             createdPlaylist={createdPlaylist} setCreatedPlaylist={setCreatedPlaylist}
             resourceToPlaylist={resourceToPlaylist} uploadedFileIds={uploadedFileIds}
-            playlist={playlist} setPlaylist={setPlaylist}
+            playlist={playlist} setPlaylist={setAndListPlaylist}
             playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
           />
         </Tab>
@@ -141,10 +143,21 @@ const PlaylistPage = ({
           <PlaylistSelect
             playlists={playlists}
             selectedPlaylist={selectedPlaylist} setSelectedPlaylist={setSelectedPlaylist}
-            setPlaylist={setPlaylist} listPlaylists={listPlaylists} listing={listing}
+            setPlaylist={setAndListPlaylist} listPlaylists={listPlaylists} listing={listing}
           />
         </Tab>
       </Tabs>
+      <Label1 paddingLeft={theme.sizing.scale200} style={{ textDecoration: 'underline' }}>
+        Uploads
+      </Label1>
+      <TableBuilder data={files} overrides={tableOverrides}>
+        <TableBuilderColumn header='Title'>
+          {row => uploads[row.fileId].title}
+        </TableBuilderColumn>
+        <TableBuilderColumn header='Start Time'>
+          {row => displayDate(row.startTime)}
+        </TableBuilderColumn>
+      </TableBuilder>
       <PlaylistItems
         files={files} uploads={uploads} playlist={playlist}
         playlistItems={playlistItems} setPlaylistItems={setPlaylistItems}

@@ -211,6 +211,7 @@ export function updateTitle (videoId, title) {
  * @see https://developers.google.com/youtube/v3/docs/playlistItems#resource
  */
 export function insertPlaylistItem (videoId, playlistId) {
+  Logger.log(`inserting video ${videoId} into playlist ${playlistId}`)
   const resource = {
     snippet: {
       playlistId: playlistId,
@@ -275,10 +276,14 @@ export function addToPlaylist (videoIds, playlistId) {
   const addVideoItem = item => videoItems.set(item.snippet.resourceId.videoId, item.id)
   // add any existing playlist items id to videoItems
   listPlaylistItems(playlistId).forEach(addVideoItem)
+  Logger.log(`videoItems already in playlist: ${videoItems}`)
   // add any new videos to the playlist and add their new playlist item id to videoItems
-  videoIds.filter(!videoItems.has).forEach(videoId =>
+  const newVideoIds = videoIds.filter(id => !videoItems.has(id))
+  Logger.log(`video ids not already in playlist: ${newVideoIds}`)
+  newVideoIds.forEach(videoId =>
     addVideoItem(insertPlaylistItem(videoId, playlistId))
   )
+  Logger.log(`updated videoItems: ${videoItems}`)
   // set playlist positions based on the order in videoIds and return updated playlist items
   return videoIds.map((videoId, position) =>
     updatePlaylistItem({

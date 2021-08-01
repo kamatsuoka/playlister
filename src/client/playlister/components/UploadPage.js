@@ -32,6 +32,7 @@ const UploadPage = ({ current, setCurrent, files, uploads, setUploads }) => {
   const showError = enqueueError(enqueue)
 
   const checkUploadStatus = useCallback(() => {
+    console.log('in checkUploadStatus')
     const fileIds = files.map(data => data.fileId)
     setCheckingStatus(true)
     const onSuccess = foundUploads => {
@@ -56,7 +57,7 @@ const UploadPage = ({ current, setCurrent, files, uploads, setUploads }) => {
     } catch (e) {
       onFailure(e)
     }
-  }, [enqueue, files, setCheckingStatus, setUploads])
+  }, [showError, files, setCheckingStatus, setUploads])
 
   const uploadedFileIds = new Set(Object.keys(uploads).filter(fileId => uploads[fileId].videoId))
 

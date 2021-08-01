@@ -92,27 +92,19 @@ const PlaylistItems = ({ playlist, files, uploads, playlistItems, setPlaylistIte
     }
   }
 
-  /**
-   * Adds videos to playlist
-   */
-  const showAddButton = () => (
-    <>
-      <Button
-        onClick={addAllToPlaylist}
-        size={SIZE.small}
-        isLoading={adding}
-        overrides={buttonOverrides}
-      >
-        <FontAwesomeIcon icon={faAngleDoubleDown} />
-        &nbsp; Add to Playlist &nbsp;
-        <FontAwesomeIcon icon={faAngleDoubleDown} />
-      </Button>
-    </>
-  )
-
   function showPlaylistItems () {
     return (
       <>
+        <Button
+          onClick={addAllToPlaylist}
+          size={SIZE.small}
+          isLoading={adding}
+          overrides={buttonOverrides}
+        >
+          <FontAwesomeIcon icon={faAngleDoubleDown} />
+          &nbsp; Add to Playlist &nbsp;
+          <FontAwesomeIcon icon={faAngleDoubleDown} />
+        </Button>
         <Label1 paddingLeft={theme.sizing.scale200} style={{ textDecoration: 'underline' }}>
           {playlist.title}
         </Label1>
@@ -131,23 +123,7 @@ const PlaylistItems = ({ playlist, files, uploads, playlistItems, setPlaylistIte
     )
   }
 
-  return (
-    <>
-      <Label1 paddingLeft={theme.sizing.scale200} style={{ textDecoration: 'underline' }}>
-        Uploads
-      </Label1>
-      <TableBuilder data={files} overrides={tableOverrides}>
-        <TableBuilderColumn header='Title'>
-          {row => uploads[row.fileId].title}
-        </TableBuilderColumn>
-        <TableBuilderColumn header='Start Time'>
-          {row => displayDate(row.startTime)}
-        </TableBuilderColumn>
-      </TableBuilder>
-      {playlist.playlistId ? showAddButton() : null}
-      {playlist.playlistId ? showPlaylistItems() : null}
-    </>
-  )
+  return playlist.playlistId && playlistItems ? showPlaylistItems() : null
 }
 
 export default PlaylistItems
