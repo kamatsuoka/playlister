@@ -164,7 +164,7 @@ const PlaylistCreate = ({
           size={SIZE.small}
           kind={playlistWasCreated() ? KIND.secondary : KIND.primary}
           isLoading={creating}
-          disabled={uploadedFileIds.length === 0 || !isValidTitle()}
+          disabled={uploadedFileIds.size === 0 || !isValidTitle()}
           overrides={buttonOverrides}
           style={{ float: 'left' }}
         >

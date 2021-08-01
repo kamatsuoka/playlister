@@ -100,6 +100,13 @@ function App () {
               <YouTubePage
                 current={2} setCurrent={setActiveKey}
                 files={files} uploads={uploads} setUploads={setUploads}
+                orgInfo={orgInfo} cameraInfo={cameraInfo} eventData={eventData}
+                playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
+                playlists={playlists} setPlaylists={setPlaylists}
+                selectedPlaylist={selectedPlaylist} setSelectedPlaylist={setSelectedPlaylist}
+                createdPlaylist={createdPlaylist} setCreatedPlaylist={setCreatedPlaylist}
+                playlist={playlist} setPlaylist={setPlaylist}
+                playlistItems={playlistItems} setPlaylistItems={setPlaylistItems}
               />
             </Tab>
             <Tab overrides={tabOverrides} title='Playlist'>

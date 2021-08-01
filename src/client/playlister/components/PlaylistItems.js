@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
-import { Button, SIZE } from 'baseui/button'
+import { Button, KIND, SHAPE, SIZE } from 'baseui/button'
 import * as youtube from '../youtube/api'
-import { Label1 } from 'baseui/typography'
 import { useSnackbar } from 'baseui/snackbar'
 import { enqueueError } from '../util/enqueueError'
 import { useStyletron } from 'baseui'
@@ -10,6 +9,7 @@ import { tableOverrides } from './TableOverrides'
 import { displayDate, parseDescription } from '../util/dates'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faAngleDoubleDown } from '@fortawesome/free-solid-svg-icons'
+import { Heading } from 'baseui/heading'
 
 export const resourceToPlaylistItem = resource => ({
   playlistItemId: resource.id,
@@ -28,7 +28,7 @@ export const resourceToPlaylistItem = resource => ({
  * The insert api seems to ignore the 'position' param.
  */
 const PlaylistItems = ({ playlist, files, uploads, playlistItems, setPlaylistItems }) => {
-  const [, theme] = useStyletron()
+  const [css] = useStyletron()
   const [adding, setAdding] = useState(false)
   const { enqueue } = useSnackbar()
   const showError = enqueueError(enqueue)
@@ -53,7 +53,7 @@ const PlaylistItems = ({ playlist, files, uploads, playlistItems, setPlaylistIte
       setAdding(false)
       showError(err)
     }
-    youtube.addToPlaylist(
+    return youtube.addToPlaylist(
       videoIds, playlist.playlistId, successHandler, failureHandler
     )
   }
@@ -78,16 +78,13 @@ const PlaylistItems = ({ playlist, files, uploads, playlistItems, setPlaylistIte
     })
     console.log('orderedEntries: ', orderedEntries)
     const orderedIds = orderedEntries.map(([id]) => id)
-    addToPlaylist(orderedIds)
+    return addToPlaylist(orderedIds)
   }
 
   const buttonOverrides = {
     Root: {
       style: ({
-        width: '100%',
-        height: theme.sizing.scale1200,
-        marginTop: theme.sizing.scale600,
-        marginBottom: theme.sizing.scale600
+        border: '2px solid black'
       })
     }
   }
@@ -95,19 +92,18 @@ const PlaylistItems = ({ playlist, files, uploads, playlistItems, setPlaylistIte
   function showPlaylistItems () {
     return (
       <>
-        <Button
-          onClick={addAllToPlaylist}
-          size={SIZE.small}
-          isLoading={adding}
-          overrides={buttonOverrides}
-        >
-          <FontAwesomeIcon icon={faAngleDoubleDown} />
-          &nbsp; Add to Playlist &nbsp;
-          <FontAwesomeIcon icon={faAngleDoubleDown} />
-        </Button>
-        <Label1 paddingLeft={theme.sizing.scale200} style={{ textDecoration: 'underline' }}>
-          {playlist.title}
-        </Label1>
+        <Heading styleLevel={5} className={css({ display: 'inline' })}>3. Add Videos &nbsp;
+          <Button
+            onClick={addAllToPlaylist}
+            size={SIZE.small}
+            shape={SHAPE.circle}
+            kind={KIND.minimal}
+            isLoading={adding}
+            overrides={buttonOverrides}
+          >
+            <FontAwesomeIcon icon={faAngleDoubleDown} />
+          </Button>
+        </Heading>
         <TableBuilder data={Object.values(playlistItems)} overrides={tableOverrides}>
           <TableBuilderColumn header='Title'>
             {row => row.title}
