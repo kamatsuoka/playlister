@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { Button, KIND, SHAPE, SIZE } from 'baseui/button'
 import * as youtube from '../youtube/api'
 import { useSnackbar } from 'baseui/snackbar'
 import { enqueueError } from '../util/enqueueError'
@@ -7,9 +6,9 @@ import { useStyletron } from 'baseui'
 import { TableBuilder, TableBuilderColumn } from 'baseui/table-semantic'
 import { tableOverrides } from './TableOverrides'
 import { displayDate, parseDescription } from '../util/dates'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faAngleDoubleDown } from '@fortawesome/free-solid-svg-icons'
 import { Heading } from 'baseui/heading'
+import ActionButton from './ActionButton'
 
 export const resourceToPlaylistItem = resource => ({
   playlistItemId: resource.id,
@@ -81,28 +80,16 @@ const PlaylistItems = ({ playlist, files, uploads, playlistItems, setPlaylistIte
     return addToPlaylist(orderedIds)
   }
 
-  const buttonOverrides = {
-    Root: {
-      style: ({
-        border: '2px solid black'
-      })
-    }
-  }
-
   function showPlaylistItems () {
     return (
       <>
         <Heading styleLevel={5} className={css({ display: 'inline' })}>3. Add Videos &nbsp;
-          <Button
+          <ActionButton
             onClick={addAllToPlaylist}
-            size={SIZE.small}
-            shape={SHAPE.circle}
-            kind={KIND.minimal}
-            isLoading={adding}
-            overrides={buttonOverrides}
-          >
-            <FontAwesomeIcon icon={faAngleDoubleDown} />
-          </Button>
+            title='add videos to playlist'
+            icon={faAngleDoubleDown}
+            spin={adding}
+          />
         </Heading>
         <TableBuilder data={Object.values(playlistItems)} overrides={tableOverrides}>
           <TableBuilderColumn header='Title'>

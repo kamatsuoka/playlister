@@ -41,7 +41,7 @@ const PlaylistSelect = ({
       flexGridColumnGap='scale100'
       flexGridRowGap='scale800'
       marginTop='scale600'
-      marginBottom='scale1200'
+      marginBottom='scale600'
     >
       <FlexGridItem {...itemProps} style={{ flexGrow: 0, flexShrink: 1, flexBasis: '0%' }}>
         <Button

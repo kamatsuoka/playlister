@@ -5,7 +5,7 @@ import { parseDescription } from '../util/dates'
 import * as youtube from '../youtube/api'
 import { findUploads } from '../youtube/api'
 import UploadList from './UploadList'
-import { Button, KIND, SIZE } from 'baseui/button'
+import { Button, KIND } from 'baseui/button'
 import prevNextButtons from './PrevNextButtons'
 import PlaylistItems, { resourceToPlaylistItem } from './PlaylistItems'
 import { ORIENTATION, Tab, Tabs } from 'baseui/tabs-motion'
@@ -13,10 +13,11 @@ import PlaylistCreate from './PlaylistCreate'
 import PlaylistSelect from './PlaylistSelect'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSyncAlt } from '@fortawesome/free-solid-svg-icons'
-import { createTheme, lightThemePrimitives, ThemeProvider } from 'baseui'
+import { createTheme, lightThemePrimitives, ThemeProvider, useStyletron } from 'baseui'
 import { StyledLink } from 'baseui/link'
 import Tooltip from './Tooltip'
 import { Heading, HeadingLevel } from 'baseui/heading'
+import { Block } from 'baseui/block'
 
 export const YouTubePage = ({
   current, setCurrent,
@@ -39,7 +40,7 @@ export const YouTubePage = ({
    * - startTime
    * - endTime
    */
-
+  const [css, theme] = useStyletron()
   // used to show status of checking for uploads
   const [checking, setChecking] = useState(false)
   // file ids that have been checked
@@ -154,13 +155,13 @@ export const YouTubePage = ({
 
   const uploadedFileIds = new Set(Object.keys(uploads).filter(fileId => uploads[fileId].videoId))
 
-  const allUploaded = files.length > 0 &&
-    files.map(file => file.fileId).every(fileId => uploadedFileIds.has(fileId))
+  const allUploaded = files.length > 0 && files.every(file => uploadedFileIds.has(file.fileId))
 
-  /*
-  const allChecked = files.length > 0 &&
-    files.map(file => file.fileId).every(fileId => checkedFileIds.has(fileId))
-*/
+  const playlistVideoIds = new Set(Object.keys(playlistItems))
+
+  const allAdded = Object.keys(playlist).length > 0 && allUploaded && files.every(file =>
+    uploads[file.fileId] && playlistVideoIds.has(uploads[file.fileId].videoId)
+  )
 
   const uploadTooltip = (
     <>
@@ -184,32 +185,8 @@ export const YouTubePage = ({
     </>
   )
 
-  return (
-    <HeadingLevel>
-      <Heading styleLevel={5}>1. <Tooltip tooltip={uploadTooltip}>Upload</Tooltip>
-        {' '}
-        <Button
-          title='sync'
-          size={SIZE.small} disabled={files.length === 0}
-          kind={KIND.minimal}
-          onClick={checkUploads}
-          overrides={{
-            Root: {
-              style: ({
-                paddingTop: 0,
-                paddingBottom: 0,
-                position: 'relative',
-                top: '3px'
-              })
-            }
-          }}
-        >
-          <FontAwesomeIcon className='fa-padded' icon={faSyncAlt} spin={checking} />
-        </Button>
-      </Heading>
-      <UploadList
-        files={files} checkedFileIds={checkedFileIds} uploads={uploads} setUploads={setUploads}
-      />
+  const getPlaylistStep = () => (
+    <Block className={css({ marginBottom: theme.sizing.scale600 })}>
       <Heading styleLevel={5}>2. Choose Playlist</Heading>
       <Tabs
         activeKey={playlistTitle.tabIndex}
@@ -229,9 +206,8 @@ export const YouTubePage = ({
         <Tab title='New' overrides={tabOverrides}>
           <PlaylistCreate
             eventData={eventData} orgInfo={orgInfo} cameraInfo={cameraInfo}
-            createdPlaylist={createdPlaylist} setCreatedPlaylist={setCreatedPlaylist}
-            resourceToPlaylist={resourceToPlaylist} uploadedFileIds={uploadedFileIds}
-            playlist={playlist} setPlaylist={setAndListPlaylist}
+            setCreatedPlaylist={setCreatedPlaylist} resourceToPlaylist={resourceToPlaylist}
+            uploadedFileIds={uploadedFileIds} setPlaylist={setAndListPlaylist}
             playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
           />
         </Tab>
@@ -243,10 +219,36 @@ export const YouTubePage = ({
           />
         </Tab>
       </Tabs>
+    </Block>
+  )
+
+  const getRenameStep = () =>
+    <Block className={css({ marginBottom: theme.sizing.scale600 })}>
+      <Heading styleLevel={5}>4. Rename</Heading>
+    </Block>
+
+  return (
+    <HeadingLevel>
+      <Heading styleLevel={5}>1. <Tooltip tooltip={uploadTooltip}>Upload</Tooltip>
+        {' '}
+        <Button
+          title='sync'
+          disabled={files.length === 0}
+          kind={KIND.minimal}
+          onClick={checkUploads}
+        >
+          <FontAwesomeIcon className='fa-padded' icon={faSyncAlt} spin={checking} />
+        </Button>
+      </Heading>
+      <UploadList
+        files={files} checkedFileIds={checkedFileIds} uploads={uploads} setUploads={setUploads}
+      />
+      {allUploaded ? getPlaylistStep() : null}
       <PlaylistItems
         files={files} uploads={uploads} playlist={playlist}
         playlistItems={playlistItems} setPlaylistItems={setPlaylistItems}
       />
+      {allAdded ? getRenameStep() : null}
       {prevNextButtons({
         current,
         setCurrent,

@@ -3,23 +3,21 @@ import React, { useState } from 'react'
 import { Input } from 'baseui/input'
 import { useStyletron } from 'baseui'
 import { FormControl } from 'baseui/form-control'
-import { Button, KIND, SIZE } from 'baseui/button'
 import * as youtube from '../youtube/api'
 import { enqueueError, errorMessage } from '../util/enqueueError'
 import { useSnackbar } from 'baseui/snackbar'
-// import { KIND as NKind, Notification } from 'baseui/notification'
 import { DEFAULT_DATE } from './EventDate'
 import { Block } from 'baseui/block'
+import { faPlus } from '@fortawesome/free-solid-svg-icons'
+import ActionButton from './ActionButton'
 
 const SUGGESTED = 'suggested'
 const CUSTOM = 'custom'
 
 const PlaylistCreate = ({
   eventData, orgInfo, cameraInfo,
-  createdPlaylist, setCreatedPlaylist,
-  resourceToPlaylist, uploadedFileIds,
-  playlist, setPlaylist,
-  playlistTitle, setPlaylistTitle
+  setCreatedPlaylist, resourceToPlaylist, uploadedFileIds,
+  setPlaylist, playlistTitle, setPlaylistTitle
 }) => {
   const [css, theme] = useStyletron()
   const [creating, setCreating] = useState(false)
@@ -105,24 +103,12 @@ const PlaylistCreate = ({
     }
   }
 
-  const playlistWasCreated = () =>
-    playlist.title && createdPlaylist.title === playlist.title &&
-    playlist.title === desiredTitle
-
-  const buttonOverrides = {
-    Root: {
-      style: ({ $theme }) => ({
-        marginTop: $theme.sizing.scale300,
-        marginRight: $theme.sizing.scale500
-      })
-    }
-  }
-
   const radioOverrides = {
     Root: {
       style: ({ $theme }) => ({
         alignItems: 'start',
-        marginRight: $theme.sizing.scale600
+        marginRight: $theme.sizing.scale600,
+        marginBottom: 0
       })
     },
     RadioMarkOuter: {
@@ -156,20 +142,20 @@ const PlaylistCreate = ({
       })
     }
   }
+  const formControlOverrides = {
+    ControlContainer: { style: ({ marginBottom: 0 }) },
+    Caption: { style: ({ marginBottom: 0 }) }
+  }
   return (
     <>
       <Block className={css({ alignItems: 'start', display: 'flex', marginTop: theme.sizing.scale200 })}>
-        <Button
-          onClick={() => findOrCreatePlaylist()}
-          size={SIZE.small}
-          kind={playlistWasCreated() ? KIND.secondary : KIND.primary}
-          isLoading={creating}
+        <ActionButton
+          onClick={findOrCreatePlaylist}
           disabled={uploadedFileIds.size === 0 || !isValidTitle()}
-          overrides={buttonOverrides}
-          style={{ float: 'left' }}
-        >
-          Create
-        </Button>
+          title='create playlist'
+          icon={faPlus} spin={creating}
+          style={{ float: 'left', marginTop: theme.sizing.scale300, marginRight: theme.sizing.scale500 }}
+        />
         <RadioGroup
           value={playlistTitle.titleChoice}
           name='titleChoice'
@@ -177,7 +163,7 @@ const PlaylistCreate = ({
           align={ALIGN.horizontal}
         >
           <Radio value={SUGGESTED} overrides={radioOverrides}>
-            <FormControl caption='suggested'>
+            <FormControl caption='suggested' overrides={formControlOverrides}>
               <Input
                 value={suggestedTitle}
                 readOnly
@@ -186,7 +172,7 @@ const PlaylistCreate = ({
             </FormControl>
           </Radio>
           <Radio value={CUSTOM} overrides={radioOverrides}>
-            <FormControl caption='custom'>
+            <FormControl caption='custom' overrides={formControlOverrides}>
               <Input
                 value={playlistTitle.customTitle || ''}
                 placeholder='custom title'
