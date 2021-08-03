@@ -4,11 +4,17 @@ import { Input } from 'baseui/input'
 import { createTheme, lightThemePrimitives, ThemeProvider, useStyletron } from 'baseui'
 import { FormControl } from 'baseui/form-control'
 
-const DEFAULT_DATE = 'default_date'
-const CUSTOM_DATE = 'custom_date'
+export const DEFAULT_DATE = 'default_date'
+export const CUSTOM_DATE = 'custom_date'
+
+/**
+ * Gets event date based on choice of default or custom
+ */
+export const getChosenDate = eventData =>
+  eventData.dateChoice === DEFAULT_DATE ? eventData.defaultDate : eventData.customDate
 
 const EventDate = ({ eventData, setEventData }) => {
-  const [css, theme] = useStyletron()
+  const [, theme] = useStyletron()
 
   const handleChange = (evt) => {
     setEventData({
@@ -121,4 +127,3 @@ const EventDate = ({ eventData, setEventData }) => {
   )
 }
 export default EventDate
-export { DEFAULT_DATE, CUSTOM_DATE }

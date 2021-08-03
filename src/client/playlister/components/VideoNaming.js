@@ -1,11 +1,10 @@
 import React from 'react'
-import { Input } from 'baseui/input'
 import { FormControl } from 'baseui/form-control'
 import { Combobox } from 'baseui/combobox'
 import { BaseCard } from './BaseCard'
 import { FlexGrid, FlexGridItem } from 'baseui/flex-grid'
 
-const VideoNaming = ({ playlist, videoNaming, setVideoNaming }) => {
+const VideoNaming = ({ videoNaming, setVideoNaming }) => {
   const handleChange = (evt) => {
     setVideoNaming({
       ...videoNaming,
@@ -32,42 +31,13 @@ const VideoNaming = ({ playlist, videoNaming, setVideoNaming }) => {
         flexGridRowGap='scale800'
       >
         <FlexGridItem {...itemProps}>
-          <FormControl label='prefix'>
-            <Input
-              value={videoNaming.prefix}
-              name='prefix'
-              onChange={handleChange}
-            />
-          </FormControl>
-        </FlexGridItem>
-        <FlexGridItem {...itemProps}>
           <FormControl label='default camera view'>
             <Combobox
               value={videoNaming.cameraView}
               name='cameraView'
               options={['chorus', 'director', 'corner', 'elevated']}
               mapOptionToString={option => option}
-              onChange={cameraView => setVideoNaming({ ...videoNaming, cameraView: cameraView})}
-            />
-          </FormControl>
-        </FlexGridItem>
-        <FlexGridItem {...itemProps}>
-          <FormControl label='next index'>
-            <Input
-              value={(playlist.itemCount || 0) + 1}
-              type='number'
-              disabled
-            />
-          </FormControl>
-        </FlexGridItem>
-        <FlexGridItem {...itemProps}>
-          <FormControl label='index offset'>
-            <Input
-              value={videoNaming.indexOffset}
-              type='number'
-              name='indexOffset'
-              min={-(playlist.itemCount || 0)}
-              onChange={handleChange}
+              onChange={cameraView => setVideoNaming({ ...videoNaming, cameraView: cameraView })}
             />
           </FormControl>
         </FlexGridItem>

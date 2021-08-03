@@ -68,6 +68,15 @@ const PlaylistSelect = ({
           valueKey='playlistId'
           labelKey='title'
           clearable={false}
+          backspaceRemoves={false}
+          deleteRemoves={false}
+          overrides={{
+            Input: {
+              style: ({
+                caretColor: 'transparent'
+              })
+            }
+          }}
         />
       </FlexGridItem>
     </FlexGrid>

@@ -91,7 +91,10 @@ const PlaylistItems = ({ playlist, files, uploads, playlistItems, setPlaylistIte
             spin={adding}
           />
         </Heading>
-        <TableBuilder data={Object.values(playlistItems)} overrides={tableOverrides}>
+        <TableBuilder
+          data={Object.values(playlistItems).sort((a, b) => a.position - b.position)}
+          overrides={tableOverrides}
+        >
           <TableBuilderColumn header='Title'>
             {row => row.title}
           </TableBuilderColumn>

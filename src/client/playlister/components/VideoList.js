@@ -14,6 +14,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { useSnackbar } from 'baseui/snackbar'
 import { enqueueError } from '../util/enqueueError'
+import { getChosenDate } from './EventDate'
+import { FormControl } from 'baseui/form-control'
+import { Combobox } from 'baseui/combobox'
 
 dayjs.extend(localizedFormat)
 dayjs.extend(advancedFormat)
@@ -24,19 +27,19 @@ dayjs.extend(utc)
 /**
  * List of videos with old and new titles
  */
-const VideoList = ({ uploads, setUploads, playlist, videoNaming }) => {
+const VideoList = ({ playlistItems, orgInfo, cameraInfo, eventData }) => {
+  const [defaultCameraView, setDefaultCameraView] = useState('director')
   const [cameraViews, setCameraViews] = useState({})
   const [renaming, setRenaming] = useState(new Set())
   const { enqueue } = useSnackbar()
   const showError = enqueueError(enqueue)
 
-  const date = playlist.eventDate
-  const startIndex = parseInt(playlist.itemCount || 0) + 1 + parseInt(videoNaming.indexOffset)
+  const date = getChosenDate(eventData)
   const pad = (n) => n < 10 ? `0${n}` : `${n}`
 
   const getNewTitle = (row, index) => {
-    const cameraView = cameraViews[row.videoId] || videoNaming.cameraView
-    return `${videoNaming.prefix} ${date} ${cameraView} ${pad(startIndex + index)}`
+    const cameraView = cameraViews[row.videoId] || defaultCameraView
+    return `${orgInfo.orgName} ${date} ${cameraView} c${cameraInfo.cameraNumber}.${pad(index)}`
   }
 
   const tableCellStyles = $theme => ({
@@ -66,12 +69,8 @@ const VideoList = ({ uploads, setUploads, playlist, videoNaming }) => {
   const allRenamed = uploads.every((video, index) => video.newTitle === getNewTitle(video, index))
 
   const renameVideo = (video, newTitle) => {
-    setRenaming(renaming => renaming.add(video.videoId))
-    const onSuccess = updatedVideo => {
-      setRenaming(renaming => {
-        renaming.delete(video.videoId)
-        return renaming
-      })
+    const onSuccess = updatedItems => {
+      setRenaming(false)
       return setUploads(
         uploads.map(upload => {
           if (upload.videoId === updatedVideo.videoId) {
@@ -81,10 +80,7 @@ const VideoList = ({ uploads, setUploads, playlist, videoNaming }) => {
         }))
     }
     const onFailure = err => {
-      setRenaming(renaming => {
-        renaming.delete(video.videoId)
-        return renaming
-      })
+      setRenaming(false)
       showError(err)
     }
     try {
@@ -95,7 +91,9 @@ const VideoList = ({ uploads, setUploads, playlist, videoNaming }) => {
   }
 
   const renameVideos = () => {
-    uploads.forEach((video, index) => {
+    setRenaming(true)
+    const newTitles = Object.entries(playlistItems).map((videoId, ))
+    playlistItems.forEach((video, index) => {
       const newTitle = getNewTitle(video, index)
       if (video.title !== newTitle) {
         renameVideo(video, newTitle)
@@ -105,7 +103,16 @@ const VideoList = ({ uploads, setUploads, playlist, videoNaming }) => {
 
   return (
     <>
-      <TableBuilder data={uploads}>
+      <FormControl label='default camera view'>
+        <Combobox
+          value={defaultCameraView}
+          name='cameraView'
+          options={['chorus', 'corner', 'director', 'elevated']}
+          mapOptionToString={option => option}
+          onChange={setDefaultCameraView}
+        />
+      </FormControl>
+      <TableBuilder data={playlistItems}>
         <TableBuilderColumn overrides={columnOverrides} header='Filename'>
           {row => row.filename}
         </TableBuilderColumn>
@@ -115,7 +122,7 @@ const VideoList = ({ uploads, setUploads, playlist, videoNaming }) => {
         <TableBuilderColumn overrides={columnOverrides} header='Camera View'>
           {row =>
             <Input
-              value={cameraViews[row.videoId] || videoNaming.cameraView}
+              value={cameraViews[row.videoId] || defaultCameraView}
               name='cameraView'
               onChange={evt => setCameraViews({
                 ...cameraViews,

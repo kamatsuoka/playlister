@@ -4,9 +4,7 @@ import { faGithub } from '@fortawesome/free-brands-svg-icons'
 import { BaseProvider, LightTheme } from 'baseui'
 import { Provider as StyletronProvider } from 'styletron-react'
 import { Client as Styletron } from 'styletron-engine-atomic'
-import VideoPage from './VideoPage'
 import { StyledLink } from 'baseui/link'
-import PlaylistPage from './PlaylistPage'
 import FilePage from './FilePage'
 import { SnackbarProvider } from 'baseui/snackbar'
 import { DEFAULT_DATE } from './EventDate'
@@ -107,27 +105,6 @@ function App () {
                 createdPlaylist={createdPlaylist} setCreatedPlaylist={setCreatedPlaylist}
                 playlist={playlist} setPlaylist={setPlaylist}
                 playlistItems={playlistItems} setPlaylistItems={setPlaylistItems}
-              />
-            </Tab>
-            <Tab overrides={tabOverrides} title='Playlist'>
-              <PlaylistPage
-                current={3} setCurrent={setActiveKey}
-                orgInfo={orgInfo} cameraInfo={cameraInfo}
-                files={files} uploads={uploads} eventData={eventData}
-                playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
-                playlists={playlists} setPlaylists={setPlaylists}
-                selectedPlaylist={selectedPlaylist} setSelectedPlaylist={setSelectedPlaylist}
-                createdPlaylist={createdPlaylist} setCreatedPlaylist={setCreatedPlaylist}
-                playlist={playlist} setPlaylist={setPlaylist}
-                playlistItems={playlistItems} setPlaylistItems={setPlaylistItems}
-              />
-            </Tab>
-            <Tab overrides={tabOverrides} title='Rename'>
-              <VideoPage
-                current={5} setCurrent={setActiveKey} files={files}
-                uploads={uploads} setUploads={setUploads}
-                playlist={playlist} setActiveKey={setActiveKey}
-                newTitles={newTitles} setNewTitles={setNewTitles}
               />
             </Tab>
           </Tabs>

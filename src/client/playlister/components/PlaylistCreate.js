@@ -6,7 +6,7 @@ import { FormControl } from 'baseui/form-control'
 import * as youtube from '../youtube/api'
 import { enqueueError, errorMessage } from '../util/enqueueError'
 import { useSnackbar } from 'baseui/snackbar'
-import { DEFAULT_DATE } from './EventDate'
+import { getChosenDate } from './EventDate'
 import { Block } from 'baseui/block'
 import { faPlus } from '@fortawesome/free-solid-svg-icons'
 import ActionButton from './ActionButton'
@@ -24,7 +24,7 @@ const PlaylistCreate = ({
   const { enqueue } = useSnackbar()
   const showError = enqueueError(enqueue)
 
-  const eventDate = eventData.dateChoice === DEFAULT_DATE ? eventData.defaultDate : eventData.customDate
+  const eventDate = getChosenDate(eventData)
 
   const titleParts = [orgInfo.orgName, eventDate, eventData.eventType, 'cam', cameraInfo.cameraNumber]
   const suggestedTitle = titleParts.filter(p => p).join(' ')
