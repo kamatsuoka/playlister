@@ -185,14 +185,16 @@ export function findUploads (files) {
  *
  * @param videoId id of video to update
  * @param title new title
+ * @param description description
  */
-export function updateTitle (videoId, title) {
+export function updateTitle (videoId, title, description) {
   // TODO: add in update to status: unlisted once app is approved
   const response = YouTube.Videos.update(
     {
       id: videoId,
       snippet: {
         title: title,
+        description: description,
         categoryId: CATEGORY_ID_MUSIC
       }
     },
@@ -298,10 +300,14 @@ export function addToPlaylist (videoIds, playlistId) {
 /**
  * Renames videos
  *
- * @param videoTitles Object of { videoId: title }
+ * @param videoTitleDesc Object of { videoId: { title, description } }
  * @return Array Object of { videoId: title }
  */
-export function renameVideos (videoTitles) {
-  const newTitles = Object.entries(videoTitles).map(([videoId, title]) => updateTitle(videoId, title))
-  return Object.fromEntries(newTitles.map(({ videoId, title }) => [videoId, title]))
+export function renameVideos (videoTitleDesc) {
+  const newTitles = Object.entries(videoTitleDesc).map(([videoId, { title, description }]) =>
+    updateTitle(videoId, title, description)
+  )
+  return Object.fromEntries(newTitles.map(({ videoId, title }) =>
+    [videoId, title]
+  ))
 }

@@ -10,7 +10,7 @@ import { useSnackbar } from 'baseui/snackbar'
 import { enqueueError } from '../util/enqueueError'
 
 const RenameStep = ({
-  cameraViews, setCameraViews, newTitles, setNewTitles,
+  cameraViews, setCameraViews, allRenamed, newTitles, setNewTitles,
   getNewTitle, playlistItems, defaultCameraView
 }) => {
   const [css, theme] = useStyletron()
@@ -22,9 +22,9 @@ const RenameStep = ({
     setRenaming(true)
     setNewTitles({})
     // map of { videoId: title }
-    const videoTitles = Object.fromEntries(
-      Object.values(playlistItems).map(({ videoId, position }) =>
-        [videoId, getNewTitle(videoId, position)]
+    const videoTitleDesc = Object.fromEntries(
+      Object.values(playlistItems).map(({ videoId, position, description }) =>
+        [videoId, { title: getNewTitle(videoId, position), description }]
       )
     )
     const onSuccess = videoTitles => {
@@ -35,8 +35,8 @@ const RenameStep = ({
       setRenaming(false)
       showError(err)
     }
-    console.log('calling youtube.renameVideos with args', videoTitles)
-    youtube.renameVideos(videoTitles, onSuccess, onFailure)
+    console.log('calling youtube.renameVideos with args', videoTitleDesc)
+    youtube.renameVideos(videoTitleDesc, onSuccess, onFailure)
   }
 
   return (
@@ -45,7 +45,7 @@ const RenameStep = ({
         4. Rename &nbsp;
         <ActionButton
           onClick={renameVideos} spin={renaming} title='sync' icon={faAngleDoubleRight}
-          disabled={Object.keys(playlistItems).length === 0}
+          disabled={Object.keys(playlistItems).length === 0} grayed={allRenamed}
         />
       </Heading>
       <RenameList

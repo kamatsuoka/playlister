@@ -72,7 +72,7 @@ export const YouTubePage = ({
       />
       {allAdded
         ? <RenameStep
-            cameraViews={cameraViews} setCameraViews={setCameraViews}
+            cameraViews={cameraViews} setCameraViews={setCameraViews} allRenamed={allRenamed}
             newTitles={newTitles} setNewTitles={setNewTitles} getNewTitle={getNewTitle}
             playlistItems={playlistItems} defaultCameraView={defaultCameraView}
           />

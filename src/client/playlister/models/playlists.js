@@ -19,5 +19,6 @@ export const resourceToPlaylistItem = resource => ({
   videoId: resource.snippet.resourceId.videoId,
   title: resource.snippet.title,
   position: resource.snippet.position,
+  description: resource.snippet.description,
   ...parseDescription(resource.snippet.description)
 })

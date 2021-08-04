@@ -284,17 +284,17 @@ export const addToPlaylist = async (videoIds, playlistId, onSuccess, onFailure) 
 /**
  * Rename list of videos. Used to rename all videos in a playlist.
  *
- * @param videoTitles Object of { videoId: title }
+ * @param videoTitleDesc Object of { videoId: { title, description } }
  * @param onSuccess success handler
  * @param onFailure failure handler
  * @return Object of { videoId: title }
  */
-export const renameVideos = (videoTitles, onSuccess, onFailure) => {
+export const renameVideos = (videoTitleDesc, onSuccess, onFailure) => {
   const run = getAppsScriptRun()
   if (run) {
     return run
       .withSuccessHandler(onSuccess)
       .withFailureHandler(onFailure)
-      .renameVideos(videoTitles)
+      .renameVideos(videoTitleDesc)
   }
 }

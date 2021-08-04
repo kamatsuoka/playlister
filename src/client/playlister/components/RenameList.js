@@ -20,8 +20,7 @@ dayjs.extend(utc)
  * List of videos with old and new titles
  */
 const RenameList = ({
-  playlistItems, newTitles, cameraViews, setCameraViews,
-  getNewTitle, defaultCameraView
+  playlistItems, newTitles, cameraViews, setCameraViews, getNewTitle, defaultCameraView
 }) => {
   const columnOverrides = {
     TableBodyCell: {
@@ -63,12 +62,12 @@ const RenameList = ({
           {(row, index) => getNewTitle(row.videoId, index)}
         </TableBuilderColumn>
         <TableBuilderColumn overrides={columnOverrides} header=''>
-          {(row, index) => newTitles[row.videoId] === getNewTitle(row.videoId, index)
+          {(row, index) => newTitles[row.videoId] &&
+          newTitles[row.videoId].title === getNewTitle(row.videoId, index)
             ? <FontAwesomeIcon icon={faCheck} />
             : null}
         </TableBuilderColumn>
       </TableBuilder>
-      \
     </>
   )
 }
