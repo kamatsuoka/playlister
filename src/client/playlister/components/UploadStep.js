@@ -1,6 +1,5 @@
 import { Heading } from 'baseui/heading'
 import Tooltip from './Tooltip'
-import { KIND } from 'baseui/button'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSyncAlt } from '@fortawesome/free-solid-svg-icons'
 import UploadList from './UploadList'
@@ -13,7 +12,7 @@ import { useSnackbar } from 'baseui/snackbar'
 import { enqueueError } from '../util/enqueueError'
 import ActionButton from './ActionButton'
 
-const UploadStep = ({ files, uploads, setUploads }) => {
+const UploadStep = ({ files, uploads, setUploads, allUploaded }) => {
   // used to show status of checking for uploads
   const [checking, setChecking] = useState(false)
   // file ids that have been checked
@@ -24,6 +23,9 @@ const UploadStep = ({ files, uploads, setUploads }) => {
   const checkUploads = useCallback(() => {
     console.log('in checkUploads')
     const fileIds = files.map(data => data.fileId)
+    if (fileIds.length === 0) {
+      return
+    }
     setChecking(true)
     const onSuccess = foundUploads => {
       setUploads(Object.fromEntries(foundUploads.map(upload => [
@@ -49,6 +51,7 @@ const UploadStep = ({ files, uploads, setUploads }) => {
     }
   }, [showError, files, setChecking, setUploads])
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => checkUploads(), [files])
 
   const uploadTooltip = (
@@ -79,7 +82,7 @@ const UploadStep = ({ files, uploads, setUploads }) => {
         {' '}
         <ActionButton
           onClick={checkUploads} spin={checking} title='sync' icon={faSyncAlt}
-          disabled={files.length === 0} kind={KIND.minimal} overrides={{}}
+          borderless disabled={files.length === 0} grayed={allUploaded}
         />
       </Heading>
       <UploadList

@@ -45,7 +45,6 @@ const RenameStep = ({
         4. Rename &nbsp;
         <ActionButton
           onClick={renameVideos} spin={renaming} title='sync' icon={faAngleDoubleRight}
-          isLoading={renaming}
           disabled={Object.keys(playlistItems).length === 0}
         />
       </Heading>

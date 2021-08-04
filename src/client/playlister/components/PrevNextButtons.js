@@ -1,38 +1,37 @@
 import React from 'react'
-import { Button, KIND, SHAPE } from 'baseui/button'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons'
+import ActionButton from './ActionButton'
 
-const prevButton = (current, setCurrent, props) => {
+const PrevButton = ({ current, setCurrent, ...props }) => {
   if (current > 0) {
     return (
-      <Button
-        {...props}
-        shape={SHAPE.round}
-        kind={KIND.minimal}
+      <ActionButton
+        borderless
+        icon={faArrowLeft}
         onClick={() => setCurrent(current - 1)}
-      >
-        <FontAwesomeIcon icon={faArrowLeft} size='lg' />
-      </Button>
+        title={props.title ? props.title : 'previous tab'}
+        {...props}
+      />
     )
-  } else { return null }
+  } else {
+    return null
+  }
 }
 
-const nextButton = (current, setCurrent, props) => {
+const NextButton = ({ current, setCurrent, ...props }) => {
   const { last = false, onClick = undefined, ...otherProps } = props
   const defaultOnClick = () => setCurrent(current + 1)
   if (last) {
     return null
   } else {
     return (
-      <Button
-        {...otherProps}
-        shape={SHAPE.round}
-        kind={KIND.minimal}
+      <ActionButton
+        borderless
+        icon={faArrowRight}
         onClick={onClick || defaultOnClick}
-      >
-        <FontAwesomeIcon icon={faArrowRight} size='lg' />
-      </Button>
+        title={props.title ? props.title : 'next tab'}
+        {...otherProps}
+      />
     )
   }
 }
@@ -43,9 +42,9 @@ const nextButton = (current, setCurrent, props) => {
 const prevNextButtons = ({ current, setCurrent, prevProps = {}, nextProps = {} }) => {
   return (
     <div align='right'>
-      {prevButton(current, setCurrent, prevProps)}
+      <PrevButton current={current} setCurrent={setCurrent} {...prevProps} />
     &nbsp;
-      {nextButton(current, setCurrent, nextProps)}
+      <NextButton current={current} setCurrent={setCurrent} {...nextProps} />
     </div>
   )
 }

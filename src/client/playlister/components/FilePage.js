@@ -5,7 +5,6 @@ import { Modal } from 'baseui/modal'
 import TimeOffset from './TimeOffset'
 import { getStartDates } from './InferredDate'
 import { KIND as NKind, Notification } from 'baseui/notification'
-import { KIND } from 'baseui/button'
 import prevNextButtons from './PrevNextButtons'
 
 /**
@@ -56,6 +55,7 @@ const FilePage = ({
         Dialog: { style: { backgroundColor: 'transparent' } },
         Close: { style: ({ display: 'none' }) }
       }}
+      unstable_ModalBackdropScroll
     >
       <video
         autoPlay controls style={{
@@ -100,7 +100,11 @@ const FilePage = ({
       {videoPreview()}
       {mediaList.length > 0 ? filesAndOffset() : null}
       {prevNextButtons({
-        current, setCurrent, nextProps: { kind: mediaList.length === 0 ? KIND.secondary : KIND.primary }
+        current,
+        setCurrent,
+        nextProps: {
+          grayed: mediaList.length === 0
+        }
       })}
     </>
   )

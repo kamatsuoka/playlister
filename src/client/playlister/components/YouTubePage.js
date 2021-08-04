@@ -1,5 +1,4 @@
 import React from 'react'
-import { KIND } from 'baseui/button'
 import prevNextButtons from './PrevNextButtons'
 import PlaylistItems from './PlaylistItems'
 import { HeadingLevel } from 'baseui/heading'
@@ -24,11 +23,6 @@ export const YouTubePage = ({
    * - startTime
    * - endTime
    */
-
-  /*
-  const playlistOkay = (playlistTitle.tabIndex === 0 && createdPlaylist.title) ||
-    (playlistTitle.tabIndex === 1 && selectedPlaylist[0] && selectedPlaylist[0].title)
-*/
 
   const uploadedFileIds = new Set(Object.keys(uploads).filter(fileId => uploads[fileId].videoId))
 
@@ -55,13 +49,13 @@ export const YouTubePage = ({
   /**
    * Have all videos in playlist been renamed?
    */
-  const allRenamed = Object.values(playlistItems).every(({ videoId, position }) =>
+  const allRenamed = allAdded && Object.values(playlistItems).every(({ videoId, position }) =>
     newTitles[videoId] === getNewTitle(videoId, position)
   )
 
   return (
     <HeadingLevel>
-      <UploadStep files={files} uploads={uploads} setUploads={setUploads} />
+      <UploadStep files={files} uploads={uploads} setUploads={setUploads} allUploaded={allUploaded} />
       {allUploaded
         ? <PlaylistStep
             setPlaylist={setPlaylist} playlists={playlists} setPlaylists={setPlaylists}
@@ -74,7 +68,7 @@ export const YouTubePage = ({
         : null}
       <PlaylistItems
         files={files} uploads={uploads} playlist={playlist}
-        playlistItems={playlistItems} setPlaylistItems={setPlaylistItems}
+        playlistItems={playlistItems} setPlaylistItems={setPlaylistItems} allAdded={allAdded}
       />
       {allAdded
         ? <RenameStep
@@ -86,7 +80,7 @@ export const YouTubePage = ({
       {prevNextButtons({
         current,
         setCurrent,
-        nextProps: { kind: allRenamed ? KIND.primary : KIND.secondary }
+        nextProps: { grayed: !allRenamed }
       })}
     </HeadingLevel>
   )

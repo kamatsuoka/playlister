@@ -18,7 +18,7 @@ import { resourceToPlaylistItem } from '../models/playlists'
  * Youtube (as of July 2021) adds new playlist items to the end of the playlist.
  * The insert api seems to ignore the 'position' param.
  */
-const PlaylistItems = ({ playlist, files, uploads, playlistItems, setPlaylistItems }) => {
+const PlaylistItems = ({ playlist, files, uploads, playlistItems, setPlaylistItems, allAdded }) => {
   const [css] = useStyletron()
   const [adding, setAdding] = useState(false)
   const { enqueue } = useSnackbar()
@@ -85,6 +85,7 @@ const PlaylistItems = ({ playlist, files, uploads, playlistItems, setPlaylistIte
             title='add videos to playlist'
             icon={faAngleDoubleDown}
             spin={adding}
+            grayed={allAdded}
           />
         </Heading>
         <TableBuilder

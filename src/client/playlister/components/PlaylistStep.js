@@ -96,7 +96,7 @@ const PlaylistStep = ({
       >
         <Tab title='New' overrides={tabOverrides}>
           <PlaylistCreate
-            eventData={eventData} orgInfo={orgInfo} cameraInfo={cameraInfo}
+            eventData={eventData} orgInfo={orgInfo} cameraInfo={cameraInfo} createdPlaylist={createdPlaylist}
             setCreatedPlaylist={setCreatedPlaylist} resourceToPlaylist={resourceToPlaylist}
             uploadedFileIds={uploadedFileIds} setPlaylist={setAndListPlaylist}
             playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}

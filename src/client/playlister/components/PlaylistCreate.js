@@ -15,7 +15,7 @@ const SUGGESTED = 'suggested'
 const CUSTOM = 'custom'
 
 const PlaylistCreate = ({
-  eventData, orgInfo, cameraInfo,
+  eventData, orgInfo, cameraInfo, createdPlaylist,
   setCreatedPlaylist, resourceToPlaylist, uploadedFileIds,
   setPlaylist, playlistTitle, setPlaylistTitle
 }) => {
@@ -152,8 +152,8 @@ const PlaylistCreate = ({
         <ActionButton
           onClick={findOrCreatePlaylist}
           disabled={uploadedFileIds.size === 0 || !isValidTitle()}
-          title='create playlist'
-          icon={faPlus} spin={creating}
+          grayed={Object.keys(createdPlaylist).length > 0 && createdPlaylist.title === desiredTitle}
+          title='create playlist' icon={faPlus} spin={creating}
           style={{ float: 'left', marginTop: theme.sizing.scale300, marginRight: theme.sizing.scale500 }}
         />
         <RadioGroup
