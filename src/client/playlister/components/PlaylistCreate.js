@@ -6,10 +6,10 @@ import { FormControl } from 'baseui/form-control'
 import * as youtube from '../youtube/api'
 import { enqueueError, errorMessage } from '../util/enqueueError'
 import { useSnackbar } from 'baseui/snackbar'
-import { getChosenDate } from './EventDate'
 import { Block } from 'baseui/block'
 import { faPlus } from '@fortawesome/free-solid-svg-icons'
 import ActionButton from './ActionButton'
+import { getChosenDate } from '../models/dates'
 
 const SUGGESTED = 'suggested'
 const CUSTOM = 'custom'
@@ -153,7 +153,7 @@ const PlaylistCreate = ({
           onClick={findOrCreatePlaylist}
           disabled={uploadedFileIds.size === 0 || !isValidTitle()}
           grayed={Object.keys(createdPlaylist).length > 0 && createdPlaylist.title === desiredTitle}
-          title='create playlist' icon={faPlus} spin={creating} pulse={true}
+          title='create playlist' icon={faPlus} spin={creating}
           style={{ float: 'left', marginTop: theme.sizing.scale300, marginRight: theme.sizing.scale500 }}
         />
         <RadioGroup

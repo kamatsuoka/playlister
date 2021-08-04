@@ -6,7 +6,7 @@ import UploadList from './UploadList'
 import React, { useCallback, useEffect, useState } from 'react'
 import { createTheme, lightThemePrimitives, ThemeProvider } from 'baseui'
 import { StyledLink } from 'baseui/link'
-import { parseDescription } from '../util/dates'
+import { parseDescription } from '../models/dates'
 import { findUploads } from '../youtube/api'
 import { useSnackbar } from 'baseui/snackbar'
 import { enqueueError } from '../util/enqueueError'
@@ -51,8 +51,12 @@ const UploadStep = ({ files, uploads, setUploads, allUploaded }) => {
     }
   }, [showError, files, setChecking, setUploads])
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => checkUploads(), [files])
+  useEffect(() => {
+    if (!allUploaded) {
+      return checkUploads()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [files])
 
   const uploadTooltip = (
     <>

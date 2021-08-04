@@ -7,18 +7,20 @@ import { Client as Styletron } from 'styletron-engine-atomic'
 import { StyledLink } from 'baseui/link'
 import FilePage from './FilePage'
 import { SnackbarProvider } from 'baseui/snackbar'
-import { DEFAULT_DATE } from './EventDate'
 import PreferencePage from './PreferencePage'
 import prevNextButtons from './PrevNextButtons'
 import { Tab, Tabs } from 'baseui/tabs-motion'
 import YouTubePage from './YouTubePage'
-import TestPage from './TestPage'
+import SheetsPage from './SheetsPage'
+// import TestPage from './TestPage'
+import { DEFAULT_DATE, getChosenDate } from '../models/dates'
+import { getVideoNumber } from '../models/renaming'
 
 const engine = new Styletron()
 
 function App () {
   // index of currently selected step
-  const [current, setCurrent] = useState(1)
+  const [current, setCurrent] = useState(0)
   // info about the organization
   const [orgInfo, setOrgInfo] = useState({ orgName: 'fcs' })
   // info about the camera
@@ -68,6 +70,35 @@ function App () {
   // items in current playlist - map of videoId to { playlistId, position, etc. }
   const [playlistItems, setPlaylistItems] = useState({})
 
+  const uploadedFileIds = new Set(Object.keys(uploads).filter(fileId => uploads[fileId].videoId))
+
+  const allUploaded = files.length > 0 && files.every(file => uploadedFileIds.has(file.fileId))
+
+  const playlistVideoIds = new Set(Object.keys(playlistItems))
+
+  const allAdded = Object.keys(playlist).length > 0 && allUploaded && files.every(file =>
+    uploads[file.fileId] && playlistVideoIds.has(uploads[file.fileId].videoId)
+  )
+
+  /**
+   * Gets the new title for a video.
+   *
+   * @param videoId video id
+   * @param index index (position) in playlist
+   */
+  const getNewTitle = (videoId, index) => {
+    const cameraView = cameraViews[videoId] || defaultCameraView
+    return `${orgInfo.orgName} ${getChosenDate(eventData)} ${cameraView} ` +
+      getVideoNumber(cameraInfo, index)
+  }
+
+  /**
+   * Have all videos in playlist been renamed?
+   */
+  const allRenamed = allAdded && Object.values(playlistItems).every(({ videoId, position }) =>
+    newTitles[videoId] === getNewTitle(videoId, position)
+  )
+
   const tabOverrides = {
     TabPanel: {
       style: ({
@@ -111,17 +142,27 @@ function App () {
                 createdPlaylist={createdPlaylist} setCreatedPlaylist={setCreatedPlaylist}
                 playlist={playlist} setPlaylist={setPlaylist}
                 playlistItems={playlistItems} setPlaylistItems={setPlaylistItems}
-                newTitles={newTitles} setNewTitles={setNewTitles}
+                newTitles={newTitles} setNewTitles={setNewTitles} getNewTitle={getNewTitle}
                 cameraViews={cameraViews} setCameraViews={setCameraViews}
-                defaultCameraView={defaultCameraView}
+                defaultCameraView={defaultCameraView} allUploaded={allUploaded}
+                uploadedFileIds={uploadedFileIds} allAdded={allAdded} allRenamed={allRenamed}
               />
             </Tab>
+            <Tab overrides={tabOverrides} title='Sheets'>
+              <SheetsPage
+                cameraInfo={cameraInfo} eventData={eventData} cameraViews={cameraViews}
+                defaultCameraView={defaultCameraView} playlist={playlist}
+              />
+              {prevNextButtons({
+                current: 3, setCurrent: setCurrent, last: true
+              })}
+            </Tab>
+            {/*
             <Tab overrides={tabOverrides} title='Test'>
               <TestPage />
+              {prevNextButtons({ current: 4, setCurrent: setCurrent })}
             </Tab>
-            <Tab overrides={tabOverrides} title='Test'>
-              <TestPage />
-            </Tab>
+*/}
           </Tabs>
         </SnackbarProvider>
         <footer>

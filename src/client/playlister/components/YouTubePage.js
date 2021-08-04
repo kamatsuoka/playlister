@@ -5,13 +5,13 @@ import { HeadingLevel } from 'baseui/heading'
 import UploadStep from './UploadStep'
 import PlaylistStep from './PlaylistStep'
 import RenameStep from './RenameStep'
-import { getChosenDate } from './EventDate'
 
 export const YouTubePage = ({
   current, setCurrent, files, uploads, setUploads, orgInfo, cameraInfo, eventData,
   playlistTitle, setPlaylistTitle, playlists, setPlaylists, selectedPlaylist, setSelectedPlaylist,
   createdPlaylist, setCreatedPlaylist, playlist, setPlaylist, playlistItems, setPlaylistItems,
-  newTitles, setNewTitles, cameraViews, setCameraViews, defaultCameraView
+  newTitles, setNewTitles, cameraViews, setCameraViews, defaultCameraView,
+  allUploaded, uploadedFileIds, allAdded, allRenamed, getNewTitle
 }) => {
   /**
    * uploads items, keyed by file id:
@@ -23,35 +23,6 @@ export const YouTubePage = ({
    * - startTime
    * - endTime
    */
-
-  const uploadedFileIds = new Set(Object.keys(uploads).filter(fileId => uploads[fileId].videoId))
-
-  const allUploaded = files.length > 0 && files.every(file => uploadedFileIds.has(file.fileId))
-
-  const playlistVideoIds = new Set(Object.keys(playlistItems))
-
-  /**
-   * Gets the new title for a video.
-   *
-   * @param videoId video id
-   * @param index index (position) in playlist
-   */
-  const getNewTitle = (videoId, index) => {
-    const cameraView = cameraViews[videoId] || defaultCameraView
-    return `${orgInfo.orgName} ${getChosenDate(eventData)} ${cameraView} ` +
-      `${cameraInfo.cameraNumber}.${((index + 1).toString().padStart(2, 0))}`
-  }
-
-  const allAdded = Object.keys(playlist).length > 0 && allUploaded && files.every(file =>
-    uploads[file.fileId] && playlistVideoIds.has(uploads[file.fileId].videoId)
-  )
-
-  /**
-   * Have all videos in playlist been renamed?
-   */
-  const allRenamed = allAdded && Object.values(playlistItems).every(({ videoId, position }) =>
-    newTitles[videoId] === getNewTitle(videoId, position)
-  )
 
   return (
     <HeadingLevel>

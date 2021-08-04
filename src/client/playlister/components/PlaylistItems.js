@@ -5,7 +5,7 @@ import { enqueueError } from '../util/enqueueError'
 import { useStyletron } from 'baseui'
 import { TableBuilder, TableBuilderColumn } from 'baseui/table-semantic'
 import { tableOverrides } from './TableOverrides'
-import { displayDate } from '../util/dates'
+import { displayDate } from '../models/dates'
 import { faAngleDoubleDown } from '@fortawesome/free-solid-svg-icons'
 import { Heading } from 'baseui/heading'
 import ActionButton from './ActionButton'
@@ -28,11 +28,10 @@ const PlaylistItems = ({ playlist, files, uploads, playlistItems, setPlaylistIte
    * Add videos to playlist in the position specified by their order in the array.
    * If video is already in playlist, just put it in the correct position.
    *
-   * @param videoIds array of video ids
+   * @param sortedVideos sorted array of video data
    */
-  const addToPlaylist = videoIds => {
-    console.log(`addToPlaylist: ${videoIds}`)
-    if (videoIds.length === 0) {
+  const addToPlaylist = sortedVideos => {
+    if (sortedVideos.length === 0) {
       setAdding(false)
       return
     }
@@ -49,7 +48,7 @@ const PlaylistItems = ({ playlist, files, uploads, playlistItems, setPlaylistIte
       showError(err)
     }
     return youtube.addToPlaylist(
-      videoIds, playlist.playlistId, successHandler, failureHandler
+      sortedVideos, playlist.playlistId, successHandler, failureHandler
     )
   }
 
@@ -57,23 +56,27 @@ const PlaylistItems = ({ playlist, files, uploads, playlistItems, setPlaylistIte
     setAdding(true)
     const videos = {}
     for (const upload of files.map(file => uploads[file.fileId])) {
-      videos[upload.videoId] = { title: upload.title, startTime: upload.startTime }
+      videos[upload.videoId] = {
+        title: upload.title, startTime: upload.startTime, videoId: upload.videoId
+      }
     }
     for (const playlistItem of Object.values(playlistItems)) {
       if (videos[playlistItem.videoId] && videos[playlistItem.videoId].startTime) {
         continue
       }
-      videos[playlistItem.videoId] = { title: playlistItem.title, startTime: playlistItem.startTime }
+      videos[playlistItem.videoId] = {
+        title: playlistItem.title, startTime: playlistItem.startTime, videoId: playlistItem.videoid
+      }
     }
-    const orderedEntries = Object.entries(videos).sort(([, v1], [, v2]) => {
+    const sortedVideos = Object.values(videos).sort((v1, v2) => {
       if (!v1.startTime && !v2.startTime) { return v1.title > v2.title ? 1 : -1 }
       if (!v1.startTime) { return -1 }
       if (!v2.startTime) { return 1 }
       return v1.startTime > v2.startTime ? 1 : -1
     })
-    console.log('orderedEntries: ', orderedEntries)
-    const orderedIds = orderedEntries.map(([id]) => id)
-    return addToPlaylist(orderedIds)
+    console.log('sortedVideos: ', sortedVideos)
+    // const orderedIds = sortedVideos.map(([id]) => id)
+    return addToPlaylist(sortedVideos)
   }
 
   function showPlaylistItems () {

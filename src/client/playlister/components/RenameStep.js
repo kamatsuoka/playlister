@@ -27,6 +27,7 @@ const RenameStep = ({
         [videoId, { title: getNewTitle(videoId, position), description }]
       )
     )
+
     const onSuccess = videoTitles => {
       setRenaming(false)
       return setNewTitles(videoTitles)

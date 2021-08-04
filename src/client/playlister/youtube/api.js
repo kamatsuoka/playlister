@@ -248,27 +248,27 @@ export const listPlaylistItems = async (playlistId, onSuccess, onFailure) => {
 /**
  * Adds videos to a playlist
  *
- * @param videoIds Array of video ids
+ * @param videos Array of video data with { title, videoId, startTime }
  * @param playlistId playlist id
  * @param onSuccess success handler
  * @param onFailure failure handler
  */
-export const addToPlaylist = async (videoIds, playlistId, onSuccess, onFailure) => {
+export const addToPlaylist = async (videos, playlistId, onSuccess, onFailure) => {
   const run = getAppsScriptRun()
   if (run) {
     return run
       .withSuccessHandler(onSuccess)
       .withFailureHandler(onFailure)
-      .addToPlaylist(videoIds, playlistId)
+      .addToPlaylist(videos.map(v => v.videoId), playlistId)
   } else {
     // for testing
     await sleep(1000)
-    const resources = videoIds.map((videoId, i) => ({
+    const resources = videos.map(({ title, videoId, startTime }, i) => ({
       id: randomId(),
       snippet: {
         playlistId: playlistId,
-        title: `video ${i}`,
-        startTime: dayjs().toISOString(),
+        title: title,
+        startTime: startTime,
         position: i,
         resourceId: {
           videoId: videoId

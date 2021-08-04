@@ -3,7 +3,7 @@
  *
  * https://developers.google.com/youtube/v3/docs/playlists#resource
  */
-import { parseDescription } from '../util/dates'
+import { parseDescription } from './dates'
 
 export const resourceToPlaylist = resource => ({
   playlistId: resource.id,

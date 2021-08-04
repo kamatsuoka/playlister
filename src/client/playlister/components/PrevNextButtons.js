@@ -19,32 +19,28 @@ const PrevButton = ({ current, setCurrent, ...props }) => {
 }
 
 const NextButton = ({ current, setCurrent, ...props }) => {
-  const { last = false, onClick = undefined, ...otherProps } = props
+  const { onClick = undefined, ...otherProps } = props
   const defaultOnClick = () => setCurrent(current + 1)
-  if (last) {
-    return null
-  } else {
-    return (
-      <ActionButton
-        borderless
-        icon={faArrowRight}
-        onClick={onClick || defaultOnClick}
-        title={props.title ? props.title : 'next tab'}
-        {...otherProps}
-      />
-    )
-  }
+  return (
+    <ActionButton
+      borderless
+      icon={faArrowRight}
+      onClick={onClick || defaultOnClick}
+      title={props.title ? props.title : 'next tab'}
+      {...otherProps}
+    />
+  )
 }
 
 /**
  * Shows standard prev/next buttons for navigation
  */
-const prevNextButtons = ({ current, setCurrent, prevProps = {}, nextProps = {} }) => {
+const prevNextButtons = ({ current, setCurrent, last, prevProps = {}, nextProps = {} }) => {
   return (
     <div align='right'>
       <PrevButton current={current} setCurrent={setCurrent} {...prevProps} />
     &nbsp;
-      <NextButton current={current} setCurrent={setCurrent} {...nextProps} />
+      {last ? null : <NextButton current={current} setCurrent={setCurrent} {...nextProps} /> }
     </div>
   )
 }

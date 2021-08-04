@@ -5,7 +5,7 @@ import { faQuestion } from '@fortawesome/free-solid-svg-icons'
 import { tableOverrides } from './TableOverrides'
 import { Button, KIND, SIZE } from 'baseui/button'
 import resumableUpload from '../youtube/youtube-uploader'
-import { displayDate } from '../util/dates'
+import { displayDate } from '../models/dates'
 import { useSnackbar } from 'baseui/snackbar'
 import { enqueueError } from '../util/enqueueError'
 
