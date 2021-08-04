@@ -1,4 +1,4 @@
-import { Button, KIND, SHAPE } from 'baseui/button'
+import { Button, KIND, SHAPE, SIZE } from 'baseui/button'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import React from 'react'
 
@@ -23,6 +23,7 @@ const ActionButton = ({ onClick, title, borderless, disabled, icon, spin, pulse,
       onClick={onClick}
       shape={SHAPE.circle}
       kind={KIND.minimal}
+      size={SIZE.compact}
       overrides={{
         Root: {
           style: ({

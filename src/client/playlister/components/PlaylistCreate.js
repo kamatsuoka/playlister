@@ -153,7 +153,7 @@ const PlaylistCreate = ({
           onClick={findOrCreatePlaylist}
           disabled={uploadedFileIds.size === 0 || !isValidTitle()}
           grayed={Object.keys(createdPlaylist).length > 0 && createdPlaylist.title === desiredTitle}
-          title='create playlist' icon={faPlus} spin={creating}
+          title='create playlist' icon={faPlus} spin={creating} pulse={true}
           style={{ float: 'left', marginTop: theme.sizing.scale300, marginRight: theme.sizing.scale500 }}
         />
         <RadioGroup

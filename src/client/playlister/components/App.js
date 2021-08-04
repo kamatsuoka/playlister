@@ -12,12 +12,13 @@ import PreferencePage from './PreferencePage'
 import prevNextButtons from './PrevNextButtons'
 import { Tab, Tabs } from 'baseui/tabs-motion'
 import YouTubePage from './YouTubePage'
+import TestPage from './TestPage'
 
 const engine = new Styletron()
 
 function App () {
   // index of currently selected step
-  const [activeKey, setActiveKey] = useState(1)
+  const [current, setCurrent] = useState(1)
   // info about the organization
   const [orgInfo, setOrgInfo] = useState({ orgName: 'fcs' })
   // info about the camera
@@ -79,20 +80,20 @@ function App () {
     <StyletronProvider value={engine}>
       <BaseProvider theme={LightTheme}>
         <SnackbarProvider>
-          <Tabs activeKey={activeKey} disabled>
+          <Tabs activeKey={current} disabled>
             <Tab overrides={tabOverrides} title='Basics'>
               <PreferencePage
-                current={0} setCurrent={setActiveKey}
+                current={0} setCurrent={setCurrent}
                 orgInfo={orgInfo} setOrgInfo={setOrgInfo}
                 eventData={eventData} setEventData={setEventData}
                 cameraInfo={cameraInfo} setCameraInfo={setCameraInfo}
                 defaultCameraView={defaultCameraView} setDefaultCameraView={setDefaultCameraView}
               />
-              {prevNextButtons({ current: 0, setCurrent: setActiveKey })}
+              {prevNextButtons({ current: 0, setCurrent: setCurrent })}
             </Tab>
             <Tab overrides={tabOverrides} title='Files'>
               <FilePage
-                current={1} setCurrent={setActiveKey}
+                current={1} setCurrent={setCurrent}
                 mediaList={mediaList} setMediaList={setMediaList}
                 files={files} setFiles={setFiles}
                 timeAdjust={timeAdjust} setTimeAdjust={setTimeAdjust}
@@ -101,7 +102,7 @@ function App () {
             </Tab>
             <Tab overrides={tabOverrides} title='YouTube'>
               <YouTubePage
-                current={2} setCurrent={setActiveKey}
+                current={2} setCurrent={setCurrent}
                 files={files} uploads={uploads} setUploads={setUploads}
                 orgInfo={orgInfo} cameraInfo={cameraInfo} eventData={eventData}
                 playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
@@ -114,6 +115,12 @@ function App () {
                 cameraViews={cameraViews} setCameraViews={setCameraViews}
                 defaultCameraView={defaultCameraView}
               />
+            </Tab>
+            <Tab overrides={tabOverrides} title='Test'>
+              <TestPage />
+            </Tab>
+            <Tab overrides={tabOverrides} title='Test'>
+              <TestPage />
             </Tab>
           </Tabs>
         </SnackbarProvider>
