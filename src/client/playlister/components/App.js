@@ -58,6 +58,10 @@ function App () {
   const [timeAdjust, setTimeAdjust] = useState({
     year: 0, month: 0, day: 0, hour: 0, minute: 0, second: 0
   })
+  // map of video id to selected camera view
+  const [cameraViews, setCameraViews] = useState({})
+  // default camera view for renaming
+  const [defaultCameraView, setDefaultCameraView] = useState('director')
   // map of video id to new title
   const [newTitles, setNewTitles] = useState({})
   // items in current playlist - map of videoId to { playlistId, position, etc. }
@@ -82,6 +86,7 @@ function App () {
                 orgInfo={orgInfo} setOrgInfo={setOrgInfo}
                 eventData={eventData} setEventData={setEventData}
                 cameraInfo={cameraInfo} setCameraInfo={setCameraInfo}
+                defaultCameraView={defaultCameraView} setDefaultCameraView={setDefaultCameraView}
               />
               {prevNextButtons({ current: 0, setCurrent: setActiveKey })}
             </Tab>
@@ -105,6 +110,9 @@ function App () {
                 createdPlaylist={createdPlaylist} setCreatedPlaylist={setCreatedPlaylist}
                 playlist={playlist} setPlaylist={setPlaylist}
                 playlistItems={playlistItems} setPlaylistItems={setPlaylistItems}
+                newTitles={newTitles} setNewTitles={setNewTitles}
+                cameraViews={cameraViews} setCameraViews={setCameraViews}
+                defaultCameraView={defaultCameraView}
               />
             </Tab>
           </Tabs>

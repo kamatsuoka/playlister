@@ -2,22 +2,17 @@ import React from 'react'
 import { KIND } from 'baseui/button'
 import prevNextButtons from './PrevNextButtons'
 import PlaylistItems from './PlaylistItems'
-import { useStyletron } from 'baseui'
-import { Heading, HeadingLevel } from 'baseui/heading'
-import { Block } from 'baseui/block'
+import { HeadingLevel } from 'baseui/heading'
 import UploadStep from './UploadStep'
 import PlaylistStep from './PlaylistStep'
+import RenameStep from './RenameStep'
+import { getChosenDate } from './EventDate'
 
 export const YouTubePage = ({
-  current, setCurrent,
-  files, uploads, setUploads,
-  orgInfo, cameraInfo, eventData,
-  playlistTitle, setPlaylistTitle,
-  playlists, setPlaylists,
-  selectedPlaylist, setSelectedPlaylist,
-  createdPlaylist, setCreatedPlaylist,
-  playlist, setPlaylist,
-  playlistItems, setPlaylistItems
+  current, setCurrent, files, uploads, setUploads, orgInfo, cameraInfo, eventData,
+  playlistTitle, setPlaylistTitle, playlists, setPlaylists, selectedPlaylist, setSelectedPlaylist,
+  createdPlaylist, setCreatedPlaylist, playlist, setPlaylist, playlistItems, setPlaylistItems,
+  newTitles, setNewTitles, cameraViews, setCameraViews, defaultCameraView
 }) => {
   /**
    * uploads items, keyed by file id:
@@ -29,7 +24,6 @@ export const YouTubePage = ({
    * - startTime
    * - endTime
    */
-  const [css, theme] = useStyletron()
 
   /*
   const playlistOkay = (playlistTitle.tabIndex === 0 && createdPlaylist.title) ||
@@ -42,14 +36,28 @@ export const YouTubePage = ({
 
   const playlistVideoIds = new Set(Object.keys(playlistItems))
 
+  /**
+   * Gets the new title for a video.
+   *
+   * @param videoId video id
+   * @param index index (position) in playlist
+   */
+  const getNewTitle = (videoId, index) => {
+    const cameraView = cameraViews[videoId] || defaultCameraView
+    return `${orgInfo.orgName} ${getChosenDate(eventData)} ${cameraView} ` +
+      `${cameraInfo.cameraNumber}.${((index + 1).toString().padStart(2, 0))}`
+  }
+
   const allAdded = Object.keys(playlist).length > 0 && allUploaded && files.every(file =>
     uploads[file.fileId] && playlistVideoIds.has(uploads[file.fileId].videoId)
   )
 
-  const getRenameStep = () =>
-    <Block className={css({ marginBottom: theme.sizing.scale600 })}>
-      <Heading styleLevel={5}>4. Rename</Heading>
-    </Block>
+  /**
+   * Have all videos in playlist been renamed?
+   */
+  const allRenamed = Object.values(playlistItems).every(({ videoId, position }) =>
+    newTitles[videoId] === getNewTitle(videoId, position)
+  )
 
   return (
     <HeadingLevel>
@@ -68,11 +76,17 @@ export const YouTubePage = ({
         files={files} uploads={uploads} playlist={playlist}
         playlistItems={playlistItems} setPlaylistItems={setPlaylistItems}
       />
-      {allAdded ? getRenameStep() : null}
+      {allAdded
+        ? <RenameStep
+            cameraViews={cameraViews} setCameraViews={setCameraViews}
+            newTitles={newTitles} setNewTitles={setNewTitles} getNewTitle={getNewTitle}
+            playlistItems={playlistItems} defaultCameraView={defaultCameraView}
+          />
+        : null}
       {prevNextButtons({
         current,
         setCurrent,
-        nextProps: { kind: allUploaded ? KIND.primary : KIND.secondary }
+        nextProps: { kind: allRenamed ? KIND.primary : KIND.secondary }
       })}
     </HeadingLevel>
   )

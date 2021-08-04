@@ -11,4 +11,4 @@ global.insertPlaylistItem = youtube.insertPlaylistItem
 global.updatePlaylistItem = youtube.updatePlaylistItem
 global.listPlaylistItems = youtube.listPlaylistItems
 global.addToPlaylist = youtube.addToPlaylist
-global.updateTitle = youtube.updateTitle
+global.renameVideos = youtube.renameVideos

@@ -8,8 +8,7 @@ import { useStyletron } from 'baseui'
 import { enqueueError, errorMessage } from '../util/enqueueError'
 import * as youtube from '../youtube/api'
 import { useSnackbar } from 'baseui/snackbar'
-import { resourceToPlaylist } from '../models/playlists'
-import { resourceToPlaylistItem } from './PlaylistItems'
+import { resourceToPlaylist, resourceToPlaylistItem } from '../models/playlists'
 
 const PlaylistStep = ({
   setPlaylist, playlists, setPlaylists,

@@ -7,13 +7,14 @@ import React from 'react'
 import { FlexGrid, FlexGridItem } from 'baseui/flex-grid'
 import { Combobox } from 'baseui/combobox'
 import { copyData, usePersist } from '../hooks/usePersist'
+import { useStyletron } from 'baseui'
 
 const PreferencePage = ({
-  orgInfo, setOrgInfo,
-  password, setPassword,
-  eventData, setEventData,
-  cameraInfo, setCameraInfo
+  orgInfo, setOrgInfo, password, setPassword,
+  eventData, setEventData, cameraInfo, setCameraInfo,
+  defaultCameraView, setDefaultCameraView
 }) => {
+  const [, theme] = useStyletron()
   const handleChange = (evt, setValues) => {
     const value = evt.target.value
     setValues(values => ({
@@ -43,22 +44,23 @@ const PreferencePage = ({
       flexGridColumnCount={2}
       flexGridColumnGap='scale800'
       flexGridRowGap='scale800'
+      width={`calc(${theme.sizing.scale4800} * 4)`}
     >
+      <FlexGridItem>
+        <FormControl label='organization' caption="short form of your organization's name">
+          <Input
+            value={orgInfo.orgName || ''}
+            name='orgName'
+            onChange={evt => handleChange(evt, setOrgInfo)}
+            required
+          />
+        </FormControl>
+      </FlexGridItem>
       <FlexGridItem>
         <FormControl label='password'>
           <Input
             value={password || ''}
             onChange={setPassword}
-          />
-        </FormControl>
-      </FlexGridItem>
-      <FlexGridItem />
-      <FlexGridItem>
-        <FormControl label='organization' caption="short form of your organization's name, for video titles">
-          <Input
-            value={orgInfo.orgName || ''}
-            name='orgName'
-            onChange={evt => handleChange(evt, setOrgInfo)}
           />
         </FormControl>
       </FlexGridItem>
@@ -73,6 +75,17 @@ const PreferencePage = ({
         </FormControl>
       </FlexGridItem>
       <FlexGridItem>
+        <FormControl label='default camera view' caption='what the camera was mostly facing'>
+          <Combobox
+            value={defaultCameraView}
+            name='cameraView'
+            options={['chorus', 'corner', 'director', 'elevated']}
+            mapOptionToString={option => option}
+            onChange={setDefaultCameraView}
+          />
+        </FormControl>
+      </FlexGridItem>
+      <FlexGridItem>
         <FormControl label='camera number' caption='cameras are numbered 1-N'>
           <Input
             value={cameraInfo.cameraNumber || ''}
@@ -81,6 +94,7 @@ const PreferencePage = ({
             min={1}
             max={9}
             onChange={evt => handleChange(evt, setCameraInfo)}
+            required
           />
         </FormControl>
       </FlexGridItem>

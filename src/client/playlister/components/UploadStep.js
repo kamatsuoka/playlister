@@ -1,6 +1,6 @@
 import { Heading } from 'baseui/heading'
 import Tooltip from './Tooltip'
-import { Button, KIND } from 'baseui/button'
+import { KIND } from 'baseui/button'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSyncAlt } from '@fortawesome/free-solid-svg-icons'
 import UploadList from './UploadList'
@@ -11,6 +11,7 @@ import { parseDescription } from '../util/dates'
 import { findUploads } from '../youtube/api'
 import { useSnackbar } from 'baseui/snackbar'
 import { enqueueError } from '../util/enqueueError'
+import ActionButton from './ActionButton'
 
 const UploadStep = ({ files, uploads, setUploads }) => {
   // used to show status of checking for uploads
@@ -76,14 +77,10 @@ const UploadStep = ({ files, uploads, setUploads }) => {
     <>
       <Heading styleLevel={5}>1. <Tooltip tooltip={uploadTooltip}>Upload</Tooltip>
         {' '}
-        <Button
-          title='sync'
-          disabled={files.length === 0}
-          kind={KIND.minimal}
-          onClick={checkUploads}
-        >
-          <FontAwesomeIcon className='fa-padded' icon={faSyncAlt} spin={checking} />
-        </Button>
+        <ActionButton
+          onClick={checkUploads} spin={checking} title='sync' icon={faSyncAlt}
+          disabled={files.length === 0} kind={KIND.minimal} overrides={{}}
+        />
       </Heading>
       <UploadList
         files={files} checkedFileIds={checkedFileIds} uploads={uploads} setUploads={setUploads}

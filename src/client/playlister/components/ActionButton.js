@@ -4,22 +4,17 @@ import React from 'react'
 
 const width = '2px'
 const style = 'solid'
-const color = 'black'
 const buttonOverrides = {
   Root: {
     style: ({
       borderTopWidth: width,
       borderTopStyle: style,
-      borderTopColor: color,
       borderRightWidth: width,
       borderRightStyle: style,
-      borderRightColor: color,
       borderBottomWidth: width,
       borderBottomStyle: style,
-      borderBottomColor: color,
       borderLeftWidth: width,
-      borderLeftStyle: style,
-      borderLeftColor: color
+      borderLeftStyle: style
     })
   }
 }

@@ -166,7 +166,7 @@ class UploadWatcher {
     const videoResource = {
       snippet: {
         title: youtubeTitle(file.name),
-        description: JSON.stringify({ startTime, endTime }),
+        description: JSON.stringify({ startTime, endTime, filename: file.name }),
         categoryId: 10
       },
       status: {

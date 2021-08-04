@@ -5,19 +5,11 @@ import { enqueueError } from '../util/enqueueError'
 import { useStyletron } from 'baseui'
 import { TableBuilder, TableBuilderColumn } from 'baseui/table-semantic'
 import { tableOverrides } from './TableOverrides'
-import { displayDate, parseDescription } from '../util/dates'
+import { displayDate } from '../util/dates'
 import { faAngleDoubleDown } from '@fortawesome/free-solid-svg-icons'
 import { Heading } from 'baseui/heading'
 import ActionButton from './ActionButton'
-
-export const resourceToPlaylistItem = resource => ({
-  playlistItemId: resource.id,
-  playlistId: resource.snippet.playlistId,
-  videoId: resource.snippet.resourceId.videoId,
-  title: resource.snippet.title,
-  position: resource.snippet.position,
-  ...parseDescription(resource.snippet.description)
-})
+import { resourceToPlaylistItem } from '../models/playlists'
 
 /**
  * List of items (videos) in playlist
@@ -44,8 +36,12 @@ const PlaylistItems = ({ playlist, files, uploads, playlistItems, setPlaylistIte
       setAdding(false)
       return
     }
-    const successHandler = items => {
-      setPlaylistItems(items.map(resourceToPlaylistItem))
+    const successHandler = resources => {
+      setPlaylistItems(Object.fromEntries(
+        resources.map(resourceToPlaylistItem)
+          .sort((a, b) => a.position - b.position)
+          .map(item => [item.videoId, item])
+      ))
       setAdding(false)
     }
     const failureHandler = err => {

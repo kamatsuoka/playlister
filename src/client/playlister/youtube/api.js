@@ -216,18 +216,6 @@ export const updatePlaylistItem = ({ playlistItemId, videoId, playlistId, positi
   }
 }
 
-export const updateTitle = (videoId, title, onSuccess, onFailure) => {
-  const run = getAppsScriptRun()
-  if (run) {
-    return run
-      .withSuccessHandler(onSuccess)
-      .withFailureHandler(onFailure)
-      .updateTitle(videoId, title)
-  } else {
-    throw Error('updateTitle not implented outside Apps Script')
-  }
-}
-
 export const listPlaylistItems = async (playlistId, onSuccess, onFailure) => {
   const run = getAppsScriptRun()
   if (run) {
@@ -257,6 +245,14 @@ export const listPlaylistItems = async (playlistId, onSuccess, onFailure) => {
   }
 }
 
+/**
+ * Adds videos to a playlist
+ *
+ * @param videoIds Array of video ids
+ * @param playlistId playlist id
+ * @param onSuccess success handler
+ * @param onFailure failure handler
+ */
 export const addToPlaylist = async (videoIds, playlistId, onSuccess, onFailure) => {
   const run = getAppsScriptRun()
   if (run) {
@@ -282,5 +278,23 @@ export const addToPlaylist = async (videoIds, playlistId, onSuccess, onFailure) 
     return new Promise(resolve => {
       return resolve(resources)
     }).then(onSuccess).catch(onFailure)
+  }
+}
+
+/**
+ * Rename list of videos. Used to rename all videos in a playlist.
+ *
+ * @param videoTitles Object of { videoId: title }
+ * @param onSuccess success handler
+ * @param onFailure failure handler
+ * @return Object of { videoId: title }
+ */
+export const renameVideos = (videoTitles, onSuccess, onFailure) => {
+  const run = getAppsScriptRun()
+  if (run) {
+    return run
+      .withSuccessHandler(onSuccess)
+      .withFailureHandler(onFailure)
+      .renameVideos(videoTitles)
   }
 }

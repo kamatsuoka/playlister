@@ -156,7 +156,8 @@ export function findUploads (files) {
         }
         const desiredDescription = JSON.stringify({
           startTime: match.fileData.startTime,
-          endTime: match.fileData.endTime
+          endTime: match.fileData.endTime,
+          filename: match.filename
         })
         if (match.description !== desiredDescription) {
           Logger.log(`Updating description of video ${match.videoId} to contain startTime and endTime`)
@@ -292,4 +293,15 @@ export function addToPlaylist (videoIds, playlistId) {
       playlistId,
       position
     }))
+}
+
+/**
+ * Renames videos
+ *
+ * @param videoTitles Object of { videoId: title }
+ * @return Array Object of { videoId: title }
+ */
+export function renameVideos (videoTitles) {
+  const newTitles = Object.entries(videoTitles).map(([videoId, title]) => updateTitle(videoId, title))
+  return Object.fromEntries(newTitles.map(({ videoId, title }) => [videoId, title]))
 }
