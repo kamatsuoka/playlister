@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { Input } from 'baseui/input'
 import { useStyletron } from 'baseui'
 import { FormControl } from 'baseui/form-control'
-import * as youtube from '../youtube/api'
+import * as youtube from '../api/youtube/youtube-client'
 import { enqueueError, errorMessage } from '../util/enqueueError'
 import { useSnackbar } from 'baseui/snackbar'
 import { Block } from 'baseui/block'
@@ -50,9 +50,9 @@ const PlaylistCreate = ({
   const playlistSuccess = verb => plist => {
     if (plist.id) {
       const created = resourceToPlaylist(plist)
+      enqueue({ message: `${verb} playlist: ${created.title}` })
       setCreatedPlaylist(created)
       setPlaylist(created)
-      enqueue({ message: `${verb} playlist: ${created.title}` })
       console.log(`${verb} playlist: `, created)
     } else {
       showError('Unexpected response: ' + JSON.stringify(plist))

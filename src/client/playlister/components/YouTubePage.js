@@ -1,7 +1,6 @@
 import React from 'react'
 import prevNextButtons from './PrevNextButtons'
 import PlaylistItems from './PlaylistItems'
-import { HeadingLevel } from 'baseui/heading'
 import UploadStep from './UploadStep'
 import PlaylistStep from './PlaylistStep'
 import RenameStep from './RenameStep'
@@ -25,7 +24,7 @@ export const YouTubePage = ({
    */
 
   return (
-    <HeadingLevel>
+    <>
       <UploadStep files={files} uploads={uploads} setUploads={setUploads} allUploaded={allUploaded} />
       {allUploaded
         ? <PlaylistStep
@@ -53,7 +52,7 @@ export const YouTubePage = ({
         setCurrent,
         nextProps: { grayed: !allRenamed }
       })}
-    </HeadingLevel>
+    </>
   )
 }
 

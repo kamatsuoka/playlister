@@ -6,6 +6,11 @@
         "userSymbol": "YouTube",
         "version": "v3",
         "serviceId": "youtube"
+      },
+      {
+        "userSymbol": "Sheets",
+        "version": "v4",
+        "serviceId": "sheets"
       }
     ]
   },

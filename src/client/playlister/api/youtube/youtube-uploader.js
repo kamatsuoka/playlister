@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const { youtubeTitle } = require('./api')
+const { youtubeTitle } = require('./youtube-client')
 
 class RetryHandler {
   constructor () {

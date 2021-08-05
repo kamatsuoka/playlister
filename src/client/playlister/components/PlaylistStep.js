@@ -6,7 +6,7 @@ import PlaylistSelect from './PlaylistSelect'
 import React, { useCallback, useState } from 'react'
 import { useStyletron } from 'baseui'
 import { enqueueError, errorMessage } from '../util/enqueueError'
-import * as youtube from '../youtube/api'
+import * as youtube from '../api/youtube/youtube-client'
 import { useSnackbar } from 'baseui/snackbar'
 import { resourceToPlaylist, resourceToPlaylistItem } from '../models/playlists'
 

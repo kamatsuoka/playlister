@@ -5,7 +5,7 @@
  * gapi.client.youtube.* functions if we're running as a regular web app.
  */
 
-import { getAppsScriptRun } from '../util/auth'
+import { getAppsScriptRun } from '../auth'
 import dayjs from 'dayjs'
 
 /**

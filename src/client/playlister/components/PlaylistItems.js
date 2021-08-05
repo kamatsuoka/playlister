@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import * as youtube from '../youtube/api'
+import * as youtube from '../api/youtube/youtube-client'
 import { useSnackbar } from 'baseui/snackbar'
 import { enqueueError } from '../util/enqueueError'
 import { useStyletron } from 'baseui'
