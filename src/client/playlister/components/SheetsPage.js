@@ -6,17 +6,17 @@ import { useSnackbar } from 'baseui/snackbar'
 import { enqueueError } from '../util/enqueueError'
 import { getChosenDate, localDate } from '../models/dates'
 import { getVideoNumber } from '../models/renaming'
-import { Table, TableBuilder, TableBuilderColumn } from 'baseui/table-semantic'
+import { TableBuilder, TableBuilderColumn } from 'baseui/table-semantic'
 import { tableOverrides } from './TableOverrides'
 import { StyledLink } from 'baseui/link'
 import { FormControl } from 'baseui/form-control'
 import { Input } from 'baseui/input'
 import { FlexGrid, FlexGridItem } from 'baseui/flex-grid'
 import Tooltip from './Tooltip'
-import { Heading, HeadingLevel } from 'baseui/heading'
+import { Heading } from 'baseui/heading'
 import { copyData, usePersist } from '../hooks/usePersist'
 import ActionButton from './ActionButton'
-import { faCheck } from '@fortawesome/free-solid-svg-icons'
+import { faSearch } from '@fortawesome/free-solid-svg-icons'
 import { useStyletron } from 'baseui'
 
 const SheetsPage = ({
@@ -100,29 +100,35 @@ const SheetsPage = ({
   }
 
   /**
-   * Gets the last few rows of the spreadsheet
+   * Gets the last few rows of the spreadsheet,
+   * with first row prepended as header
    */
   const getTail = useCallback(rowCount => {
-    if (sheetIdsOkay()) {
-      setTail([])
-      setTailing(true)
-      const onSuccess = tailRows => {
-        console.log('got tail of sheet:', tailRows)
-        setTailing(false)
-        return setTail(tailRows)
-      }
-      const onError = e => {
-        setTailing(false)
-        showError(e)
-      }
-      try {
-        const sheetName = spreadsheetInfo.sheetName
-        const quotedSheetName = sheetName.includes(' ') ? `'${sheetName}'` : sheetName
-        const range = `${quotedSheetName}!A1:J1`
-        return sheets.tailSheet(spreadsheetInfo.spreadsheetId, range, rowCount, onSuccess, onError)
-      } catch (e) {
-        showError(e)
-      }
+    setTail([])
+    setTailing(true)
+    const onSuccess = tailRows => {
+      console.log('got tail of sheet:', tailRows)
+      setTailing(false)
+      return setTail(tailRows)
+    }
+    const onError = e => {
+      setTailing(false)
+      showError(e)
+    }
+    try {
+      const sheetName = spreadsheetInfo.sheetName
+      const quotedSheetName = sheetName.includes(' ') ? `'${sheetName}'` : sheetName
+      const range = `${quotedSheetName}!A1:J1`
+      return sheets.tailSheet({
+        spreadsheetId: spreadsheetInfo.spreadsheetId,
+        range,
+        rowCount,
+        header: true,
+        onSuccess,
+        onError
+      })
+    } catch (e) {
+      showError(e)
     }
   }, [spreadsheetInfo.spreadsheetId, spreadsheetInfo.sheetName, showError, setTail])
 
@@ -153,6 +159,23 @@ const SheetsPage = ({
       }
     }
   })
+
+  const showTail = () => (
+    <TableBuilder data={tail.slice(1)} overrides={tableOverrides}>
+      {[...Array(8).keys()].map(i =>
+        <TableBuilderColumn header={tail[0][i]} key={`column${i}`}>
+          {row =>
+            row[i] && row[i].startsWith('https://www.youtube.com/')
+              ? (
+                <StyledLink href={row[i]} target='_blank' rel='noopener noreferrer'>
+                  youtube link
+                </StyledLink>
+                )
+              : row[i]}
+        </TableBuilderColumn>
+      )}
+    </TableBuilder>
+  )
 
   return (
     <>
@@ -186,9 +209,9 @@ const SheetsPage = ({
           {row => row.cameraName}
         </TableBuilderColumn>
       </TableBuilder>
-      <Heading styleLevel={5}><Tooltip tooltip={tooltip}>Sheet</Tooltip> to Append to</Heading>
+      <Heading styleLevel={5}><Tooltip tooltip={tooltip}>Google Sheet</Tooltip></Heading>
       <FlexGrid
-        flexGridColumnCount={3}
+        flexGridColumnCount={2}
         flexGridColumnGap='scale800'
         flexGridRowGap='scale800'
       >
@@ -212,45 +235,12 @@ const SheetsPage = ({
             />
           </FormControl>
         </FlexGridItem>
-        <FlexGridItem
-          {...itemWidthProps({ width: theme.sizing.scale1200, position: 'relative', top: '-' + theme.sizing.scale800 })}
-        >
-          <ActionButton onClick={() => getTail(3)} grayed={!sheetIdsOkay()} icon={faCheck} spin={tailing} />
-        </FlexGridItem>
       </FlexGrid>
-      <HeadingLevel>
-        <Heading styleLevel={6}>Last Few Rows</Heading>
-        <TableBuilder data={tail} overrides={tableOverrides}>
-          <TableBuilderColumn header='date'>
-            {row => row[0]}
-          </TableBuilderColumn>
-          <TableBuilderColumn header='vid #'>
-            {row => row[1]}
-          </TableBuilderColumn>
-          <TableBuilderColumn header='start time'>
-            {row => row[2]}
-          </TableBuilderColumn>
-          <TableBuilderColumn header='end time'>
-            {row => row[3]}
-          </TableBuilderColumn>
-          <TableBuilderColumn header='link'>
-            {row =>
-              <StyledLink href={row[4]} target='_blank' rel='noopener noreferrer'>
-                ...{row[4].slice(-15)}
-              </StyledLink>}
-          </TableBuilderColumn>
-          <TableBuilderColumn header='cam #'>
-            {row => row[5]}
-          </TableBuilderColumn>
-          <TableBuilderColumn header='cam view'>
-            {row => row[6]}
-          </TableBuilderColumn>
-          <TableBuilderColumn header='cam name'>
-            {row => row[7]}
-          </TableBuilderColumn>
-        </TableBuilder>
-      </HeadingLevel>
-      <Table data={tail} overrides={tableOverrides} />
+      <Heading styleLevel={5}>
+        Check Recent Rows {' '}
+        <ActionButton onClick={() => getTail(3)} grayed={!sheetIdsOkay()} icon={faSearch} spin={tailing} />
+      </Heading>
+      {tail[0] ? showTail() : null}
     </>
   )
 }

@@ -32,7 +32,8 @@ export const getRange = (spreadsheetId, range) => {
 }
 
 /**
- * Tails a sheet.
+ * Tails a sheet. Returns last `rowCount` rows, optionally prepended with
+ * first row as header.
  *
  * Finds the last row by appending an empty list of rows to the table, which returns
  * the range appended. The `range` parameter specifies where to search for data.
@@ -40,21 +41,30 @@ export const getRange = (spreadsheetId, range) => {
  * @param spreadsheetId {string} id of spreadsheet
  * @param range {string} range to search for data in spreadsheet (typically e.g. sheetId!A1:C1)
  * @param rowCount number of rows to return
+ * @param header true to prepend with first row as header
  * @return {[[]]} array of rows, with each row an array of values
  */
-export const tailSheet = (spreadsheetId, range, rowCount) => {
+export const tailSheet = ({ spreadsheetId, range, rowCount, header }) => {
   const appendResult = appendRows(spreadsheetId, range, [])
   Logger.log(`result of empty appendRows: ${appendResult}`)
   const appendRange = appendResult.updates.updatedRange
   Logger.log(`append range: ${appendRange}`)
   const lastCol = range.match(/([A-Z]+)[0-9]+$/)[1]
   const prefix = range.includes('!') ? range.split('!')[0] + '!' : ''
-  const headRange = `${prefix}A1:${lastCol}1`
-  Logger.log(`head range: ${headRange}`)
-  const headRows = getRange(spreadsheetId, headRange)
-  const lastRow = appendRange.match(/[0-9]+$/)[0]
-  const firstRow = Math.max(1, lastRow - rowCount)
-  const tailRange = `${prefix}A${firstRow}:${lastCol}${lastRow}`
-  Logger.log(`tail range: ${tailRange}`)
-  return headRows.concat(getRange(spreadsheetId, tailRange))
+
+  const getHeadRows = () => {
+    const headRange = `${prefix}A1:${lastCol}1`
+    Logger.log(`head range: ${headRange}`)
+    return getRange(spreadsheetId, headRange)
+  }
+
+  const getTailRows = () => {
+    const lastRow = appendRange.match(/[0-9]+$/)[0]
+    const firstRow = Math.max(1, lastRow - rowCount)
+    const tailRange = `${prefix}A${firstRow}:${lastCol}${lastRow}`
+    Logger.log(`tail range: ${tailRange}`)
+    return getRange(spreadsheetId, tailRange)
+  }
+
+  return header ? getHeadRows().concat(getTailRows()) : getTailRows()
 }
