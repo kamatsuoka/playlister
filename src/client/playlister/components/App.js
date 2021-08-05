@@ -21,7 +21,7 @@ const engine = new Styletron()
 
 function App () {
   // index of currently selected step
-  const [current, setCurrent] = useState(0)
+  const [current, setCurrent] = useState(1)
   // info about the organization
   const [orgInfo, setOrgInfo] = useState({ orgName: 'fcs' })
   // info about the camera

@@ -6,17 +6,13 @@ import RenameList from './RenameList'
 import React, { useState } from 'react'
 import { useStyletron } from 'baseui'
 import * as youtube from '../api/youtube/youtube-client'
-import { useSnackbar } from 'baseui/snackbar'
-import { enqueueError } from '../util/enqueueError'
 
 const RenameStep = ({
   cameraViews, setCameraViews, allRenamed, newTitles, setNewTitles,
-  getNewTitle, playlistItems, defaultCameraView
+  getNewTitle, playlistItems, defaultCameraView, enqueue, showError
 }) => {
   const [css, theme] = useStyletron()
   const [renaming, setRenaming] = useState(false)
-  const { enqueue } = useSnackbar()
-  const showError = enqueueError(enqueue)
 
   const renameVideos = () => {
     setRenaming(true)
@@ -29,6 +25,8 @@ const RenameStep = ({
     )
 
     const onSuccess = videoTitles => {
+      enqueue({ message: 'all videos renamed' })
+      console.log('youtube.renameVideos succeeded with', videoTitles)
       setRenaming(false)
       return setNewTitles(videoTitles)
     }

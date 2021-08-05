@@ -224,23 +224,8 @@ export const listPlaylistItems = async (playlistId, onSuccess, onFailure) => {
       .withFailureHandler(onFailure)
       .listPlaylistItems(playlistId)
   } else {
-    // for testing
-    await sleep(1000)
-    const numItems = Math.max(1, Math.round(Math.random() * 5))
-    const resources = Array.from({ length: numItems }, (x, i) => ({
-      id: randomId(),
-      snippet: {
-        playlistId: playlistId,
-        title: `video ${i}`,
-        startTime: dayjs().toISOString(),
-        position: i,
-        resourceId: {
-          videoId: i
-        }
-      }
-    }))
     return new Promise(resolve => {
-      return resolve(resources)
+      return resolve([])
     }).then(onSuccess).catch(onFailure)
   }
 }
@@ -270,6 +255,7 @@ export const addToPlaylist = async (videos, playlistId, onSuccess, onFailure) =>
         title: title,
         startTime: startTime,
         position: i,
+        description: JSON.stringify({ startTime }),
         resourceId: {
           videoId: videoId
         }
@@ -289,12 +275,21 @@ export const addToPlaylist = async (videos, playlistId, onSuccess, onFailure) =>
  * @param onFailure failure handler
  * @return Object of { videoId: title }
  */
-export const renameVideos = (videoTitleDesc, onSuccess, onFailure) => {
+export const renameVideos = async (videoTitleDesc, onSuccess, onFailure) => {
   const run = getAppsScriptRun()
   if (run) {
     return run
       .withSuccessHandler(onSuccess)
       .withFailureHandler(onFailure)
       .renameVideos(videoTitleDesc)
+  } else {
+    // for testing
+    await sleep(1000)
+    const results = Object.fromEntries(
+      Object.entries(videoTitleDesc).map(([videoId, { title }]) => [videoId, title])
+    )
+    return new Promise(resolve => {
+      return resolve(results)
+    }).then(onSuccess).catch(onFailure)
   }
 }

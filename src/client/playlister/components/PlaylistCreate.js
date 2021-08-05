@@ -4,8 +4,7 @@ import { Input } from 'baseui/input'
 import { useStyletron } from 'baseui'
 import { FormControl } from 'baseui/form-control'
 import * as youtube from '../api/youtube/youtube-client'
-import { enqueueError, errorMessage } from '../util/enqueueError'
-import { useSnackbar } from 'baseui/snackbar'
+import { errorMessage } from '../util/enqueueError'
 import { Block } from 'baseui/block'
 import { faPlus } from '@fortawesome/free-solid-svg-icons'
 import ActionButton from './ActionButton'
@@ -17,12 +16,10 @@ const CUSTOM = 'custom'
 const PlaylistCreate = ({
   eventData, orgInfo, cameraInfo, createdPlaylist,
   setCreatedPlaylist, resourceToPlaylist, uploadedFileIds,
-  setPlaylist, playlistTitle, setPlaylistTitle
+  setPlaylist, playlistTitle, setPlaylistTitle, enqueue, showError
 }) => {
   const [css, theme] = useStyletron()
   const [creating, setCreating] = useState(false)
-  const { enqueue } = useSnackbar()
-  const showError = enqueueError(enqueue)
 
   const eventDate = getChosenDate(eventData)
 

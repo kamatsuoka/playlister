@@ -5,9 +5,8 @@ import PlaylistCreate from './PlaylistCreate'
 import PlaylistSelect from './PlaylistSelect'
 import React, { useCallback, useState } from 'react'
 import { useStyletron } from 'baseui'
-import { enqueueError, errorMessage } from '../util/enqueueError'
+import { errorMessage } from '../util/enqueueError'
 import * as youtube from '../api/youtube/youtube-client'
-import { useSnackbar } from 'baseui/snackbar'
 import { resourceToPlaylist, resourceToPlaylistItem } from '../models/playlists'
 
 const PlaylistStep = ({
@@ -16,12 +15,10 @@ const PlaylistStep = ({
   createdPlaylist, setCreatedPlaylist,
   selectedPlaylist, setSelectedPlaylist,
   playlistTitle, setPlaylistTitle,
-  eventData, orgInfo, cameraInfo
+  eventData, orgInfo, cameraInfo, enqueue, showError
 }) => {
   const [css, theme] = useStyletron()
   const [listing, setListing] = useState(false)
-  const { enqueue } = useSnackbar()
-  const showError = enqueueError(enqueue)
 
   /**
    * Failure handler for listing playlists
@@ -100,6 +97,7 @@ const PlaylistStep = ({
             setCreatedPlaylist={setCreatedPlaylist} resourceToPlaylist={resourceToPlaylist}
             uploadedFileIds={uploadedFileIds} setPlaylist={setAndListPlaylist}
             playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
+            enqueue={enqueue} showError={showError}
           />
         </Tab>
         <Tab title='Existing' overrides={tabOverrides}>

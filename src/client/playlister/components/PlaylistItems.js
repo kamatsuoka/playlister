@@ -1,7 +1,5 @@
 import React, { useState } from 'react'
 import * as youtube from '../api/youtube/youtube-client'
-import { useSnackbar } from 'baseui/snackbar'
-import { enqueueError } from '../util/enqueueError'
 import { useStyletron } from 'baseui'
 import { TableBuilder, TableBuilderColumn } from 'baseui/table-semantic'
 import { tableOverrides } from './TableOverrides'
@@ -18,11 +16,11 @@ import { resourceToPlaylistItem } from '../models/playlists'
  * Youtube (as of July 2021) adds new playlist items to the end of the playlist.
  * The insert api seems to ignore the 'position' param.
  */
-const PlaylistItems = ({ playlist, files, uploads, playlistItems, setPlaylistItems, allAdded }) => {
+const PlaylistItems = ({
+  playlist, files, uploads, playlistItems, setPlaylistItems, allAdded, enqueue, showError
+}) => {
   const [css] = useStyletron()
   const [adding, setAdding] = useState(false)
-  const { enqueue } = useSnackbar()
-  const showError = enqueueError(enqueue)
 
   /**
    * Add videos to playlist in the position specified by their order in the array.
@@ -41,6 +39,7 @@ const PlaylistItems = ({ playlist, files, uploads, playlistItems, setPlaylistIte
           .sort((a, b) => a.position - b.position)
           .map(item => [item.videoId, item])
       ))
+      enqueue({ message: `all videos added to ${playlist.title}` })
       setAdding(false)
     }
     const failureHandler = err => {
@@ -65,7 +64,7 @@ const PlaylistItems = ({ playlist, files, uploads, playlistItems, setPlaylistIte
         continue
       }
       videos[playlistItem.videoId] = {
-        title: playlistItem.title, startTime: playlistItem.startTime, videoId: playlistItem.videoid
+        title: playlistItem.title, startTime: playlistItem.startTime, videoId: playlistItem.videoId
       }
     }
     const sortedVideos = Object.values(videos).sort((v1, v2) => {

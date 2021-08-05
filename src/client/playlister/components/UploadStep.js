@@ -8,17 +8,13 @@ import { createTheme, lightThemePrimitives, ThemeProvider } from 'baseui'
 import { StyledLink } from 'baseui/link'
 import { parseDescription } from '../models/dates'
 import { findUploads } from '../api/youtube/youtube-client'
-import { useSnackbar } from 'baseui/snackbar'
-import { enqueueError } from '../util/enqueueError'
 import ActionButton from './ActionButton'
 
-const UploadStep = ({ files, uploads, setUploads, allUploaded }) => {
+const UploadStep = ({ files, uploads, setUploads, allUploaded, enqueue, showError }) => {
   // used to show status of checking for uploads
   const [checking, setChecking] = useState(false)
   // file ids that have been checked
   const [checkedFileIds, setCheckedFileIds] = useState(new Set())
-  const { enqueue } = useSnackbar()
-  const showError = enqueueError(enqueue)
 
   const checkUploads = useCallback(() => {
     console.log('in checkUploads')
