@@ -154,7 +154,7 @@ const PlaylistCreate = ({
           disabled={uploadedFileIds.size === 0 || !isValidTitle()}
           grayed={Object.keys(createdPlaylist).length > 0 && createdPlaylist.title === desiredTitle}
           title='create playlist' icon={faPlus} spin={creating}
-          style={{ float: 'left', marginTop: theme.sizing.scale300, marginRight: theme.sizing.scale500 }}
+          style={{ float: 'left', marginTop: theme.sizing.scale500, marginRight: theme.sizing.scale500 }}
         />
         <RadioGroup
           value={playlistTitle.titleChoice}
@@ -167,6 +167,8 @@ const PlaylistCreate = ({
               <Input
                 value={suggestedTitle}
                 readOnly
+                onFocus={() => setPlaylistTitle(values => ({ ...values, titleChoice: SUGGESTED }))}
+                positive={playlistTitle.titleChoice === SUGGESTED && createdPlaylist.title === suggestedTitle}
                 overrides={suggestedInputOverrides}
               />
             </FormControl>
@@ -178,7 +180,8 @@ const PlaylistCreate = ({
                 placeholder='custom title'
                 name='customTitle'
                 onChange={handleChange}
-                onFocus={() => setPlaylistTitle({ ...playlistTitle, titleChoice: CUSTOM })}
+                onFocus={() => setPlaylistTitle(values => ({ ...values, titleChoice: CUSTOM }))}
+                positive={playlistTitle.titleChoice === CUSTOM && createdPlaylist.title === playlistTitle.customTitle}
                 overrides={inputOverrides}
               />
             </FormControl>
