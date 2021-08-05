@@ -20,7 +20,7 @@ dayjs.extend(utc)
  * List of videos with old and new titles
  */
 const RenameList = ({
-  playlistItems, newTitles, cameraViews, setCameraViews, getNewTitle, defaultCameraView
+  playlistItems, renamedTitles, cameraViews, setCameraViews, getNewTitle, defaultCameraView
 }) => {
   const columnOverrides = {
     TableBodyCell: {
@@ -40,6 +40,27 @@ const RenameList = ({
         paddingRight: $theme.sizing.scale800
       })
     }
+  }
+
+  const hasIntendedTitle = (row, index) => {
+    const intendedTitle = getNewTitle(row.videoId, index)
+    console.log(`in rename list row ${index}, intended title = ${intendedTitle}`)
+    if (row.title === intendedTitle) {
+      console.log(`video ${row.title} already had intended title`)
+      return true
+    }
+    if (renamedTitles[row.videoId]) {
+      const renamedTitle = renamedTitles[row.videoId].title
+      if (renamedTitle === intendedTitle) {
+        console.log(`video ${row.title} was renamed to match intended title`)
+        return true
+      } else {
+        console.log(`video ${row.title} was renamed but does NOT match intended title!!!`)
+      }
+    } else {
+      console.log(`video ${row.title} has not been renamed`)
+    }
+    return false
   }
 
   return (
@@ -62,10 +83,7 @@ const RenameList = ({
           {(row, index) => getNewTitle(row.videoId, index)}
         </TableBuilderColumn>
         <TableBuilderColumn overrides={columnOverrides} header=''>
-          {(row, index) => newTitles[row.videoId] &&
-          newTitles[row.videoId].title === getNewTitle(row.videoId, index)
-            ? <FontAwesomeIcon icon={faCheck} />
-            : null}
+          {(row, index) => hasIntendedTitle(row, index) ? <FontAwesomeIcon icon={faCheck} /> : null}
         </TableBuilderColumn>
       </TableBuilder>
     </>

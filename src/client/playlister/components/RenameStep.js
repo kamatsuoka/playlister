@@ -8,7 +8,7 @@ import { useStyletron } from 'baseui'
 import * as youtube from '../api/youtube/youtube-client'
 
 const RenameStep = ({
-  cameraViews, setCameraViews, allRenamed, newTitles, setNewTitles,
+  cameraViews, setCameraViews, allRenamed, renamedTitles, setRenamedTitles,
   getNewTitle, playlistItems, defaultCameraView, enqueue, showError
 }) => {
   const [css, theme] = useStyletron()
@@ -16,7 +16,7 @@ const RenameStep = ({
 
   const renameVideos = () => {
     setRenaming(true)
-    setNewTitles({})
+    setRenamedTitles({})
     // map of { videoId: title }
     const videoTitleDesc = Object.fromEntries(
       Object.values(playlistItems).map(({ videoId, position, description }) =>
@@ -28,14 +28,14 @@ const RenameStep = ({
       enqueue({ message: 'all videos renamed' })
       console.log('youtube.renameVideos succeeded with', videoTitles)
       setRenaming(false)
-      return setNewTitles(videoTitles)
+      return setRenamedTitles(videoTitles)
     }
     const onFailure = err => {
       setRenaming(false)
       showError(err)
     }
     console.log('calling youtube.renameVideos with args', videoTitleDesc)
-    youtube.renameVideos(videoTitleDesc, onSuccess, onFailure)
+    return youtube.renameVideos(videoTitleDesc, onSuccess, onFailure)
   }
 
   return (
@@ -48,7 +48,7 @@ const RenameStep = ({
         />
       </Heading>
       <RenameList
-        playlistItems={playlistItems} newTitles={newTitles} setNewTitles={setNewTitles}
+        playlistItems={playlistItems} renamedTitles={renamedTitles} setNewTitles={setRenamedTitles}
         cameraViews={cameraViews} setCameraViews={setCameraViews} defaultCameraView={defaultCameraView}
         getNewTitle={getNewTitle}
       />

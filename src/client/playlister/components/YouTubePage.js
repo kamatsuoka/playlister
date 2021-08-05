@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import prevNextButtons from './PrevNextButtons'
 import PlaylistItems from './PlaylistItems'
 import UploadStep from './UploadStep'
@@ -6,12 +6,13 @@ import PlaylistStep from './PlaylistStep'
 import RenameStep from './RenameStep'
 import { useSnackbar } from 'baseui/snackbar'
 import { enqueueError } from '../util/enqueueError'
+import { DEBUG_PLAYLISTS, DebugContext } from './DebugContext'
 
 export const YouTubePage = ({
   current, setCurrent, files, uploads, setUploads, orgInfo, cameraInfo, eventData,
   playlistTitle, setPlaylistTitle, playlists, setPlaylists, selectedPlaylist, setSelectedPlaylist,
   createdPlaylist, setCreatedPlaylist, playlist, setPlaylist, playlistItems, setPlaylistItems,
-  newTitles, setNewTitles, cameraViews, setCameraViews, defaultCameraView,
+  renamedTitles, setRenamedTitles, cameraViews, setCameraViews, defaultCameraView,
   allUploaded, uploadedFileIds, allAdded, allRenamed, getNewTitle
 }) => {
   /**
@@ -26,6 +27,7 @@ export const YouTubePage = ({
    */
   const { enqueue } = useSnackbar()
   const showError = enqueueError(enqueue)
+  const debugProps = useContext(DebugContext)
 
   return (
     <>
@@ -33,7 +35,7 @@ export const YouTubePage = ({
         files={files} uploads={uploads} setUploads={setUploads} allUploaded={allUploaded}
         enqueue={enqueue} showError={showError}
       />
-      {allUploaded
+      {allUploaded || debugProps.includes(DEBUG_PLAYLISTS)
         ? <PlaylistStep
             setPlaylist={setPlaylist} playlists={playlists} setPlaylists={setPlaylists}
             setPlaylistItems={setPlaylistItems} uploadedFileIds={uploadedFileIds}
@@ -49,10 +51,10 @@ export const YouTubePage = ({
         playlistItems={playlistItems} setPlaylistItems={setPlaylistItems} allAdded={allAdded}
         enqueue={enqueue} showError={showError}
       />
-      {allAdded
+      {allAdded || debugProps.includes(DEBUG_PLAYLISTS)
         ? <RenameStep
             cameraViews={cameraViews} setCameraViews={setCameraViews} allRenamed={allRenamed}
-            newTitles={newTitles} setNewTitles={setNewTitles} getNewTitle={getNewTitle}
+            renamedTitles={renamedTitles} setRenamedTitles={setRenamedTitles} getNewTitle={getNewTitle}
             playlistItems={playlistItems} defaultCameraView={defaultCameraView}
             enqueue={enqueue} showError={showError}
           />
