@@ -8,6 +8,7 @@ import { faAngleDoubleDown } from '@fortawesome/free-solid-svg-icons'
 import { Heading } from 'baseui/heading'
 import ActionButton from './ActionButton'
 import { resourceToPlaylistItem } from '../models/playlists'
+import GreenCheckMark from './GreenCheckMark'
 
 /**
  * List of items (videos) in playlist
@@ -74,7 +75,6 @@ const PlaylistItems = ({
       return v1.startTime > v2.startTime ? 1 : -1
     })
     console.log('sortedVideos: ', sortedVideos)
-    // const orderedIds = sortedVideos.map(([id]) => id)
     return addToPlaylist(sortedVideos)
   }
 
@@ -94,6 +94,9 @@ const PlaylistItems = ({
           data={Object.values(playlistItems).sort((a, b) => a.position - b.position)}
           overrides={tableOverrides}
         >
+          <TableBuilderColumn header=''>
+            {row => row.position !== undefined ? <GreenCheckMark /> : null}
+          </TableBuilderColumn>
           <TableBuilderColumn header='Title'>
             {row => row.title}
           </TableBuilderColumn>

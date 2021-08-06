@@ -6,9 +6,8 @@ import advancedFormat from 'dayjs/plugin/advancedFormat'
 import timezone from 'dayjs/plugin/timezone' // dependent on utc plugin
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { TableBuilder, TableBuilderColumn } from 'baseui/table-semantic'
-import { faCheck } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Combobox } from 'baseui/combobox'
+import GreenCheckMark from './GreenCheckMark'
 
 dayjs.extend(localizedFormat)
 dayjs.extend(advancedFormat)
@@ -54,6 +53,9 @@ const RenameList = ({
   return (
     <>
       <TableBuilder data={Object.values(playlistItems).sort((a, b) => a.position - b.position)}>
+        <TableBuilderColumn overrides={columnOverrides} header=''>
+          {(row, index) => hasIntendedTitle(row, index) ? <GreenCheckMark /> : null}
+        </TableBuilderColumn>
         <TableBuilderColumn overrides={columnOverrides} header='Original Title'>
           {row => row.title}
         </TableBuilderColumn>
@@ -69,9 +71,6 @@ const RenameList = ({
         </TableBuilderColumn>
         <TableBuilderColumn overrides={columnOverrides} header='New Title'>
           {(row, index) => getNewTitle(row.videoId, index)}
-        </TableBuilderColumn>
-        <TableBuilderColumn overrides={columnOverrides} header=''>
-          {(row, index) => hasIntendedTitle(row, index) ? <FontAwesomeIcon icon={faCheck} /> : null}
         </TableBuilderColumn>
       </TableBuilder>
     </>

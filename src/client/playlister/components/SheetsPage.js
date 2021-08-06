@@ -11,11 +11,7 @@ import ActionButton from './ActionButton'
 import { faAngleDoubleDown } from '@fortawesome/free-solid-svg-icons'
 import VideoMetadata from './VideoMetadata'
 import GoogleSheetInfo from './GoogleSheetInfo'
-import { TableBuilder, TableBuilderColumn } from 'baseui/table-semantic'
-import { tableOverrides } from './TableOverrides'
-import { StyledLink } from 'baseui/link'
 import { DEBUG_METADATA, DebugContext } from './DebugContext'
-import { Label2 } from 'baseui/typography'
 
 const SheetsPage = ({
   cameraInfo, eventData, cameraViews, defaultCameraView,
@@ -139,34 +135,14 @@ const SheetsPage = ({
     }
   }, [videoMetadata, spreadsheetInfo.spreadsheetId, spreadsheetInfo.sheetName, showError])
 
-  const showAddedRows = () => (
-    <>
-      <Label2 style={{ textDecoration: 'underline' }}>Added Rows</Label2>
-      <TableBuilder data={addedRows} overrides={tableOverrides}>
-        {[...Array(8).keys()].map(i =>
-          <TableBuilderColumn header='' key={`column${i}`}>
-            {row =>
-              row[i] && row[i].startsWith(BASE_URL)
-                ? (
-                  <StyledLink href={row[i]} target='_blank' rel='noopener noreferrer'>
-                    youtube link
-                  </StyledLink>
-                  )
-                : row[i]}
-          </TableBuilderColumn>
-        )}
-      </TableBuilder>
-    </>
-  )
-
   const showVideoMetadata = () => (
     <>
-      <Heading styleLevel={5}>Video Metadata To Add {' '}
+      <Heading styleLevel={5}>Add Video Metadata {' '}
         <ActionButton
           onClick={addMetadataToSheet} grayed={tail.length === 0} icon={faAngleDoubleDown} spin={adding}
         />
       </Heading>
-      <VideoMetadata videoMetadata={videoMetadata} />
+      <VideoMetadata videoMetadata={videoMetadata} addedRows={addedRows} />
     </>
   )
 
@@ -177,7 +153,6 @@ const SheetsPage = ({
         tail={tail} setTail={setTail} baseUrl={BASE_URL}
       />
       {tail.length > 0 ? showVideoMetadata() : null}
-      {addedRows.length > 0 ? showAddedRows() : null}
     </>
   )
 }

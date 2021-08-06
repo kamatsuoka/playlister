@@ -8,6 +8,7 @@ import resumableUpload from '../api/youtube/youtube-uploader'
 import { displayDate } from '../models/dates'
 import { useSnackbar } from 'baseui/snackbar'
 import { enqueueError } from '../util/enqueueError'
+import GreenCheckMark from './GreenCheckMark'
 
 const UPLOADING = 'uploading'
 const ERROR = 'error'
@@ -107,6 +108,9 @@ const UploadList = ({ files, checkedFileIds, uploads, setUploads }) => {
   return (
     <div>
       <TableBuilder data={files} overrides={tableOverrides}>
+        <TableBuilderColumn overrides={columnOverrides} header=''>
+          {row => uploads[row.fileId] ? <GreenCheckMark /> : null}
+        </TableBuilderColumn>
         <TableBuilderColumn overrides={columnOverrides} header='Filename'>
           {row => row.filename}
         </TableBuilderColumn>

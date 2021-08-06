@@ -52,6 +52,7 @@ const PreferencePage = ({
             value={orgInfo.orgName || ''}
             name='orgName'
             onChange={evt => handleChange(evt, setOrgInfo)}
+            positive={orgInfo.orgName !== ''}
             required
           />
         </FormControl>
@@ -71,6 +72,7 @@ const PreferencePage = ({
             onChange={value => setEventData({ ...eventData, eventType: value })}
             options={['rehearsal', 'coaching', 'performance']}
             mapOptionToString={option => option}
+            positive={eventData.eventType !== ''}
           />
         </FormControl>
       </FlexGridItem>
@@ -82,6 +84,7 @@ const PreferencePage = ({
             options={['chorus', 'corner', 'director', 'elevated']}
             mapOptionToString={option => option}
             onChange={setDefaultCameraView}
+            positive={defaultCameraView !== ''}
           />
         </FormControl>
       </FlexGridItem>
@@ -95,6 +98,7 @@ const PreferencePage = ({
             max={9}
             onChange={evt => handleChange(evt, setCameraInfo)}
             required
+            positive={cameraInfo.cameraNumber !== ''}
           />
         </FormControl>
       </FlexGridItem>
@@ -105,6 +109,7 @@ const PreferencePage = ({
             onChange={value => setCameraInfo({ ...cameraInfo, cameraName: value })}
             options={['q2n4k', 'q2n', 'iPhone']}
             mapOptionToString={option => option}
+            positive={cameraInfo.cameraName !== ''}
           />
         </FormControl>
       </FlexGridItem>
