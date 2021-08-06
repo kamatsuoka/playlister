@@ -8,7 +8,7 @@
  * @return object with values
  * @see https://developers.google.com/sheets/api/guides/values#appending_values
  */
-export const appendRows = (spreadsheetId, range, values) => {
+export const appendRows = ({ spreadsheetId, range, values }) => {
   Logger.log(`sheets-server.appendRows: appending ${JSON.stringify(values)}`)
   const valueInputOption = 'USER_ENTERED'
   const valueRange = Sheets.newRowData()
@@ -16,7 +16,10 @@ export const appendRows = (spreadsheetId, range, values) => {
   const appendRequest = Sheets.newAppendCellsRequest()
   appendRequest.sheetName = spreadsheetId
   appendRequest.rows = [valueRange]
-  return Sheets.Spreadsheets.Values.append(valueRange, spreadsheetId, range, { valueInputOption })
+  return Sheets.Spreadsheets.Values.append(valueRange, spreadsheetId, range, {
+    valueInputOption,
+    includeValuesInResponse: true
+  }).updates
 }
 
 /**
@@ -45,9 +48,9 @@ export const getRange = (spreadsheetId, range) => {
  * @return {[[]]} array of rows, with each row an array of values
  */
 export const tailSheet = ({ spreadsheetId, range, rowCount, header }) => {
-  const appendResult = appendRows(spreadsheetId, range, [])
-  Logger.log(`result of empty appendRows: ${appendResult}`)
-  const appendRange = appendResult.updates.updatedRange
+  const appendUpdates = appendRows({ spreadsheetId, range, values: [] })
+  Logger.log(`result of empty appendRows: ${appendUpdates}`)
+  const appendRange = appendUpdates.updatedRange
   Logger.log(`append range: ${appendRange}`)
   const lastCol = range.match(/([A-Z]+)[0-9]+$/)[1]
   const prefix = range.includes('!') ? range.split('!')[0] + '!' : ''

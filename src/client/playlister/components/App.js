@@ -16,7 +16,7 @@ import SheetsPage from './SheetsPage'
 import { DEFAULT_DATE, getChosenDate } from '../models/dates'
 import { getVideoNumber } from '../models/renaming'
 import { HeadingLevel } from 'baseui/heading'
-import { DEBUG_PLAYLISTS, DebugContext } from './DebugContext'
+import { DEBUG_METADATA, DebugContext } from './DebugContext'
 
 const engine = new Styletron()
 
@@ -112,7 +112,7 @@ function App () {
     }
   }
 
-  const [debugProps] = useState([DEBUG_PLAYLISTS])
+  const [debugProps] = useState([DEBUG_METADATA])
 
   return (
     <StyletronProvider value={engine}>

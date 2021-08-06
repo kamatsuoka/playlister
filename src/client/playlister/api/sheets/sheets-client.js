@@ -1,12 +1,12 @@
 import { getAppsScriptRun } from '../auth'
 
-export const appendRows = (spreadsheetId, range, values, onSuccess, onFailure) => {
+export const appendRows = ({ spreadsheetId, range, values, onSuccess, onFailure }) => {
   const run = getAppsScriptRun()
   if (run) {
     return run
       .withSuccessHandler(onSuccess)
       .withFailureHandler(onFailure)
-      .appendRows(spreadsheetId, range, values)
+      .appendRows({ spreadsheetId, range, values })
   } else {
     return new Promise(resolve => {
       return resolve([])

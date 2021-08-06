@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
 import { resourceToPlaylistItem } from '../models/playlists'
 import * as youtube from '../api/youtube/youtube-client'
 import * as sheets from '../api/sheets/sheets-client'
@@ -6,49 +6,33 @@ import { useSnackbar } from 'baseui/snackbar'
 import { enqueueError } from '../util/enqueueError'
 import { getChosenDate, localDate } from '../models/dates'
 import { getVideoNumber } from '../models/renaming'
+import { Heading } from 'baseui/heading'
+import ActionButton from './ActionButton'
+import { faAngleDoubleDown } from '@fortawesome/free-solid-svg-icons'
+import VideoMetadata from './VideoMetadata'
+import GoogleSheetInfo from './GoogleSheetInfo'
 import { TableBuilder, TableBuilderColumn } from 'baseui/table-semantic'
 import { tableOverrides } from './TableOverrides'
 import { StyledLink } from 'baseui/link'
-import { FormControl } from 'baseui/form-control'
-import { Input } from 'baseui/input'
-import { FlexGrid, FlexGridItem } from 'baseui/flex-grid'
-import Tooltip from './Tooltip'
-import { Heading } from 'baseui/heading'
-import { copyData, usePersist } from '../hooks/usePersist'
-import ActionButton from './ActionButton'
-import { faSearch } from '@fortawesome/free-solid-svg-icons'
-import { useStyletron } from 'baseui'
+import { DEBUG_METADATA, DebugContext } from './DebugContext'
+import { Label2 } from 'baseui/typography'
 
 const SheetsPage = ({
   cameraInfo, eventData, cameraViews, defaultCameraView,
   playlist, spreadsheetInfo, setSpreadsheetInfo
 }) => {
-  const [, theme] = useStyletron()
   const { enqueue } = useSnackbar()
   const showError = enqueueError(enqueue)
   const [videoMetadata, setVideoMetadata] = useState([])
   const [tail, setTail] = useState([])
-  const [tailing, setTailing] = useState(false)
+  const [adding, setAdding] = useState(false)
+  const [addedRows, setAddedRows] = useState([])
 
-  const BASE_URL = 'https://www.youtube.com/watch'
+  const debugProps = useContext(DebugContext)
+
+  const BASE_URL = 'https://www.youtube.com/'
   const getUrl = (videoId, playlistId, position) =>
-    `${BASE_URL}?v=${videoId}&list=${playlistId}&index=${position + 1}`
-
-  const handleChange = evt => {
-    const value = evt.target.value
-    setSpreadsheetInfo(values => ({
-      ...values,
-      [evt.target.name]: value
-    }))
-  }
-
-  const SPREADSHEET_DATA_KEY = 'spreadsheet_info'
-  usePersist({
-    key: SPREADSHEET_DATA_KEY,
-    onRestore: copyData,
-    setState: setSpreadsheetInfo,
-    state: spreadsheetInfo
-  })
+    `${BASE_URL}watch?v=${videoId}&list=${playlistId}&index=${position + 1}`
 
   const playlistItemsToVideoMetadata = useCallback(items => {
     return items.map((item, index) => ({
@@ -67,14 +51,22 @@ const SheetsPage = ({
     }))
   }, [eventData, cameraInfo, cameraViews, defaultCameraView])
 
+  const testDataToMetadata = data => ({
+    date: data[0],
+    videoNumber: data[1],
+    startTime: data[2],
+    endTime: data[3],
+    title: `video ${data[1]}`,
+    link: data[4],
+    cameraNumber: data[5],
+    cameraView: data[6],
+    cameraName: data[7]
+  })
+
   /**
    * Gets the updated list of playlist items
    */
   const getPlaylistItems = useCallback(() => {
-    if (!playlist.playlistId) {
-      return
-    }
-    setVideoMetadata([])
     const onSuccess = resources => {
       const videoMetadatas = playlistItemsToVideoMetadata(
         resources
@@ -83,10 +75,22 @@ const SheetsPage = ({
       )
       return setVideoMetadata(videoMetadatas)
     }
-    try {
-      return youtube.listPlaylistItems(playlist.playlistId, onSuccess, showError)
-    } catch (e) {
-      showError(e)
+    if (playlist.playlistId) {
+      setVideoMetadata([])
+      try {
+        return youtube.listPlaylistItems(playlist.playlistId, onSuccess, showError)
+      } catch (e) {
+        showError(e)
+      }
+    } else {
+      if (debugProps.includes(DEBUG_METADATA)) {
+        const metadata = [
+          ['8/5/2021', '1', '2021-07-21 13:19:57', '2021-07-21 14:44:24', 'https://www.youtube.com/watch?v=f5RS5smvNUs&list=PLI78W9w-3gY4dnp7Y-bDRW0i0OZdRExUO&index=1', '1', 'chorus', 'kenji q2n4k'],
+          ['8/5/2021', '2', '2021-07-21 14:53:38', '2021-07-21 15:38:40', 'https://www.youtube.com/watch?v=-f_2nFcc_K8&list=PLI78W9w-3gY4dnp7Y-bDRW0i0OZdRExUO&index=2', '1', 'chorus', 'kenji q2n4k'],
+          ['8/5/2021', '3', '2021-07-21 15:38:44', '2021-07-21 16:20:42', 'https://www.youtube.com/watch?v=9KXn-QN34lo&list=PLI78W9w-3gY4dnp7Y-bDRW0i0OZdRExUO&index=3', '1', 'chorus', 'kenji q2n4k']
+        ].map(testDataToMetadata)
+        setVideoMetadata(metadata)
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [playlist.playlistId, showError, setVideoMetadata])
@@ -94,153 +98,80 @@ const SheetsPage = ({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(getPlaylistItems, [playlist.playlistId])
 
-  function sheetIdsOkay () {
-    return spreadsheetInfo.spreadsheetId && spreadsheetInfo.spreadsheetId.length > 40 &&
-      spreadsheetInfo.sheetName && spreadsheetInfo.sheetName.length > 2
-  }
-
   /**
-   * Gets the last few rows of the spreadsheet,
-   * with first row prepended as header
+   * Adds video metadata to sheet
    */
-  const getTail = useCallback(rowCount => {
-    setTail([])
-    setTailing(true)
-    const onSuccess = tailRows => {
-      console.log('got tail of sheet:', tailRows)
-      setTailing(false)
-      return setTail(tailRows)
+  const addMetadataToSheet = useCallback(() => {
+    setAdding(true)
+    const onSuccess = updates => {
+      const addedRows = updates.updatedData.values
+      console.log('got added rows:', addedRows)
+      setAdding(false)
+      return setAddedRows(addedRows)
     }
     const onError = e => {
-      setTailing(false)
+      setAdding(false)
       showError(e)
     }
     try {
       const sheetName = spreadsheetInfo.sheetName
       const quotedSheetName = sheetName.includes(' ') ? `'${sheetName}'` : sheetName
       const range = `${quotedSheetName}!A1:J1`
-      return sheets.tailSheet({
+      const values = videoMetadata.map(meta => [
+        meta.date,
+        meta.videoNumber,
+        meta.startTime,
+        meta.endTime,
+        meta.link,
+        meta.cameraNumber,
+        meta.cameraView,
+        meta.cameraName
+      ])
+      return sheets.appendRows({
         spreadsheetId: spreadsheetInfo.spreadsheetId,
         range,
-        rowCount,
-        header: true,
+        values,
         onSuccess,
         onError
       })
     } catch (e) {
       showError(e)
     }
-  }, [spreadsheetInfo.spreadsheetId, spreadsheetInfo.sheetName, showError, setTail])
+  }, [videoMetadata, spreadsheetInfo.spreadsheetId, spreadsheetInfo.sheetName, showError])
 
-  const tooltip = (
+  const showAddedRows = () => (
     <>
-      The Google Sheets spreadsheet id is found in the url path.
-      <br />
-      The url typically looks like
-      https://docs.google.com/spreadsheets/d/$SPREADSHEET_ID/edit#gid=...
-      <br />
+      <Label2 style={{ textDecoration: 'underline' }}>Added Rows</Label2>
+      <TableBuilder data={addedRows} overrides={tableOverrides}>
+        {[...Array(8).keys()].map(i =>
+          <TableBuilderColumn header='' key={`column${i}`}>
+            {row =>
+              row[i] && row[i].startsWith(BASE_URL)
+                ? (
+                  <StyledLink href={row[i]} target='_blank' rel='noopener noreferrer'>
+                    youtube link
+                  </StyledLink>
+                  )
+                : row[i]}
+          </TableBuilderColumn>
+        )}
+      </TableBuilder>
     </>
-  )
-
-  const itemProps = {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center'
-  }
-
-  const itemWidthProps = blockStyle => ({
-    ...itemProps,
-    overrides: {
-      Block: {
-        style: ({
-          flexGrow: 0,
-          ...blockStyle
-        })
-      }
-    }
-  })
-
-  const showTail = () => (
-    <TableBuilder data={tail.slice(1)} overrides={tableOverrides}>
-      {[...Array(8).keys()].map(i =>
-        <TableBuilderColumn header={tail[0][i]} key={`column${i}`}>
-          {row =>
-            row[i] && row[i].startsWith('https://www.youtube.com/')
-              ? (
-                <StyledLink href={row[i]} target='_blank' rel='noopener noreferrer'>
-                  youtube link
-                </StyledLink>
-                )
-              : row[i]}
-        </TableBuilderColumn>
-      )}
-    </TableBuilder>
   )
 
   return (
     <>
-      <Heading styleLevel={5}>Video Metadata</Heading>
-      <TableBuilder data={videoMetadata} overrides={tableOverrides}>
-        <TableBuilderColumn header='date'>
-          {row => row.date}
-        </TableBuilderColumn>
-        <TableBuilderColumn header='vid #'>
-          {row => row.videoNumber}
-        </TableBuilderColumn>
-        <TableBuilderColumn header='start time'>
-          {row => row.startTime}
-        </TableBuilderColumn>
-        <TableBuilderColumn header='end time'>
-          {row => row.endTime}
-        </TableBuilderColumn>
-        <TableBuilderColumn header='link'>
-          {row =>
-            <StyledLink href={row.link} target='_blank' rel='noopener noreferrer'>
-              {row.title}
-            </StyledLink>}
-        </TableBuilderColumn>
-        <TableBuilderColumn header='cam #'>
-          {row => row.cameraNumber}
-        </TableBuilderColumn>
-        <TableBuilderColumn header='cam view'>
-          {row => row.cameraView}
-        </TableBuilderColumn>
-        <TableBuilderColumn header='cam name'>
-          {row => row.cameraName}
-        </TableBuilderColumn>
-      </TableBuilder>
-      <Heading styleLevel={5}><Tooltip tooltip={tooltip}>Google Sheet</Tooltip></Heading>
-      <FlexGrid
-        flexGridColumnCount={2}
-        flexGridColumnGap='scale800'
-        flexGridRowGap='scale800'
-      >
-        <FlexGridItem {...itemProps}>
-          <FormControl caption='spreadsheet id'>
-            <Input
-              value={spreadsheetInfo.spreadsheetId || ''}
-              name='spreadsheetId'
-              placeholder='long alphanumeric in url path like 1BTxLr0...'
-              onChange={handleChange}
-            />
-          </FormControl>
-        </FlexGridItem>
-        <FlexGridItem {...itemWidthProps({ width: theme.sizing.scale4800 })}>
-          <FormControl caption='sheet name'>
-            <Input
-              value={spreadsheetInfo.sheetName || ''}
-              name='sheetName'
-              placeholder='sheet name as it appears in tab'
-              onChange={handleChange}
-            />
-          </FormControl>
-        </FlexGridItem>
-      </FlexGrid>
-      <Heading styleLevel={5}>
-        Check Recent Rows {' '}
-        <ActionButton onClick={() => getTail(3)} grayed={!sheetIdsOkay()} icon={faSearch} spin={tailing} />
+      <GoogleSheetInfo
+        spreadsheetInfo={spreadsheetInfo} setSpreadsheetInfo={setSpreadsheetInfo}
+        tail={tail} setTail={setTail} baseUrl={BASE_URL}
+      />
+      <Heading styleLevel={5}>Video Metadata To Add {' '}
+        <ActionButton
+          onClick={addMetadataToSheet} grayed={tail.length === 0} icon={faAngleDoubleDown} spin={adding}
+        />
       </Heading>
-      {tail[0] ? showTail() : null}
+      <VideoMetadata videoMetadata={videoMetadata} />
+      {addedRows.length > 0 ? showAddedRows() : null}
     </>
   )
 }
