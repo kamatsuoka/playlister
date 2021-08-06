@@ -159,18 +159,24 @@ const SheetsPage = ({
     </>
   )
 
-  return (
+  const showVideoMetadata = () => (
     <>
-      <GoogleSheetInfo
-        spreadsheetInfo={spreadsheetInfo} setSpreadsheetInfo={setSpreadsheetInfo}
-        tail={tail} setTail={setTail} baseUrl={BASE_URL}
-      />
       <Heading styleLevel={5}>Video Metadata To Add {' '}
         <ActionButton
           onClick={addMetadataToSheet} grayed={tail.length === 0} icon={faAngleDoubleDown} spin={adding}
         />
       </Heading>
       <VideoMetadata videoMetadata={videoMetadata} />
+    </>
+  )
+
+  return (
+    <>
+      <GoogleSheetInfo
+        spreadsheetInfo={spreadsheetInfo} setSpreadsheetInfo={setSpreadsheetInfo}
+        tail={tail} setTail={setTail} baseUrl={BASE_URL}
+      />
+      {tail.length > 0 ? showVideoMetadata() : null}
       {addedRows.length > 0 ? showAddedRows() : null}
     </>
   )

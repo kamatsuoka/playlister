@@ -3,7 +3,7 @@ import { Heading } from 'baseui/heading'
 import ActionButton from './ActionButton'
 import { faAngleDoubleRight } from '@fortawesome/free-solid-svg-icons'
 import RenameList from './RenameList'
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { useStyletron } from 'baseui'
 import * as youtube from '../api/youtube/youtube-client'
 
@@ -14,7 +14,7 @@ const RenameStep = ({
   const [css, theme] = useStyletron()
   const [renaming, setRenaming] = useState(false)
 
-  const renameVideos = () => {
+  const renameVideos = useCallback(() => {
     setRenaming(true)
     setRenamedTitles({})
     // map of { videoId: title }
@@ -36,7 +36,8 @@ const RenameStep = ({
     }
     console.log('calling youtube.renameVideos with args', videoTitleDesc)
     return youtube.renameVideos(videoTitleDesc, onSuccess, onFailure)
-  }
+    // eslint-disable-next-line
+  }, [playlistItems])
 
   return (
     <Block className={css({ marginBottom: theme.sizing.scale600 })}>
@@ -48,9 +49,9 @@ const RenameStep = ({
         />
       </Heading>
       <RenameList
-        playlistItems={playlistItems} renamedTitles={renamedTitles} setNewTitles={setRenamedTitles}
+        playlistItems={playlistItems} renamedTitles={renamedTitles} getNewTitle={getNewTitle}
         cameraViews={cameraViews} setCameraViews={setCameraViews} defaultCameraView={defaultCameraView}
-        getNewTitle={getNewTitle}
+
       />
     </Block>
   )

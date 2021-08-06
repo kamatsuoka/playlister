@@ -39,7 +39,7 @@ const GoogleSheetInfo = ({ spreadsheetInfo, setSpreadsheetInfo, tail, setTail, b
   })
 
   const sheetIdsOkay = () => spreadsheetInfo.spreadsheetId && spreadsheetInfo.spreadsheetId.length > 40 &&
-    spreadsheetInfo.sheetName && spreadsheetInfo.sheetName.length > 2
+    spreadsheetInfo.sheetName && spreadsheetInfo.sheetName.length > 1
 
   /**
    * Gets the last few rows of the spreadsheet,
@@ -125,7 +125,12 @@ const GoogleSheetInfo = ({ spreadsheetInfo, setSpreadsheetInfo, tail, setTail, b
   return (
     <>
       <Heading styleLevel={5}><Tooltip tooltip={tooltip}>Google Sheet</Tooltip>{' '}
-        <ActionButton onClick={() => getTail(3)} grayed={!sheetIdsOkay()} icon={faSearch} spin={tailing} />
+        <ActionButton
+          onClick={() => getTail(3)} disabled={!sheetIdsOkay()} icon={faSearch} spin={tailing}
+          title={sheetIdsOkay()
+            ? 'find sheet and show recent rows'
+            : 'please enter valid google spreadsheet id and sheet name'}
+        />
       </Heading>
       <FlexGrid
         flexGridColumnCount={2}
@@ -142,12 +147,12 @@ const GoogleSheetInfo = ({ spreadsheetInfo, setSpreadsheetInfo, tail, setTail, b
             />
           </FormControl>
         </FlexGridItem>
-        <FlexGridItem {...itemWidthProps({ width: theme.sizing.scale4800 })}>
+        <FlexGridItem {...itemWidthProps({ width: '35%' })}>
           <FormControl caption='sheet name'>
             <Input
               value={spreadsheetInfo.sheetName || ''}
               name='sheetName'
-              placeholder='sheet name as it appears in tab'
+              placeholder='sheet name from tab'
               onChange={handleChange}
             />
           </FormControl>

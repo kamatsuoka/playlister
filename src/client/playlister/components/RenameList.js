@@ -20,7 +20,8 @@ dayjs.extend(utc)
  * List of videos with old and new titles
  */
 const RenameList = ({
-  playlistItems, renamedTitles, cameraViews, setCameraViews, getNewTitle, defaultCameraView
+  playlistItems, renamedTitles, getNewTitle,
+  cameraViews, setCameraViews, defaultCameraView
 }) => {
   const columnOverrides = {
     TableBodyCell: {
@@ -44,23 +45,10 @@ const RenameList = ({
 
   const hasIntendedTitle = (row, index) => {
     const intendedTitle = getNewTitle(row.videoId, index)
-    console.log(`in rename list row ${index}, intended title = ${intendedTitle}`)
     if (row.title === intendedTitle) {
-      console.log(`video ${row.title} already had intended title`)
       return true
     }
-    if (renamedTitles[row.videoId]) {
-      const renamedTitle = renamedTitles[row.videoId].title
-      if (renamedTitle === intendedTitle) {
-        console.log(`video ${row.title} was renamed to match intended title`)
-        return true
-      } else {
-        console.log(`video ${row.title} was renamed but does NOT match intended title!!!`)
-      }
-    } else {
-      console.log(`video ${row.title} has not been renamed`)
-    }
-    return false
+    return renamedTitles[row.videoId] === intendedTitle
   }
 
   return (
