@@ -36,7 +36,7 @@ const NextButton = ({ current, setCurrent, ...props }) => {
 /**
  * Shows standard prev/next buttons for navigation
  */
-const prevNextButtons = ({ current, setCurrent, last, prevProps = {}, nextProps = {} }) => {
+const PrevNextButtons = ({ current, setCurrent, last, prevProps = {}, nextProps = {} }) => {
   return (
     <div align='right'>
       <PrevButton current={current} setCurrent={setCurrent} {...prevProps} />
@@ -46,4 +46,4 @@ const prevNextButtons = ({ current, setCurrent, last, prevProps = {}, nextProps 
   )
 }
 
-export default prevNextButtons
+export default PrevNextButtons

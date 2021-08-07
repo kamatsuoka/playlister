@@ -5,7 +5,7 @@ import { Modal } from 'baseui/modal'
 import TimeOffset from './TimeOffset'
 import { getStartDates } from './InferredDate'
 import { KIND as NKind, Notification } from 'baseui/notification'
-import prevNextButtons from './PrevNextButtons'
+import PrevNextButtons from './PrevNextButtons'
 
 /**
  * Adjust time on file metadata in case camera doesn't have time zone
@@ -99,13 +99,13 @@ const FilePage = ({
       <MediaReader setMediaList={setMediaList} />
       {videoPreview()}
       {mediaList.length > 0 ? filesAndOffset() : null}
-      {prevNextButtons({
-        current,
-        setCurrent,
-        nextProps: {
+      <PrevNextButtons
+        current={current}
+        setCurrent={setCurrent}
+        nextProps={{
           grayed: mediaList.length === 0
-        }
-      })}
+        }}
+      />
     </>
   )
 }

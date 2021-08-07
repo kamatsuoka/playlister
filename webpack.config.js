@@ -7,7 +7,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const HtmlWebpackInlineSourcePlugin = require('html-webpack-inline-source-plugin')
 const DynamicCdnWebpackPlugin = require('dynamic-cdn-webpack-plugin')
 const moduleToCdn = require('module-to-cdn')
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
 /*
 const wasmFile = resolve(
@@ -158,9 +158,9 @@ const clientConfig = {
     // add the generated js code to the html file inline
     new HtmlWebpackInlineSourcePlugin(),
     // this plugin allows us to add dynamically load packages from a CDN
-    new DynamicCdnWebpackPlugin(DynamicCdnWebpackPluginConfig),
+    new DynamicCdnWebpackPlugin(DynamicCdnWebpackPluginConfig)
     // analyze webpack contents
-    new BundleAnalyzerPlugin()
+    // new BundleAnalyzerPlugin()
   ]
 }
 

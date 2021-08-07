@@ -1,5 +1,5 @@
 import React, { useContext } from 'react'
-import prevNextButtons from './PrevNextButtons'
+import PrevNextButtons from './PrevNextButtons'
 import PlaylistItems from './PlaylistItems'
 import UploadStep from './UploadStep'
 import PlaylistStep from './PlaylistStep'
@@ -59,11 +59,7 @@ export const YouTubePage = ({
             enqueue={enqueue} showError={showError}
           />
         : null}
-      {prevNextButtons({
-        current,
-        setCurrent,
-        nextProps: { grayed: !allRenamed }
-      })}
+      <PrevNextButtons current={current} setCurrent={setCurrent} nextProps={{ grayed: !allRenamed }} />
     </>
   )
 }

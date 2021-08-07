@@ -17,15 +17,20 @@ const restore = (key) => {
 const save = (key, state) =>
   window.localStorage.setItem(key, JSON.stringify(state))
 
-const usePersist = ({key, onRestore, setState, state}) => {
+const usePersist = ({ key, onRestore, setState, state }) => {
   useEffect(() => {
-    setState(onRestore(restore(key)))
+    const restored = restore(key)
+    if (Object.values(restored).some(value => value || value === 0 || value === false)) {
+      // only restore if there's something to restore, otherwise use defaults
+      console.log('restoring ', restored)
+      setState(onRestore(restored))
+    }
   }, [key, onRestore, setState])
   useEffect(() => {
     save(key, state)
   }, [key, state])
 }
 
-const copyData = data => Object.assign({}, data)
+const copyData = data => ({ ...data })
 
-export {copyData, usePersist}
+export { copyData, usePersist }

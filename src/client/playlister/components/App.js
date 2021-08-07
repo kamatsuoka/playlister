@@ -7,8 +7,8 @@ import { Client as Styletron } from 'styletron-engine-atomic'
 import { StyledLink } from 'baseui/link'
 import FilePage from './FilePage'
 import { SnackbarProvider } from 'baseui/snackbar'
-import PreferencePage from './PreferencePage'
-import prevNextButtons from './PrevNextButtons'
+import SetupPage from './SetupPage'
+import PrevNextButtons from './PrevNextButtons'
 import { Tab, Tabs } from 'baseui/tabs-motion'
 import YouTubePage from './YouTubePage'
 import SheetsPage from './SheetsPage'
@@ -24,7 +24,7 @@ function App () {
   // index of currently selected step
   const [current, setCurrent] = useState(0)
   // info about the organization
-  const [orgInfo, setOrgInfo] = useState({ orgName: 'fcs' })
+  const [orgInfo, setOrgInfo] = useState({ orgName: '' })
   // info about the camera
   const [cameraInfo, setCameraInfo] = useState({ cameraNumber: 1, cameraName: '' })
   // media info as detected by mediainfo.js
@@ -83,6 +83,7 @@ function App () {
   )
   // sheet urls have the form https://docs.google.com/spreadsheets/d/{SPREADSHEET_ID}/edit#gid={SHEET_ID}
   const [spreadsheetInfo, setSpreadsheetInfo] = useState({ spreadsheetId: '', sheetId: '' })
+
   /**
    * Gets the new title for a video.
    *
@@ -121,15 +122,14 @@ function App () {
           <DebugContext.Provider value={debugProps}>
             <HeadingLevel>
               <Tabs activeKey={current} disabled>
-                <Tab overrides={tabOverrides} title='Basics'>
-                  <PreferencePage
+                <Tab overrides={tabOverrides} title='Setup'>
+                  <SetupPage
                     current={0} setCurrent={setCurrent}
                     orgInfo={orgInfo} setOrgInfo={setOrgInfo}
                     eventData={eventData} setEventData={setEventData}
                     cameraInfo={cameraInfo} setCameraInfo={setCameraInfo}
                     defaultCameraView={defaultCameraView} setDefaultCameraView={setDefaultCameraView}
                   />
-                  {prevNextButtons({ current: 0, setCurrent: setCurrent })}
                 </Tab>
                 <Tab overrides={tabOverrides} title='Files'>
                   <FilePage
@@ -163,14 +163,12 @@ function App () {
                     defaultCameraView={defaultCameraView} playlist={playlist}
                     spreadsheetInfo={spreadsheetInfo} setSpreadsheetInfo={setSpreadsheetInfo}
                   />
-                  {prevNextButtons({
-                    current: 3, setCurrent: setCurrent, last: true
-                  })}
+                  <PrevNextButtons current={3} setCurrent={setCurrent} last />
                 </Tab>
                 {/*
             <Tab overrides={tabOverrides} title='Test'>
               <TestPage />
-              {prevNextButtons({ current: 4, setCurrent: setCurrent })}
+              <PrevNextButtons  current={4}, setCurrent={setCurrent} />
             </Tab>
 */}
               </Tabs>
