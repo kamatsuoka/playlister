@@ -4,7 +4,8 @@ import { tableOverrides } from './TableOverrides'
 import { TableBuilder, TableBuilderColumn } from 'baseui/table-semantic'
 import { Button, KIND, SIZE } from 'baseui/button'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPlay, faTimes } from '@fortawesome/free-solid-svg-icons'
+import { faPlay } from '@fortawesome/free-solid-svg-icons/faPlay'
+import { faTimes } from '@fortawesome/free-solid-svg-icons/faTimes'
 import { displayDate, durationSeconds } from '../models/dates'
 
 /*

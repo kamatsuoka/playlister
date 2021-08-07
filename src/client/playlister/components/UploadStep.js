@@ -1,7 +1,7 @@
 import { Heading } from 'baseui/heading'
 import Tooltip from './Tooltip'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSyncAlt } from '@fortawesome/free-solid-svg-icons'
+import { faSyncAlt } from '@fortawesome/free-solid-svg-icons/faSyncAlt'
 import UploadList from './UploadList'
 import React, { useCallback, useEffect, useState } from 'react'
 import { createTheme, lightThemePrimitives, ThemeProvider } from 'baseui'

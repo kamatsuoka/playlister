@@ -6,7 +6,7 @@ import { FormControl } from 'baseui/form-control'
 import * as youtube from '../api/youtube/youtube-client'
 import { errorMessage } from '../util/enqueueError'
 import { Block } from 'baseui/block'
-import { faPlus } from '@fortawesome/free-solid-svg-icons'
+import { faPlus } from '@fortawesome/free-solid-svg-icons/faPlus'
 import ActionButton from './ActionButton'
 import { getChosenDate } from '../models/dates'
 

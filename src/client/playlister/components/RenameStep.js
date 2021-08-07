@@ -1,7 +1,7 @@
 import { Block } from 'baseui/block'
 import { Heading } from 'baseui/heading'
 import ActionButton from './ActionButton'
-import { faAngleDoubleRight } from '@fortawesome/free-solid-svg-icons'
+import { faAngleDoubleRight } from '@fortawesome/free-solid-svg-icons/faAngleDoubleRight'
 import RenameList from './RenameList'
 import React, { useCallback, useState } from 'react'
 import { useStyletron } from 'baseui'

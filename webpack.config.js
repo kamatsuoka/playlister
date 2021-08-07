@@ -7,6 +7,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const HtmlWebpackInlineSourcePlugin = require('html-webpack-inline-source-plugin')
 const DynamicCdnWebpackPlugin = require('dynamic-cdn-webpack-plugin')
 const moduleToCdn = require('module-to-cdn')
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
 /*
 const wasmFile = resolve(
@@ -87,7 +88,7 @@ const DynamicCdnWebpackPluginConfig = {
   // set "verbose" to true to print console logs on CDN usage while webpack builds
   verbose: false,
   resolver: (packageName, packageVersion, options) => {
-    const packageSuffix = isProd ? '.min.js' : '.js'
+    // const packageSuffix = isProd ? '.min.js' : '.js'
     const moduleDetails = moduleToCdn(packageName, packageVersion, options)
     if (moduleDetails) {
       return moduleDetails
@@ -95,13 +96,6 @@ const DynamicCdnWebpackPluginConfig = {
     // "name" should match the package being imported
     // "var" is important to get right -- this should be the exposed global. Look up "webpack externals" for info.
     switch (packageName) {
-      case 'baseui':
-        return {
-          name: packageName,
-          var: 'BaseUI',
-          version: packageVersion,
-          url: `https://unpkg.com/baseui@${packageVersion}/dist/baseui${packageSuffix}`
-        }
       default:
         return null
     }
@@ -164,7 +158,9 @@ const clientConfig = {
     // add the generated js code to the html file inline
     new HtmlWebpackInlineSourcePlugin(),
     // this plugin allows us to add dynamically load packages from a CDN
-    new DynamicCdnWebpackPlugin(DynamicCdnWebpackPluginConfig)
+    new DynamicCdnWebpackPlugin(DynamicCdnWebpackPluginConfig),
+    // analyze webpack contents
+    new BundleAnalyzerPlugin()
   ]
 }
 

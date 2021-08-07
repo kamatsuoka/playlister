@@ -1,7 +1,7 @@
 import { FlexGrid, FlexGridItem } from 'baseui/flex-grid'
 import { Button, KIND, SIZE } from 'baseui/button'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSyncAlt } from '@fortawesome/free-solid-svg-icons'
+import { faSyncAlt } from '@fortawesome/free-solid-svg-icons/faSyncAlt'
 import { Select } from 'baseui/select'
 import React from 'react'
 

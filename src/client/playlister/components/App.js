@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faGithub } from '@fortawesome/free-brands-svg-icons'
+import { faGithub } from '@fortawesome/free-brands-svg-icons/faGithub'
 import { BaseProvider, LightTheme } from 'baseui'
 import { Provider as StyletronProvider } from 'styletron-react'
 import { Client as Styletron } from 'styletron-engine-atomic'
