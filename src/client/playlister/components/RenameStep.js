@@ -9,7 +9,7 @@ import * as youtube from '../api/youtube/youtube-client'
 
 const RenameStep = ({
   cameraViews, setCameraViews, allRenamed, renamedTitles, setRenamedTitles,
-  getNewTitle, playlistItems, defaultCameraView, enqueue, showError
+  getNewTitle, playlistItems, cameraInfo, enqueue, showError
 }) => {
   const [css, theme] = useStyletron()
   const [renaming, setRenaming] = useState(false)
@@ -35,7 +35,7 @@ const RenameStep = ({
       showError(err)
     }
     console.log('calling youtube.renameVideos with args', videoTitleDesc)
-    return youtube.renameVideos(videoTitleDesc, onSuccess, onFailure)
+    return youtube.renameVideos({ videoTitleDesc, onSuccess, onFailure })
     // eslint-disable-next-line
   }, [playlistItems])
 
@@ -50,7 +50,7 @@ const RenameStep = ({
       </Heading>
       <RenameList
         playlistItems={playlistItems} renamedTitles={renamedTitles} getNewTitle={getNewTitle}
-        cameraViews={cameraViews} setCameraViews={setCameraViews} defaultCameraView={defaultCameraView}
+        cameraViews={cameraViews} setCameraViews={setCameraViews} cameraInfo={cameraInfo}
 
       />
     </Block>

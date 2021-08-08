@@ -16,17 +16,22 @@ import SheetsPage from './SheetsPage'
 import { DEFAULT_DATE, getChosenDate } from '../models/dates'
 import { getVideoNumber } from '../models/renaming'
 import { HeadingLevel } from 'baseui/heading'
-import { DEBUG_METADATA, DebugContext } from './DebugContext'
+import { DEBUG_METADATA, DebugContext } from '../context/DebugContext'
+import LoginPage from './LoginPage'
 
 const engine = new Styletron()
 
 function App () {
+  // app password
+  const [password, setPassword] = useState('')
   // index of currently selected step
   const [current, setCurrent] = useState(0)
   // info about the organization
   const [orgInfo, setOrgInfo] = useState({ orgName: '' })
   // info about the camera
-  const [cameraInfo, setCameraInfo] = useState({ cameraNumber: 1, cameraName: '' })
+  const [cameraInfo, setCameraInfo] = useState({
+    cameraNumber: 1, cameraName: '', defaultCameraView: 'director'
+  })
   // media info as detected by mediainfo.js
   const [mediaList, setMediaList] = useState([])
   // videos uploaded to youtube, keyed by file id
@@ -65,8 +70,6 @@ function App () {
   })
   // map of video id to selected camera view
   const [cameraViews, setCameraViews] = useState({})
-  // default camera view for renaming
-  const [defaultCameraView, setDefaultCameraView] = useState('director')
   // map of video id to updated title after renaming
   const [renamedTitles, setRenamedTitles] = useState({})
   // items in current playlist - map of videoId to { playlistId, position, etc. }
@@ -91,7 +94,7 @@ function App () {
    * @param index index (position) in playlist
    */
   const getNewTitle = (videoId, index) => {
-    const cameraView = cameraViews[videoId] || defaultCameraView
+    const cameraView = cameraViews[videoId] || cameraInfo.defaultCameraView
     return `${orgInfo.orgName} ${getChosenDate(eventData)} ${cameraView} ` +
       getVideoNumber(cameraInfo, index)
   }
@@ -122,18 +125,24 @@ function App () {
           <DebugContext.Provider value={debugProps}>
             <HeadingLevel>
               <Tabs activeKey={current} disabled>
+                <Tab overrides={tabOverrides} title='Login'>
+                  <LoginPage
+                    current={0} setCurrent={setCurrent}
+                    password={password} setPassword={setPassword}
+                  />
+                </Tab>
                 <Tab overrides={tabOverrides} title='Setup'>
                   <SetupPage
-                    current={0} setCurrent={setCurrent}
+                    current={1} setCurrent={setCurrent}
                     orgInfo={orgInfo} setOrgInfo={setOrgInfo}
                     eventData={eventData} setEventData={setEventData}
                     cameraInfo={cameraInfo} setCameraInfo={setCameraInfo}
-                    defaultCameraView={defaultCameraView} setDefaultCameraView={setDefaultCameraView}
+                    spreadsheetInfo={spreadsheetInfo} setSpreadsheetInfo={setSpreadsheetInfo}
                   />
                 </Tab>
                 <Tab overrides={tabOverrides} title='Files'>
                   <FilePage
-                    current={1} setCurrent={setCurrent}
+                    current={2} setCurrent={setCurrent}
                     mediaList={mediaList} setMediaList={setMediaList}
                     files={files} setFiles={setFiles}
                     timeAdjust={timeAdjust} setTimeAdjust={setTimeAdjust}
@@ -142,7 +151,7 @@ function App () {
                 </Tab>
                 <Tab overrides={tabOverrides} title='YouTube'>
                   <YouTubePage
-                    current={2} setCurrent={setCurrent}
+                    current={3} setCurrent={setCurrent}
                     files={files} uploads={uploads} setUploads={setUploads}
                     orgInfo={orgInfo} cameraInfo={cameraInfo} eventData={eventData}
                     playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
@@ -153,17 +162,16 @@ function App () {
                     playlistItems={playlistItems} setPlaylistItems={setPlaylistItems}
                     renamedTitles={renamedTitles} setRenamedTitles={setRenamedTitles} getNewTitle={getNewTitle}
                     cameraViews={cameraViews} setCameraViews={setCameraViews}
-                    defaultCameraView={defaultCameraView} allUploaded={allUploaded}
-                    uploadedFileIds={uploadedFileIds} allAdded={allAdded} allRenamed={allRenamed}
+                    allUploaded={allUploaded} uploadedFileIds={uploadedFileIds}
+                    allAdded={allAdded} allRenamed={allRenamed}
                   />
                 </Tab>
                 <Tab overrides={tabOverrides} title='Sheets'>
                   <SheetsPage
                     cameraInfo={cameraInfo} eventData={eventData} cameraViews={cameraViews}
-                    defaultCameraView={defaultCameraView} playlist={playlist}
-                    spreadsheetInfo={spreadsheetInfo} setSpreadsheetInfo={setSpreadsheetInfo}
+                    playlist={playlist} spreadsheetInfo={spreadsheetInfo} setSpreadsheetInfo={setSpreadsheetInfo}
                   />
-                  <PrevNextButtons current={3} setCurrent={setCurrent} last />
+                  <PrevNextButtons current={4} setCurrent={setCurrent} last />
                 </Tab>
                 {/*
             <Tab overrides={tabOverrides} title='Test'>

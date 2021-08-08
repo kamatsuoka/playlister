@@ -10,7 +10,7 @@ import { parseDescription } from '../models/dates'
 import { findUploads } from '../api/youtube/youtube-client'
 import ActionButton from './ActionButton'
 
-const UploadStep = ({ files, uploads, setUploads, allUploaded, enqueue, showError }) => {
+const UploadStep = ({ files, uploads, setUploads, allUploaded, showError }) => {
   // used to show status of checking for uploads
   const [checking, setChecking] = useState(false)
   // file ids that have been checked
@@ -41,7 +41,7 @@ const UploadStep = ({ files, uploads, setUploads, allUploaded, enqueue, showErro
     }
 
     try {
-      return findUploads(files, onSuccess, onFailure)
+      return findUploads({ files, onSuccess, onFailure })
     } catch (e) {
       onFailure(e)
     }

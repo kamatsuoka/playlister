@@ -6,13 +6,13 @@ import PlaylistStep from './PlaylistStep'
 import RenameStep from './RenameStep'
 import { useSnackbar } from 'baseui/snackbar'
 import { enqueueError } from '../util/enqueueError'
-import { DEBUG_PLAYLISTS, DebugContext } from './DebugContext'
+import { DEBUG_PLAYLISTS, DebugContext } from '../context/DebugContext'
 
 export const YouTubePage = ({
   current, setCurrent, files, uploads, setUploads, orgInfo, cameraInfo, eventData,
   playlistTitle, setPlaylistTitle, playlists, setPlaylists, selectedPlaylist, setSelectedPlaylist,
   createdPlaylist, setCreatedPlaylist, playlist, setPlaylist, playlistItems, setPlaylistItems,
-  renamedTitles, setRenamedTitles, cameraViews, setCameraViews, defaultCameraView,
+  renamedTitles, setRenamedTitles, cameraViews, setCameraViews,
   allUploaded, uploadedFileIds, allAdded, allRenamed, getNewTitle
 }) => {
   /**
@@ -55,7 +55,7 @@ export const YouTubePage = ({
         ? <RenameStep
             cameraViews={cameraViews} setCameraViews={setCameraViews} allRenamed={allRenamed}
             renamedTitles={renamedTitles} setRenamedTitles={setRenamedTitles} getNewTitle={getNewTitle}
-            playlistItems={playlistItems} defaultCameraView={defaultCameraView}
+            playlistItems={playlistItems} cameraInfo={cameraInfo}
             enqueue={enqueue} showError={showError}
           />
         : null}

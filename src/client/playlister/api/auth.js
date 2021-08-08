@@ -1,20 +1,18 @@
-const gapi = window.gapi
-
 /**
- * Checks if user is authenticated.
- * If running in Apps Script, the answer is always yes.
+ * Checks password
  */
-const isAuthenticated = () => {
-  try {
-    if (getAppsScriptRun()) { return true }
-    if (gapi.auth2) {
-      const auth2 = gapi.auth2.getAuthInstance()
-      return auth2 && auth2.isSignedIn.get()
-    }
-  } catch (e) {
-    console.error(e)
+const checkPassword = ({ password, onSuccess, onFailure }) => {
+  const run = getAppsScriptRun()
+  if (run) {
+    return run
+      .withSuccessHandler(onSuccess)
+      .withFailureHandler(onFailure)
+      .checkPassword(password)
+  } else {
+    return new Promise(resolve => {
+      return resolve(true)
+    }).then(onSuccess).catch(onFailure)
   }
-  return false
 }
 
 /**
@@ -31,4 +29,4 @@ const getAppsScriptRun = () => {
   }
 }
 
-export { gapi, getAppsScriptRun, isAuthenticated }
+export { getAppsScriptRun, checkPassword }

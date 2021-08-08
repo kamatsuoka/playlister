@@ -1,6 +1,7 @@
+import React from 'react'
 import { Card } from 'baseui/card'
 
-export const BaseCard = ({ children, title }) => {
+const BaseCard = ({ children, title }) => {
   return (
     <Card
       overrides={{
@@ -22,3 +23,5 @@ export const BaseCard = ({ children, title }) => {
     </Card>
   )
 }
+
+export default BaseCard

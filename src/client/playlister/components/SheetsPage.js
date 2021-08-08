@@ -10,25 +10,23 @@ import { Heading } from 'baseui/heading'
 import ActionButton from './ActionButton'
 import { faAngleDoubleDown } from '@fortawesome/free-solid-svg-icons/faAngleDoubleDown'
 import VideoMetadata from './VideoMetadata'
-import GoogleSheetInfo from './GoogleSheetInfo'
-import { DEBUG_METADATA, DebugContext } from './DebugContext'
+import { DEBUG_METADATA, DebugContext } from '../context/DebugContext'
+import { BASE_SHEETS_URL } from './SetupPage'
 
 const SheetsPage = ({
-  cameraInfo, eventData, cameraViews, defaultCameraView,
+  cameraInfo, eventData, cameraViews,
   playlist, spreadsheetInfo, setSpreadsheetInfo
 }) => {
   const { enqueue } = useSnackbar()
   const showError = enqueueError(enqueue)
   const [videoMetadata, setVideoMetadata] = useState([])
-  const [tail, setTail] = useState([])
   const [adding, setAdding] = useState(false)
   const [addedRows, setAddedRows] = useState([])
 
   const debugProps = useContext(DebugContext)
 
-  const BASE_URL = 'https://www.youtube.com/'
   const getUrl = (videoId, playlistId, position) =>
-    `${BASE_URL}watch?v=${videoId}&list=${playlistId}&index=${position + 1}`
+    `${BASE_SHEETS_URL}watch?v=${videoId}&list=${playlistId}&index=${position + 1}`
 
   const playlistItemsToVideoMetadata = useCallback(items => {
     return items.map((item, index) => ({
@@ -42,10 +40,10 @@ const SheetsPage = ({
       playlistId: item.playlistId,
       position: item.position,
       cameraNumber: cameraInfo.cameraNumber,
-      cameraView: cameraViews[item.videoId] || defaultCameraView,
+      cameraView: cameraViews[item.videoId] || cameraInfo.defaultCameraView,
       cameraName: cameraInfo.cameraName
     }))
-  }, [eventData, cameraInfo, cameraViews, defaultCameraView])
+  }, [eventData, cameraInfo, cameraViews])
 
   const testDataToMetadata = data => ({
     date: data[0],
@@ -74,7 +72,9 @@ const SheetsPage = ({
     if (playlist.playlistId) {
       setVideoMetadata([])
       try {
-        return youtube.listPlaylistItems(playlist.playlistId, onSuccess, showError)
+        return youtube.listPlaylistItems({
+          playlistId: playlist.playlistId, onSuccess, onError: showError
+        })
       } catch (e) {
         showError(e)
       }
@@ -135,24 +135,14 @@ const SheetsPage = ({
     }
   }, [videoMetadata, spreadsheetInfo.spreadsheetId, spreadsheetInfo.sheetName, showError])
 
-  const showVideoMetadata = () => (
+  return (
     <>
       <Heading styleLevel={5}>Add Video Metadata {' '}
         <ActionButton
-          onClick={addMetadataToSheet} grayed={tail.length === 0} icon={faAngleDoubleDown} spin={adding}
+          onClick={addMetadataToSheet} icon={faAngleDoubleDown} spin={adding}
         />
       </Heading>
       <VideoMetadata videoMetadata={videoMetadata} addedRows={addedRows} />
-    </>
-  )
-
-  return (
-    <>
-      <GoogleSheetInfo
-        spreadsheetInfo={spreadsheetInfo} setSpreadsheetInfo={setSpreadsheetInfo}
-        tail={tail} setTail={setTail} baseUrl={BASE_URL}
-      />
-      {tail.length > 0 ? showVideoMetadata() : null}
     </>
   )
 }

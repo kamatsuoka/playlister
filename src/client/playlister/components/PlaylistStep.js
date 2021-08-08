@@ -5,7 +5,6 @@ import PlaylistCreate from './PlaylistCreate'
 import PlaylistSelect from './PlaylistSelect'
 import React, { useCallback, useState } from 'react'
 import { useStyletron } from 'baseui'
-import { errorMessage } from '../util/enqueueError'
 import * as youtube from '../api/youtube/youtube-client'
 import { resourceToPlaylist, resourceToPlaylistItem } from '../models/playlists'
 
@@ -21,26 +20,22 @@ const PlaylistStep = ({
   const [listing, setListing] = useState(false)
 
   /**
-   * Failure handler for listing playlists
-   */
-  const playlistFailure = err => {
-    setListing(false)
-    showError(`Error listing playlists: ${errorMessage(err)}`)
-  }
-
-  /**
    * Find list of (hopefully recent) playlists
    */
   function listPlaylists () {
     setListing(true)
-    const successHandler = resources => {
+    const onSuccess = resources => {
       setPlaylists(resources.map(resourceToPlaylist))
       setListing(false)
     }
+    const onFailure = err => {
+      setListing(false)
+      showError(err)
+    }
     try {
-      return youtube.listPlaylists(successHandler, playlistFailure)
+      return youtube.listPlaylists({ onSuccess, onFailure })
     } catch (e) {
-      playlistFailure(e)
+      onFailure(e)
     }
   }
 
@@ -60,7 +55,9 @@ const PlaylistStep = ({
     }
     if (playlist.playlistId) {
       console.log('calling youtube.listPlaylistItems ...')
-      return youtube.listPlaylistItems(playlist.playlistId, onSuccess, showError)
+      return youtube.listPlaylistItems({
+        playlistId: playlist.playlistId, onSuccess, onFailure: showError
+      })
     }
   }, [showError, setPlaylist, setPlaylistItems])
 

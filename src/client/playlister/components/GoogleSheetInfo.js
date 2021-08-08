@@ -2,8 +2,6 @@ import { FlexGrid, FlexGridItem } from 'baseui/flex-grid'
 import { FormControl } from 'baseui/form-control'
 import { Input } from 'baseui/input'
 import React, { useCallback, useState } from 'react'
-import { useStyletron } from 'baseui'
-import { Heading } from 'baseui/heading'
 import ActionButton from './ActionButton'
 import { faSearch } from '@fortawesome/free-solid-svg-icons/faSearch'
 import * as sheets from '../api/sheets/sheets-client'
@@ -15,6 +13,7 @@ import { tableOverrides } from './TableOverrides'
 import { StyledLink } from 'baseui/link'
 import Tooltip from './Tooltip'
 import { Label2 } from 'baseui/typography'
+import { useStyletron } from 'baseui'
 
 const GoogleSheetInfo = ({ spreadsheetInfo, setSpreadsheetInfo, tail, setTail, baseUrl }) => {
   const [, theme] = useStyletron()
@@ -76,7 +75,7 @@ const GoogleSheetInfo = ({ spreadsheetInfo, setSpreadsheetInfo, tail, setTail, b
 
   const itemProps = {
     display: 'flex',
-    alignItems: 'center',
+    // alignItems: 'center',
     justifyContent: 'center'
   }
 
@@ -114,7 +113,7 @@ const GoogleSheetInfo = ({ spreadsheetInfo, setSpreadsheetInfo, tail, setTail, b
 
   const tooltip = (
     <>
-      The Google Sheets spreadsheet id is found in the url path.
+      The spreadsheet id is found in the url path.
       <br />
       The url typically looks like
       https://docs.google.com/spreadsheets/d/$SPREADSHEET_ID/edit#gid=...
@@ -122,32 +121,35 @@ const GoogleSheetInfo = ({ spreadsheetInfo, setSpreadsheetInfo, tail, setTail, b
     </>
   )
 
+  const spreadsheetIdCaption = <Tooltip tooltip={tooltip}>spreadsheet id</Tooltip>
+
   return (
     <>
-      <Heading styleLevel={5}><Tooltip tooltip={tooltip}>Google Sheet</Tooltip>{' '}
-        <ActionButton
-          onClick={() => getTail(3)} disabled={!sheetIdsOkay()} icon={faSearch} spin={tailing}
-          title={sheetIdsOkay()
-            ? 'find sheet and show recent rows'
-            : 'please enter valid google spreadsheet id and sheet name'}
-        />
-      </Heading>
       <FlexGrid
-        flexGridColumnCount={2}
+        flexGridColumnCount={3}
         flexGridColumnGap='scale800'
         flexGridRowGap='scale800'
       >
+        <FlexGridItem {...itemProps} style={{ flexGrow: 0, flexShrink: 1, flexBasis: '0%', marginTop: theme.sizing.scale200 }}>
+          <ActionButton
+            onClick={() => getTail(3)} disabled={!sheetIdsOkay()} icon={faSearch} spin={tailing}
+            title={sheetIdsOkay()
+              ? 'find sheet and show recent rows'
+              : 'please enter valid google spreadsheet id and sheet name'}
+          />
+        </FlexGridItem>
         <FlexGridItem {...itemProps}>
-          <FormControl caption='spreadsheet id'>
+          <FormControl caption={spreadsheetIdCaption}>
             <Input
               value={spreadsheetInfo.spreadsheetId || ''}
               name='spreadsheetId'
-              placeholder='long alphanumeric in url path like 1BTxLr0...'
+              placeholder='long alphanumeric id'
+              overrides={{ Input: { props: { spellCheck: 'false' } } }}
               onChange={handleChange}
             />
           </FormControl>
         </FlexGridItem>
-        <FlexGridItem {...itemWidthProps({ width: '35%' })}>
+        <FlexGridItem {...itemWidthProps({ width: '30%' })}>
           <FormControl caption='sheet name'>
             <Input
               value={spreadsheetInfo.sheetName || ''}

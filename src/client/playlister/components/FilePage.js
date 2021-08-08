@@ -28,7 +28,7 @@ const FilePage = ({
    * - file
    */
   const [overrideTimeZone, setOverrideTimeZone] = useState(true)
-  const [previewUrl, setPreviewUrl] = React.useState(null)
+  const [previewUrl, setPreviewUrl] = useState(null)
 
   const startDates = getStartDates(files)
   const defaultDate = startDates[0]

@@ -34,7 +34,7 @@ const PlaylistItems = ({
       setAdding(false)
       return
     }
-    const successHandler = resources => {
+    const onSuccess = resources => {
       setPlaylistItems(Object.fromEntries(
         resources.map(resourceToPlaylistItem)
           .sort((a, b) => a.position - b.position)
@@ -43,12 +43,12 @@ const PlaylistItems = ({
       enqueue({ message: `all videos added to ${playlist.title}` })
       setAdding(false)
     }
-    const failureHandler = err => {
+    const onFailure = err => {
       setAdding(false)
       showError(err)
     }
     return youtube.addToPlaylist(
-      sortedVideos, playlist.playlistId, successHandler, failureHandler
+      { videos: sortedVideos, playlistId: playlist.playlistId, onSuccess, onFailure }
     )
   }
 

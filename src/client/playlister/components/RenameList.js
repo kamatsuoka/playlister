@@ -20,7 +20,7 @@ dayjs.extend(utc)
  */
 const RenameList = ({
   playlistItems, renamedTitles, getNewTitle,
-  cameraViews, setCameraViews, defaultCameraView
+  cameraViews, setCameraViews, cameraInfo
 }) => {
   const columnOverrides = {
     TableBodyCell: {
@@ -62,7 +62,7 @@ const RenameList = ({
         <TableBuilderColumn overrides={cameraViewColumnOverrides} header='Camera View'>
           {row =>
             <Combobox
-              value={cameraViews[row.videoId] || defaultCameraView}
+              value={cameraViews[row.videoId] || cameraInfo.defaultCameraView}
               name='cameraView'
               options={['chorus', 'corner', 'director', 'elevated']}
               mapOptionToString={option => option}

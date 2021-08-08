@@ -58,7 +58,7 @@ export const listPlaylists = () => {
 /**
  * Inserts (creates) a new playlist
  */
-export function insertPlaylist (title, description) {
+export function insertPlaylist ({ title, description }) {
   const resource = {
     snippet: {
       title: title,
@@ -187,7 +187,7 @@ export function findUploads (files) {
  * @param title new title
  * @param description description
  */
-export function updateTitle (videoId, title, description) {
+export function updateTitle ({ videoId, title, description }) {
   // TODO: add in update to status: unlisted once app is approved
   const response = YouTube.Videos.update(
     {
@@ -274,7 +274,7 @@ export function listPlaylistItems (playlistId) {
  * Adds an array of video ids to a playlist in the order specified,.
  * If video is already in playlist, just set its position.
  */
-export function addToPlaylist (videoIds, playlistId) {
+export function addToPlaylist ({ videoIds, playlistId }) {
   const videoItems = new Map() // map of video id to playlist item id
   const addVideoItem = item => videoItems.set(item.snippet.resourceId.videoId, item.id)
   // add any existing playlist items id to videoItems
@@ -305,7 +305,7 @@ export function addToPlaylist (videoIds, playlistId) {
  */
 export function renameVideos (videoTitleDesc) {
   const newTitles = Object.entries(videoTitleDesc).map(([videoId, { title, description }]) =>
-    updateTitle(videoId, title, description)
+    updateTitle({ videoId, title, description })
   )
   return Object.fromEntries(newTitles.map(({ videoId, title }) =>
     [videoId, title]

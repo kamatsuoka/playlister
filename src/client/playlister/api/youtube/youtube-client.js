@@ -23,7 +23,7 @@ const sleep = ms => {
  * @param onFailure failure handler: (error) => {}
  * @returns {Promise<*>}
  */
-export const findPlaylist = async (title, onSuccess, onFailure) => {
+export const findPlaylist = async ({ title, onSuccess, onFailure }) => {
   console.log(`findPlaylist: searching for ${title}`)
   const run = getAppsScriptRun()
   if (run) {
@@ -59,7 +59,7 @@ const samplePlaylist = (id, title, description, itemCount, publishedAt) => ({
  * @param onFailure failure handler: (error) => {}
  * @returns {Promise<*>}
  */
-export const listPlaylists = async (onSuccess, onFailure) => {
+export const listPlaylists = async ({ onSuccess, onFailure }) => {
   const run = getAppsScriptRun()
   if (run) {
     return run
@@ -86,14 +86,14 @@ export const listPlaylists = async (onSuccess, onFailure) => {
  * I think that means we can't let the app create a playlist on our behalf
  * unless we're signed in as the account owner.
  */
-export const insertPlaylist = async (title, onSuccess, onFailure) => {
+export const insertPlaylist = async ({ title, onSuccess, onFailure }) => {
   const description = `created by playlister on ${dayjs().format()}`
   const run = getAppsScriptRun()
   if (run) {
     run
       .withSuccessHandler(onSuccess)
       .withFailureHandler(onFailure)
-      .insertPlaylist(title, description)
+      .insertPlaylist({ title, description })
   } else {
     // for testing
     await sleep(1000)
@@ -129,16 +129,16 @@ const randomId = () => Math.random().toString(36).substr(2, 9)
 /**
  * Finds uploads given local file metadata
  *
- * @param fileList local file metadata with start/end times
+ * @param files local file metadata with start/end times
  * @param onSuccess success handler: (video) => {}
  * @param onFailure failure handler: (error) => {}
  * @returns {Promise<*>}
  */
-export const findUploads = async (fileList, onSuccess, onFailure) => {
+export const findUploads = async ({ files, onSuccess, onFailure }) => {
   const fileData = Object.fromEntries(
-    fileList.map(fileData => [fileData.filename, {
-      title: youtubeTitle(fileData.filename),
-      fileData: { ...fileData, file: undefined } // can't send file object over wire
+    files.map(file => [file.filename, {
+      title: youtubeTitle(file.filename),
+      fileData: { ...file, file: undefined } // can't send DOM File over wire
     }])
   )
 
@@ -150,7 +150,7 @@ export const findUploads = async (fileList, onSuccess, onFailure) => {
       .findUploads(fileData)
   } else {
     await sleep(1000)
-    const uploads = fileList.map(fd => ({
+    const uploads = files.map(fd => ({
       videoId: randomId(),
       title: youtubeTitle(fd.filename),
       publishedAt: dayjs().toISOString(),
@@ -160,31 +160,6 @@ export const findUploads = async (fileList, onSuccess, onFailure) => {
     }))
     return new Promise((resolve) => {
       return resolve(uploads)
-    }).then(onSuccess).catch(onFailure)
-  }
-}
-
-export const insertPlaylistItem = (videoId, playlistId, onSuccess, onFailure) => {
-  const run = getAppsScriptRun()
-  if (run) {
-    return run
-      .withSuccessHandler(onSuccess)
-      .withFailureHandler(onFailure)
-      .insertPlaylistItem(videoId, playlistId)
-  } else {
-    // for testing
-    const item = {
-      snippet: {
-        playlistId: playlistId,
-        title: `title for ${videoId}`,
-        position: Math.max(1, Math.round(Math.random() * 5)),
-        resourceId: {
-          videoId: videoId
-        }
-      }
-    }
-    return new Promise(resolve => {
-      return resolve(item)
     }).then(onSuccess).catch(onFailure)
   }
 }
@@ -216,7 +191,7 @@ export const updatePlaylistItem = ({ playlistItemId, videoId, playlistId, positi
   }
 }
 
-export const listPlaylistItems = async (playlistId, onSuccess, onFailure) => {
+export const listPlaylistItems = async ({ playlistId, onSuccess, onFailure }) => {
   const run = getAppsScriptRun()
   if (run) {
     return run
@@ -238,13 +213,13 @@ export const listPlaylistItems = async (playlistId, onSuccess, onFailure) => {
  * @param onSuccess success handler
  * @param onFailure failure handler
  */
-export const addToPlaylist = async (videos, playlistId, onSuccess, onFailure) => {
+export const addToPlaylist = async ({ videos, playlistId, onSuccess, onFailure }) => {
   const run = getAppsScriptRun()
   if (run) {
     return run
       .withSuccessHandler(onSuccess)
       .withFailureHandler(onFailure)
-      .addToPlaylist(videos.map(v => v.videoId), playlistId)
+      .addToPlaylist({ videoIds: videos.map(v => v.videoId), playlistId })
   } else {
     // for testing
     await sleep(1000)
@@ -275,7 +250,7 @@ export const addToPlaylist = async (videos, playlistId, onSuccess, onFailure) =>
  * @param onFailure failure handler
  * @return Object of { videoId: title }
  */
-export const renameVideos = async (videoTitleDesc, onSuccess, onFailure) => {
+export const renameVideos = async ({ videoTitleDesc, onSuccess, onFailure }) => {
   const run = getAppsScriptRun()
   if (run) {
     return run

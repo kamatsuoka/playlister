@@ -77,7 +77,7 @@ const PlaylistCreate = ({
     setPlaylist({})
     setCreating(true)
     const title = desiredTitle
-    const successHandler = plist => {
+    const onSuccess = plist => {
       if (plist) {
         return playlistSuccess('found')(plist)
       } else {
@@ -85,7 +85,9 @@ const PlaylistCreate = ({
       }
     }
     try {
-      return youtube.findPlaylist(title, successHandler, playlistFailure('finding'))
+      return youtube.findPlaylist({
+        title, onSuccess, onFailure: playlistFailure('finding')
+      })
     } catch (e) {
       playlistFailure('finding')(e)
     }
@@ -93,8 +95,11 @@ const PlaylistCreate = ({
 
   function createPlaylist (title) {
     try {
-      return youtube.insertPlaylist(title, playlistSuccess('created'), playlistFailure('creating')
-      )
+      return youtube.insertPlaylist({
+        title,
+        onSuccess: playlistSuccess('created'),
+        onFailure: playlistFailure('creating')
+      })
     } catch (e) {
       playlistFailure('creating')(e)
     }
