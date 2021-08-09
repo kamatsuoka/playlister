@@ -84,7 +84,7 @@ export function insertPlaylist ({ title, description }) {
  * @param {Object} fileMap - map of filename to { title, fileData }
  * @return Array of { videoId, title, publishedAt, filename, duration, startTime }
  */
-export function findUploads ({ files: fileMap }) {
+export function findUploads ({ fileMap }) {
   Logger.log(`fileMap = ${JSON.stringify(fileMap)}`)
   // titles as they have likely been munged from filenames:
   // extension removed, any non-alnum character replaced with space
@@ -97,15 +97,19 @@ export function findUploads ({ files: fileMap }) {
 
   const matchingVideos = {} // map of filename to video data
   const channels = YouTube.Channels.list('contentDetails', { mine: true })
+  console.log(`in findUploads, found ${channels.items.length} channels`)
   // we *probably* just have one channel, but just in case ...
   channels.items.forEach(channel => {
     // Channel resource: https://developers.google.com/youtube/v3/docs/channels
     // each channel has a special 'uploads' playlist that's not ordinarily visible
     const playlistId = channel.contentDetails.relatedPlaylists.uploads
+    if (!playlistId) {
+      console.error(`playlistId for channel uploads not found! channel: ${JSON.stringify(channel)}`)
+    }
     // Although it's not documented, playlist items seem to come back in reverse
     // chronological order. We're going to assume our files were uploaded
     // recently enough that we don't need to look back more than 50 items.
-    const items = listPlaylistItems(playlistId)
+    const items = listPlaylistItems({ playlistId })
     Logger.log(`for channel ${channel.id}, got ${items.length} PlaylistItems`)
     if (items.length === 0) {
       return []
@@ -213,7 +217,7 @@ export function updateTitle ({ videoId, title, description }) {
  * @returns  GoogleAppsScript.YouTube.Schema.PlaylistItem
  * @see https://developers.google.com/youtube/v3/docs/playlistItems#resource
  */
-export function insertPlaylistItem (videoId, playlistId) {
+function insertPlaylistItem (videoId, playlistId) {
   Logger.log(`inserting video ${videoId} into playlist ${playlistId}`)
   const resource = {
     snippet: {
@@ -254,6 +258,7 @@ function updatePlaylistItem ({ playlistItemId, videoId, playlistId, position }) 
  * @returns Array[{ id, snippet: { title, description, playlistId, position }, resourceId: { videoId } } ]
  */
 export function listPlaylistItems ({ playlistId }) {
+  console.log(`calling listPlaylistItems with playlistId = ${playlistId}`)
   const optionalArgs = {
     playlistId: playlistId,
     maxResults: 50,
@@ -278,7 +283,7 @@ export function addToPlaylist ({ videoIds, playlistId }) {
   const videoItems = new Map() // map of video id to playlist item id
   const addVideoItem = item => videoItems.set(item.snippet.resourceId.videoId, item.id)
   // add any existing playlist items id to videoItems
-  listPlaylistItems(playlistId).forEach(addVideoItem)
+  listPlaylistItems({ playlistId }).forEach(addVideoItem)
   Logger.log(`videoItems already in playlist: ${videoItems}`)
   // add any new videos to the playlist and add their new playlist item id to videoItems
   const newVideoIds = videoIds.filter(id => !videoItems.has(id))
