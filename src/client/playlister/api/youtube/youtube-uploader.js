@@ -1,6 +1,5 @@
 import axios from 'axios'
-
-const { youtubeTitle } = require('./youtube-client')
+import { youtubeTitle } from '../../models/renaming'
 
 class RetryHandler {
   constructor () {
@@ -227,11 +226,4 @@ class UploadWatcher {
   }
 }
 
-function resumableUpload (file, fileId, startTime, endTime, progressHandler, completeHandler, errorHandler) {
-  return google.script.run.withSuccessHandler(token =>
-    (new UploadWatcher(progressHandler, completeHandler, errorHandler))
-      .uploadFile(file, fileId, startTime, endTime, token)
-  ).getToken()
-}
-
-export default resumableUpload
+export default UploadWatcher

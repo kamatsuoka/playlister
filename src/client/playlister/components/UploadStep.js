@@ -3,18 +3,21 @@ import Tooltip from './Tooltip'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSyncAlt } from '@fortawesome/free-solid-svg-icons/faSyncAlt'
 import UploadList from './UploadList'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
 import { createTheme, lightThemePrimitives, ThemeProvider } from 'baseui'
 import { StyledLink } from 'baseui/link'
 import { parseDescription } from '../models/dates'
-import { findUploads } from '../api/youtube/youtube-client'
 import ActionButton from './ActionButton'
+import { callServer } from '../api/api'
+import PasswordContext from '../context/PasswordContext'
+import { youtubeTitle } from '../models/renaming'
 
 const UploadStep = ({ files, uploads, setUploads, allUploaded, showError }) => {
   // used to show status of checking for uploads
   const [checking, setChecking] = useState(false)
   // file ids that have been checked
   const [checkedFileIds, setCheckedFileIds] = useState(new Set())
+  const { password } = useContext(PasswordContext)
 
   const checkUploads = useCallback(() => {
     console.log('in checkUploads')
@@ -40,8 +43,15 @@ const UploadStep = ({ files, uploads, setUploads, allUploaded, showError }) => {
       setChecking(false)
     }
 
+    const fileMap = Object.fromEntries(
+      files.map(file => [file.filename, {
+        title: youtubeTitle(file.filename),
+        fileData: { ...file, file: undefined } // can't send DOM File over wire
+      }])
+    )
+
     try {
-      return findUploads({ files, onSuccess, onFailure })
+      return callServer('findUploads', onSuccess, onFailure, ({ password, fileMap }))
     } catch (e) {
       onFailure(e)
     }

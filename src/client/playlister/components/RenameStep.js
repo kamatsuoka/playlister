@@ -3,9 +3,10 @@ import { Heading } from 'baseui/heading'
 import ActionButton from './ActionButton'
 import { faAngleDoubleRight } from '@fortawesome/free-solid-svg-icons/faAngleDoubleRight'
 import RenameList from './RenameList'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useContext, useState } from 'react'
 import { useStyletron } from 'baseui'
-import * as youtube from '../api/youtube/youtube-client'
+import PasswordContext from '../context/PasswordContext'
+import { callServer } from '../api/api'
 
 const RenameStep = ({
   cameraViews, setCameraViews, allRenamed, renamedTitles, setRenamedTitles,
@@ -13,6 +14,7 @@ const RenameStep = ({
 }) => {
   const [css, theme] = useStyletron()
   const [renaming, setRenaming] = useState(false)
+  const { password } = useContext(PasswordContext)
 
   const renameVideos = useCallback(() => {
     setRenaming(true)
@@ -35,7 +37,7 @@ const RenameStep = ({
       showError(err)
     }
     console.log('calling youtube.renameVideos with args', videoTitleDesc)
-    return youtube.renameVideos({ videoTitleDesc, onSuccess, onFailure })
+    return callServer('renameVideos', onSuccess, onFailure, { password, videoTitleDesc })
     // eslint-disable-next-line
   }, [playlistItems])
 

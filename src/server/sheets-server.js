@@ -8,6 +8,7 @@
  * @return object with values
  * @see https://developers.google.com/sheets/api/guides/values#appending_values
  */
+
 export const appendRows = ({ spreadsheetId, range, values }) => {
   Logger.log(`sheets-server.appendRows: appending ${JSON.stringify(values)}`)
   const valueInputOption = 'USER_ENTERED'
@@ -43,8 +44,8 @@ export const getRange = (spreadsheetId, range) => {
  *
  * @param spreadsheetId {string} id of spreadsheet
  * @param range {string} range to search for data in spreadsheet (typically e.g. sheetId!A1:C1)
- * @param rowCount number of rows to return
- * @param header true to prepend with first row as header
+ * @param rowCount {int} number of rows to return
+ * @param header {boolean} true to prepend with first row as header
  * @return {[[]]} array of rows, with each row an array of values
  */
 export const tailSheet = ({ spreadsheetId, range, rowCount, header }) => {

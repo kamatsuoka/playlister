@@ -1,5 +1,4 @@
-import React, { useState } from 'react'
-import * as youtube from '../api/youtube/youtube-client'
+import React, { useContext, useState } from 'react'
 import { useStyletron } from 'baseui'
 import { TableBuilder, TableBuilderColumn } from 'baseui/table-semantic'
 import { tableOverrides } from './TableOverrides'
@@ -9,6 +8,8 @@ import { Heading } from 'baseui/heading'
 import ActionButton from './ActionButton'
 import { resourceToPlaylistItem } from '../models/playlists'
 import GreenCheckMark from './GreenCheckMark'
+import { callServer } from '../api/api'
+import PasswordContext from '../context/PasswordContext'
 
 /**
  * List of items (videos) in playlist
@@ -22,6 +23,7 @@ const PlaylistItems = ({
 }) => {
   const [css] = useStyletron()
   const [adding, setAdding] = useState(false)
+  const { password } = useContext(PasswordContext)
 
   /**
    * Add videos to playlist in the position specified by their order in the array.
@@ -47,8 +49,8 @@ const PlaylistItems = ({
       setAdding(false)
       showError(err)
     }
-    return youtube.addToPlaylist(
-      { videos: sortedVideos, playlistId: playlist.playlistId, onSuccess, onFailure }
+    return callServer('addToPlaylist', onSuccess, onFailure,
+      { password, videos: sortedVideos, playlistId: playlist.playlistId }
     )
   }
 

@@ -1,7 +1,5 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react'
 import { resourceToPlaylistItem } from '../models/playlists'
-import * as youtube from '../api/youtube/youtube-client'
-import * as sheets from '../api/sheets/sheets-client'
 import { useSnackbar } from 'baseui/snackbar'
 import { enqueueError } from '../util/enqueueError'
 import { getChosenDate, localDate } from '../models/dates'
@@ -12,6 +10,8 @@ import { faAngleDoubleDown } from '@fortawesome/free-solid-svg-icons/faAngleDoub
 import VideoMetadata from './VideoMetadata'
 import { DEBUG_METADATA, DebugContext } from '../context/DebugContext'
 import { BASE_SHEETS_URL } from './SetupPage'
+import { callServer } from '../api/api'
+import PasswordContext from '../context/PasswordContext'
 
 const SheetsPage = ({
   cameraInfo, eventData, cameraViews,
@@ -22,6 +22,7 @@ const SheetsPage = ({
   const [videoMetadata, setVideoMetadata] = useState([])
   const [adding, setAdding] = useState(false)
   const [addedRows, setAddedRows] = useState([])
+  const { password } = useContext(PasswordContext)
 
   const debugProps = useContext(DebugContext)
 
@@ -72,9 +73,9 @@ const SheetsPage = ({
     if (playlist.playlistId) {
       setVideoMetadata([])
       try {
-        return youtube.listPlaylistItems({
-          playlistId: playlist.playlistId, onSuccess, onError: showError
-        })
+        return callServer('listPlaylistItems', onSuccess, showError,
+          { password, playlistId: playlist.playlistId }
+        )
       } catch (e) {
         showError(e)
       }
@@ -123,17 +124,16 @@ const SheetsPage = ({
         meta.cameraView,
         meta.cameraName
       ])
-      return sheets.appendRows({
+      return callServer('appendRows', onSuccess, onError, {
+        password,
         spreadsheetId: spreadsheetInfo.spreadsheetId,
         range,
-        values,
-        onSuccess,
-        onError
+        values
       })
     } catch (e) {
       showError(e)
     }
-  }, [videoMetadata, spreadsheetInfo.spreadsheetId, spreadsheetInfo.sheetName, showError])
+  }, [password, videoMetadata, spreadsheetInfo.spreadsheetId, spreadsheetInfo.sheetName, showError])
 
   return (
     <>

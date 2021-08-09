@@ -3,10 +3,11 @@ import { Heading } from 'baseui/heading'
 import { ORIENTATION, Tab, Tabs } from 'baseui/tabs-motion'
 import PlaylistCreate from './PlaylistCreate'
 import PlaylistSelect from './PlaylistSelect'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useContext, useState } from 'react'
 import { useStyletron } from 'baseui'
-import * as youtube from '../api/youtube/youtube-client'
 import { resourceToPlaylist, resourceToPlaylistItem } from '../models/playlists'
+import { callServer } from '../api/api'
+import PasswordContext from '../context/PasswordContext'
 
 const PlaylistStep = ({
   setPlaylist, playlists, setPlaylists,
@@ -18,6 +19,7 @@ const PlaylistStep = ({
 }) => {
   const [css, theme] = useStyletron()
   const [listing, setListing] = useState(false)
+  const { password } = useContext(PasswordContext)
 
   /**
    * Find list of (hopefully recent) playlists
@@ -33,7 +35,7 @@ const PlaylistStep = ({
       showError(err)
     }
     try {
-      return youtube.listPlaylists({ onSuccess, onFailure })
+      return callServer('listPlaylists', onSuccess, onFailure, {})
     } catch (e) {
       onFailure(e)
     }
@@ -54,10 +56,10 @@ const PlaylistStep = ({
       ))
     }
     if (playlist.playlistId) {
-      console.log('calling youtube.listPlaylistItems ...')
-      return youtube.listPlaylistItems({
-        playlistId: playlist.playlistId, onSuccess, onFailure: showError
-      })
+      console.log('calling listPlaylistItems ...')
+      return callServer('listPlaylistItems', onSuccess, showError,
+        { password, playlistId: playlist.playlistId }
+      )
     }
   }, [showError, setPlaylist, setPlaylistItems])
 

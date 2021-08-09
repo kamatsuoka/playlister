@@ -1,37 +1,35 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { FlexGrid, FlexGridItem } from 'baseui/flex-grid'
 import { FormControl } from 'baseui/form-control'
 import { Input } from 'baseui/input'
 import { Paragraph3 } from 'baseui/typography'
 import { useStyletron } from 'baseui'
-import * as auth from '../api/auth'
 import ActionButton from './ActionButton'
 import { faSignInAlt } from '@fortawesome/free-solid-svg-icons/faSignInAlt'
 import { useSnackbar } from 'baseui/snackbar'
 import { enqueueError } from '../util/enqueueError'
+import PasswordContext from '../context/PasswordContext'
+import { callServer } from '../api/api'
 
-const LoginPage = ({ current, setCurrent, password, setPassword }) => {
+const LoginPage = ({ current, setCurrent }) => {
   const [, theme] = useStyletron()
   const [verifying, setVerifying] = useState(false)
   const { enqueue } = useSnackbar()
   const showError = enqueueError(enqueue)
+  const { password, setPassword } = useContext(PasswordContext)
 
   const checkPassword = () => {
     setVerifying(true)
     const onSuccess = ok => {
       setVerifying(false)
-      if (ok) {
-        return setCurrent(current + 1)
-      } else {
-        showError('incorrect password')
-      }
+      return setCurrent(current + 1)
     }
     const onFailure = e => {
       setVerifying(false)
       showError(e)
     }
     try {
-      auth.checkPassword({ password, onSuccess, onFailure })
+      callServer('checkPassword', onSuccess, onFailure, password)
     } catch (e) {
       onFailure(e)
     }

@@ -19,7 +19,7 @@ const findMatchingItem = (result, title) => {
 /**
  * Finds my playlist with given title
  */
-export const findMyPlaylist = (title, nextPageToken = '') => {
+export const findMyPlaylist = ({ title, nextPageToken = '' }) => {
   const MAX_RESULTS = 50
   const part = ['snippet', 'contentDetails']
   const optionalArgs = {
@@ -81,17 +81,17 @@ export function insertPlaylist ({ title, description }) {
  * 4. Updating video's description field to contain video start/end time, if necessary
  * 5. Returning videos that match one of the given filenames / titles
  *
- * @param {Object} files - map of filename to { title, fileData }
+ * @param {Object} fileMap - map of filename to { title, fileData }
  * @return Array of { videoId, title, publishedAt, filename, duration, startTime }
  */
-export function findUploads (files) {
-  Logger.log(`files = ${JSON.stringify(files)}`)
+export function findUploads ({ files: fileMap }) {
+  Logger.log(`fileMap = ${JSON.stringify(fileMap)}`)
   // titles as they have likely been munged from filenames:
   // extension removed, any non-alnum character replaced with space
-  const filenameSet = new Set(Object.keys(files))
-  const titleSet = new Set(Object.values(files).map(file => file.title))
+  const filenameSet = new Set(Object.keys(fileMap))
+  const titleSet = new Set(Object.values(fileMap).map(file => file.title))
   const titleToFilename = Object.fromEntries(
-    Object.entries(files).map(([filename, data]) => [data.title, filename])
+    Object.entries(fileMap).map(([filename, data]) => [data.title, filename])
   )
   Logger.log(`titleToFilename = ${JSON.stringify(titleToFilename)}`)
 
@@ -125,7 +125,7 @@ export function findUploads (files) {
           upload.filename = titleToFilename[upload.title]
         }
         if (upload.filename) {
-          upload.fileData = files[upload.filename].fileData
+          upload.fileData = fileMap[upload.filename].fileData
           return [upload]
         }
         return []
@@ -141,9 +141,9 @@ export function findUploads (files) {
         }
         Logger.log(`matching video: ${JSON.stringify(video)}`)
         const videoSeconds = dayjs.duration(video.contentDetails.duration).asSeconds()
-        if (Math.abs(videoSeconds - files[match.filename].durationSeconds) > 1) {
+        if (Math.abs(videoSeconds - fileMap[match.filename].durationSeconds) > 1) {
           Logger.log(`duration of video ${video.id}, "${video.snippet.title}" at ${videoSeconds} seconds ` +
-            `doesn't match file ${match.filename} at ${files[match.filename].durationSeconds} seconds ` +
+            `doesn't match file ${match.filename} at ${fileMap[match.filename].durationSeconds} seconds ` +
             ' (±1), ignoring')
           continue
         }
@@ -233,7 +233,7 @@ export function insertPlaylistItem (videoId, playlistId) {
  * @returns  GoogleAppsScript.YouTube.Schema.PlaylistItem
  * @see https://developers.google.com/youtube/v3/docs/playlistItems#resource
  */
-export function updatePlaylistItem ({ playlistItemId, videoId, playlistId, position }) {
+function updatePlaylistItem ({ playlistItemId, videoId, playlistId, position }) {
   const resource = {
     id: playlistItemId,
     snippet: {
@@ -253,7 +253,7 @@ export function updatePlaylistItem ({ playlistItemId, videoId, playlistId, posit
  *
  * @returns Array[{ id, snippet: { title, description, playlistId, position }, resourceId: { videoId } } ]
  */
-export function listPlaylistItems (playlistId) {
+export function listPlaylistItems ({ playlistId }) {
   const optionalArgs = {
     playlistId: playlistId,
     maxResults: 50,
@@ -303,7 +303,7 @@ export function addToPlaylist ({ videoIds, playlistId }) {
  * @param videoTitleDesc Object of { videoId: { title, description } }
  * @return Array Object of { videoId: title }
  */
-export function renameVideos (videoTitleDesc) {
+export function renameVideos ({ videoTitleDesc }) {
   const newTitles = Object.entries(videoTitleDesc).map(([videoId, { title, description }]) =>
     updateTitle({ videoId, title, description })
   )

@@ -1,14 +1,16 @@
 import { ALIGN, Radio, RadioGroup } from 'baseui/radio'
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { Input } from 'baseui/input'
 import { useStyletron } from 'baseui'
 import { FormControl } from 'baseui/form-control'
-import * as youtube from '../api/youtube/youtube-client'
 import { errorMessage } from '../util/enqueueError'
 import { Block } from 'baseui/block'
 import { faPlus } from '@fortawesome/free-solid-svg-icons/faPlus'
 import ActionButton from './ActionButton'
 import { getChosenDate } from '../models/dates'
+import { callServer } from '../api/api'
+import PasswordContext from '../context/PasswordContext'
+import dayjs from 'dayjs'
 
 const SUGGESTED = 'suggested'
 const CUSTOM = 'custom'
@@ -25,6 +27,7 @@ const PlaylistCreate = ({
 
   const titleParts = [orgInfo.orgName, eventDate, eventData.eventType, 'cam', cameraInfo.cameraNumber]
   const suggestedTitle = titleParts.filter(p => p).join(' ')
+  const { password } = useContext(PasswordContext)
 
   const handleChange = (evt) => {
     setPlaylistTitle({
@@ -84,22 +87,20 @@ const PlaylistCreate = ({
         return createPlaylist(title)
       }
     }
+    const onFailure = playlistFailure('finding')
     try {
-      return youtube.findPlaylist({
-        title, onSuccess, onFailure: playlistFailure('finding')
-      })
+      return callServer('findPlaylist', onSuccess, onFailure, { password, title })
     } catch (e) {
-      playlistFailure('finding')(e)
+      onFailure(e)
     }
   }
 
   function createPlaylist (title) {
     try {
-      return youtube.insertPlaylist({
-        title,
-        onSuccess: playlistSuccess('created'),
-        onFailure: playlistFailure('creating')
-      })
+      const description = `created by playlister on ${dayjs().format()}`
+      return callServer('insertPlaylist', playlistSuccess('created'), playlistFailure('creating'),
+        { password, title, description }
+      )
     } catch (e) {
       playlistFailure('creating')(e)
     }

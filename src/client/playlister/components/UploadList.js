@@ -4,11 +4,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faQuestion } from '@fortawesome/free-solid-svg-icons/faQuestion'
 import { tableOverrides } from './TableOverrides'
 import { Button, KIND, SIZE } from 'baseui/button'
-import resumableUpload from '../api/youtube/youtube-uploader'
+import UploadWatcher from '../api/youtube/youtube-uploader'
 import { displayDate } from '../models/dates'
 import { useSnackbar } from 'baseui/snackbar'
 import { enqueueError } from '../util/enqueueError'
 import GreenCheckMark from './GreenCheckMark'
+import { callServer } from '../api/api'
 
 const UPLOADING = 'uploading'
 const ERROR = 'error'
@@ -23,6 +24,7 @@ const UploadList = ({ files, checkedFileIds, uploads, setUploads }) => {
   const [uploadProgress, setUploadProgress] = useState({})
   const { enqueue } = useSnackbar()
   const showError = enqueueError(enqueue)
+  const [authToken, setAuthToken] = useState('')
 
   const uploadFile = (file, fileId, startTime, endTime) => {
     const progressHandler = percent => {
@@ -36,7 +38,19 @@ const UploadList = ({ files, checkedFileIds, uploads, setUploads }) => {
       console.log('completeHandler: uploaded = ', uploaded)
       return setUploads(uploads => ({ ...uploads, [fileId]: uploaded }))
     }
-    resumableUpload(file, fileId, startTime, endTime, progressHandler, completeHandler, errorHandler)
+    const startUpload = authToken =>
+      new UploadWatcher(progressHandler, completeHandler, errorHandler)
+        .uploadFile(file, fileId, startTime, endTime, authToken)
+
+    if (authToken) {
+      return startUpload(authToken)
+    } else {
+      const onSuccess = token => {
+        setAuthToken(token)
+        return startUpload(token)
+      }
+      return callServer('getToken', onSuccess, errorHandler, {})
+    }
   }
 
   const getButtonContent = fileId => {

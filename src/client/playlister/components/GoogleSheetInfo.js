@@ -1,10 +1,9 @@
 import { FlexGrid, FlexGridItem } from 'baseui/flex-grid'
 import { FormControl } from 'baseui/form-control'
 import { Input } from 'baseui/input'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useContext, useState } from 'react'
 import ActionButton from './ActionButton'
 import { faSearch } from '@fortawesome/free-solid-svg-icons/faSearch'
-import * as sheets from '../api/sheets/sheets-client'
 import { useSnackbar } from 'baseui/snackbar'
 import { enqueueError } from '../util/enqueueError'
 import { copyData, usePersist } from '../hooks/usePersist'
@@ -14,12 +13,15 @@ import { StyledLink } from 'baseui/link'
 import Tooltip from './Tooltip'
 import { Label2 } from 'baseui/typography'
 import { useStyletron } from 'baseui'
+import { callServer } from '../api/api'
+import PasswordContext from '../context/PasswordContext'
 
 const GoogleSheetInfo = ({ spreadsheetInfo, setSpreadsheetInfo, tail, setTail, baseUrl }) => {
   const [, theme] = useStyletron()
   const [tailing, setTailing] = useState(false)
   const { enqueue } = useSnackbar()
   const showError = enqueueError(enqueue)
+  const { password } = useContext(PasswordContext)
 
   const handleChange = evt => {
     const value = evt.target.value
@@ -52,7 +54,7 @@ const GoogleSheetInfo = ({ spreadsheetInfo, setSpreadsheetInfo, tail, setTail, b
       setTailing(false)
       return setTail(tailRows)
     }
-    const onError = e => {
+    const onFailure = e => {
       setTailing(false)
       showError(e)
     }
@@ -60,13 +62,12 @@ const GoogleSheetInfo = ({ spreadsheetInfo, setSpreadsheetInfo, tail, setTail, b
       const sheetName = spreadsheetInfo.sheetName
       const quotedSheetName = sheetName.includes(' ') ? `'${sheetName}'` : sheetName
       const range = `${quotedSheetName}!A1:J1`
-      return sheets.tailSheet({
+      return callServer('tailSheet', onSuccess, onFailure, {
+        password,
         spreadsheetId: spreadsheetInfo.spreadsheetId,
         range,
         rowCount,
-        header: false,
-        onSuccess,
-        onError
+        header: false
       })
     } catch (e) {
       showError(e)
