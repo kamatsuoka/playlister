@@ -19,7 +19,7 @@ const findMatchingItem = (result, title) => {
 /**
  * Finds my playlist with given title
  */
-export const findMyPlaylist = ({ title, nextPageToken = '' }) => {
+export const findPlaylist = ({ title, nextPageToken = '' }) => {
   const MAX_RESULTS = 50
   const part = ['snippet', 'contentDetails']
   const optionalArgs = {
@@ -36,7 +36,7 @@ export const findMyPlaylist = ({ title, nextPageToken = '' }) => {
     return playlist
   }
   if (response.nextPageToken) {
-    return findMyPlaylist(title, response.nextPageToken)
+    return findPlaylist(title, response.nextPageToken)
   }
   return null
 }
