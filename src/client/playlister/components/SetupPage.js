@@ -18,10 +18,9 @@ import { Paragraph3 } from 'baseui/typography'
 export const BASE_SHEETS_URL = 'https://www.youtube.com/'
 
 const SetupPage = ({
-  current, setCurrent,
-  orgInfo, setOrgInfo, password, setPassword,
+  current, setCurrent, orgInfo, setOrgInfo, password, setPassword,
   eventData, setEventData, cameraInfo, setCameraInfo,
-  spreadsheetInfo, setSpreadsheetInfo
+  spreadsheetInfo, setSpreadsheetInfo, tailed, setTailed
 }) => {
   const [css, theme] = useStyletron()
   const [tail, setTail] = useState([])
@@ -194,14 +193,16 @@ const SetupPage = ({
 
         <GoogleSheetInfo
           spreadsheetInfo={spreadsheetInfo} setSpreadsheetInfo={setSpreadsheetInfo}
-          tail={tail} setTail={setTail} baseUrl={BASE_SHEETS_URL}
+          tailed={tailed} setTailed={setTailed} tail={tail} setTail={setTail} baseUrl={BASE_SHEETS_URL}
         />
       </BaseCard>
       <ToasterContainer>
         <PrevNextButtons
           current={current} setCurrent={setCurrent}
           nextProps={{
-            onClick: () => allFilled() ? setCurrent(current + 1) : warnFields()
+            onClick: () => allFilled() ? setCurrent(current + 1) : warnFields(),
+            disabled: !tailed,
+            title: tailed ? '' : 'click the search icon to verify your access to the google sheet'
           }}
         />
       </ToasterContainer>

@@ -1,11 +1,13 @@
 import React, { useCallback, useState } from 'react'
 
-import { LocaleProvider } from 'baseui'
+import { LocaleProvider, useStyletron } from 'baseui'
 import { FileUploader } from 'baseui/file-uploader'
 // eslint-disable-next-line camelcase
 import en_US from 'baseui/locale/en_US'
 import { useSnackbar } from 'baseui/snackbar'
 import { enqueueError } from '../util/enqueueError'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faFileVideo } from '@fortawesome/free-regular-svg-icons'
 
 // import MediaInfo from 'mediainfo.js'
 // // using MediaInfo through npm/react didn't work,
@@ -28,6 +30,7 @@ const MediaReader = ({ setMediaList }) => {
    * - filename
    * - file
    */
+  const [css, theme] = useStyletron()
   const [analyzing, setAnalyzing] = useState(false)
 
   const { enqueue } = useSnackbar()
@@ -120,9 +123,11 @@ const MediaReader = ({ setMediaList }) => {
     fileuploader: {
       ...en_US.fileuploader,
       dropFilesToUpload: (
-        <div style={{ textAlign: 'center' }}>
-          Drop video files here to extract their timestamps
-        </div>
+        <>
+          <div className={css({ textAlign: 'center', marginBottom: theme.sizing.scale600 })}>
+            Drop video files here or click to browse
+          </div>
+        </>
       )
     }
   }
@@ -130,16 +135,27 @@ const MediaReader = ({ setMediaList }) => {
     <LocaleProvider locale={locale}>
       <FileUploader
         onDrop={onDrop}
+        disableClick={false}
         progressMessage={
-          analyzing
-            ? 'Analyzing ...'
-            : ''
-        }
+        analyzing
+          ? 'Analyzing ...'
+          : ''
+      }
         overrides={{
           Root: {
             style: ({ $theme }) => ({
               marginBottom: $theme.sizing.scale600
             })
+          },
+          ButtonComponent: {
+            props: {
+              overrides: {
+                BaseButton: {
+                  // eslint-disable-next-line react/display-name
+                  component: () => <FontAwesomeIcon icon={faFileVideo} size='2x' />
+                }
+              }
+            }
           }
         }}
       />

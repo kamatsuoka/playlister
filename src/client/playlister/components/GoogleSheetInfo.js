@@ -16,7 +16,7 @@ import { useStyletron } from 'baseui'
 import { callServer } from '../api/api'
 import PasswordContext from '../context/PasswordContext'
 
-const GoogleSheetInfo = ({ spreadsheetInfo, setSpreadsheetInfo, tail, setTail, baseUrl }) => {
+const GoogleSheetInfo = ({ spreadsheetInfo, setSpreadsheetInfo, tail, setTail, baseUrl, tailed, setTailed }) => {
   const [, theme] = useStyletron()
   const [tailing, setTailing] = useState(false)
   const { enqueue } = useSnackbar()
@@ -29,6 +29,7 @@ const GoogleSheetInfo = ({ spreadsheetInfo, setSpreadsheetInfo, tail, setTail, b
       ...values,
       [evt.target.name]: value
     }))
+    setTailed(false)
   }
 
   const SPREADSHEET_DATA_KEY = 'spreadsheet_info'
@@ -49,8 +50,10 @@ const GoogleSheetInfo = ({ spreadsheetInfo, setSpreadsheetInfo, tail, setTail, b
   const getTail = useCallback(rowCount => {
     setTail([])
     setTailing(true)
+    setTailed(false)
     const onSuccess = tailRows => {
       console.log('got tail of sheet:', tailRows)
+      setTailed(true)
       setTailing(false)
       return setTail(tailRows)
     }
@@ -147,6 +150,7 @@ const GoogleSheetInfo = ({ spreadsheetInfo, setSpreadsheetInfo, tail, setTail, b
               placeholder='long alphanumeric id'
               overrides={{ Input: { props: { spellCheck: 'false' } } }}
               onChange={handleChange}
+              positive={tailed}
             />
           </FormControl>
         </FlexGridItem>
@@ -157,6 +161,7 @@ const GoogleSheetInfo = ({ spreadsheetInfo, setSpreadsheetInfo, tail, setTail, b
               name='sheetName'
               placeholder='sheet name from tab'
               onChange={handleChange}
+              positive={tailed}
             />
           </FormControl>
         </FlexGridItem>

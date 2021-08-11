@@ -72,7 +72,16 @@ const TimeOffset = ({
     )
   }
 
-  const timestampAdjustmentTitle = <span style={{ paddingLeft: theme.sizing.scale600 }}>Time Adjustments </span>
+  const timestampAdjustmentTitle = (
+    <span
+      className={css({
+        marginLeft: theme.sizing.scale600,
+        borderBottomWidth: '1px',
+        borderBottomStyle: 'dotted'
+      })}
+    >Time Adjustments
+    </span>
+  )
 
   // panel expander icon is placed to the left of the title by shifting the title
   return (

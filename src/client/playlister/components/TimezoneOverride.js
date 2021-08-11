@@ -49,7 +49,7 @@ const TimezoneOverride = ({ mediaList, value, setValue }) => {
       >
         <SmallSpan>
           <Tooltip tooltip={utcMessage}>
-            Interpret Times
+            Interpret times
           </Tooltip>
           {' '} in local time zone ({dayjs.tz.guess()})
         </SmallSpan>

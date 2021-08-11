@@ -48,6 +48,8 @@ function App () {
     eventType: 'rehearsal',
     dateChoice: DEFAULT_DATE
   })
+  // did we successfully get the tail of the spreadsheet?
+  const [tailed, setTailed] = useState(false)
   // playlist title settings for finding / creating a playlist
   const [playlistTitle, setPlaylistTitle] = useState({
     tabIndex: 0,
@@ -141,9 +143,10 @@ function App () {
                       eventData={eventData} setEventData={setEventData}
                       cameraInfo={cameraInfo} setCameraInfo={setCameraInfo}
                       spreadsheetInfo={spreadsheetInfo} setSpreadsheetInfo={setSpreadsheetInfo}
+                      tailed={tailed} setTailed={setTailed}
                     />
                   </Tab>
-                  <Tab overrides={tabOverrides} title='Files'>
+                  <Tab overrides={tabOverrides} title='Timestamps'>
                     <FilePage
                       current={2} setCurrent={setCurrent}
                       mediaList={mediaList} setMediaList={setMediaList}
@@ -169,19 +172,13 @@ function App () {
                       allAdded={allAdded} allRenamed={allRenamed}
                     />
                   </Tab>
-                  <Tab overrides={tabOverrides} title='Sheets'>
+                  <Tab overrides={tabOverrides} title='Metadata'>
                     <SheetsPage
                       cameraInfo={cameraInfo} eventData={eventData} cameraViews={cameraViews}
                       playlist={playlist} spreadsheetInfo={spreadsheetInfo} setSpreadsheetInfo={setSpreadsheetInfo}
                     />
                     <PrevNextButtons current={4} setCurrent={setCurrent} last />
                   </Tab>
-                  {/*
-            <Tab overrides={tabOverrides} title='Test'>
-              <TestPage />
-              <PrevNextButtons  current={4}, setCurrent={setCurrent} />
-            </Tab>
-*/}
                 </Tabs>
               </HeadingLevel>
             </DebugContext.Provider>
