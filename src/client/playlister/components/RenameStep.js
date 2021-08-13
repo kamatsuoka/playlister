@@ -1,5 +1,3 @@
-import { Block } from 'baseui/block'
-import { Heading } from 'baseui/heading'
 import ActionButton from './ActionButton'
 import { faAngleDoubleRight } from '@fortawesome/free-solid-svg-icons/faAngleDoubleRight'
 import RenameList from './RenameList'
@@ -42,20 +40,22 @@ const RenameStep = ({
   }, [playlistItems])
 
   return (
-    <Block className={css({ marginBottom: theme.sizing.scale600 })}>
-      <Heading styleLevel={5}>
-        4. Rename &nbsp;
-        <ActionButton
-          onClick={renameVideos} spin={renaming} title='sync' icon={faAngleDoubleRight}
-          disabled={Object.keys(playlistItems).length === 0} grayed={allRenamed}
-        />
-      </Heading>
+    <>
+      <ActionButton
+        onClick={renameVideos} spin={renaming} title='sync' icon={faAngleDoubleRight}
+        disabled={Object.keys(playlistItems).length === 0} grayed={allRenamed}
+        className={css({
+          float: 'left',
+          marginTop: theme.sizing.scale200,
+          marginRight: theme.sizing.scale600
+        })}
+        text='Rename'
+      />
       <RenameList
         playlistItems={playlistItems} renamedTitles={renamedTitles} getNewTitle={getNewTitle}
         cameraViews={cameraViews} setCameraViews={setCameraViews} cameraInfo={cameraInfo}
-
       />
-    </Block>
+    </>
   )
 }
 

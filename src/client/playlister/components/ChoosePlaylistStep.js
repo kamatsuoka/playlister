@@ -1,15 +1,13 @@
-import { Block } from 'baseui/block'
-import { Heading } from 'baseui/heading'
-import { ORIENTATION, Tab, Tabs } from 'baseui/tabs-motion'
 import PlaylistCreate from './PlaylistCreate'
 import PlaylistSelect from './PlaylistSelect'
 import React, { useCallback, useContext, useState } from 'react'
-import { useStyletron } from 'baseui'
+// import { useStyletron } from 'baseui'
 import { resourceToPlaylist, resourceToPlaylistItem } from '../models/playlists'
 import { callServer } from '../api/api'
 import PasswordContext from '../context/PasswordContext'
+import { Tab, Tabs } from 'baseui/tabs-motion'
 
-const PlaylistStep = ({
+const ChoosePlaylistStep = ({
   setPlaylist, playlists, setPlaylists,
   setPlaylistItems, uploadedFileIds,
   createdPlaylist, setCreatedPlaylist,
@@ -17,7 +15,7 @@ const PlaylistStep = ({
   playlistTitle, setPlaylistTitle,
   eventData, orgInfo, cameraInfo, enqueue, showError
 }) => {
-  const [css, theme] = useStyletron()
+  // const [css, theme] = useStyletron()
   const [listing, setListing] = useState(false)
   const { password } = useContext(PasswordContext)
 
@@ -66,49 +64,45 @@ const PlaylistStep = ({
   const tabOverrides = {
     TabPanel: {
       style: ({
-        paddingTop: 0,
-        paddingBottom: 0
+        // paddingTop: 0,
+        // paddingBottom: 0
       })
     }
   }
 
   return (
-    <Block className={css({ marginBottom: theme.sizing.scale600 })}>
-      <Heading styleLevel={5}>2. Choose Playlist</Heading>
-      <Tabs
-        activeKey={playlistTitle.tabIndex}
-        orientation={ORIENTATION.vertical}
-        onChange={({ activeKey }) => {
-          setPlaylistTitle({ ...playlistTitle, tabIndex: parseInt(activeKey) })
-          if (activeKey === '1' && playlists.length === 0) {
-            return listPlaylists()
-          }
-          if (activeKey === '0' && Object.keys(createdPlaylist).length > 0) {
-            return setAndListPlaylist(createdPlaylist)
-          } else if (activeKey === '1' && selectedPlaylist[0] && Object.keys(selectedPlaylist[0]).length > 0) {
-            return setAndListPlaylist(selectedPlaylist[0])
-          }
-        }}
-      >
-        <Tab title='New' overrides={tabOverrides}>
-          <PlaylistCreate
-            eventData={eventData} orgInfo={orgInfo} cameraInfo={cameraInfo} createdPlaylist={createdPlaylist}
-            setCreatedPlaylist={setCreatedPlaylist} resourceToPlaylist={resourceToPlaylist}
-            uploadedFileIds={uploadedFileIds} setPlaylist={setAndListPlaylist}
-            playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
-            enqueue={enqueue} showError={showError}
-          />
-        </Tab>
-        <Tab title='Existing' overrides={tabOverrides}>
-          <PlaylistSelect
-            playlists={playlists}
-            selectedPlaylist={selectedPlaylist} setSelectedPlaylist={setSelectedPlaylist}
-            setPlaylist={setAndListPlaylist} listPlaylists={listPlaylists} listing={listing}
-          />
-        </Tab>
-      </Tabs>
-    </Block>
+    <Tabs
+      activeKey={playlistTitle.tabIndex}
+      onChange={({ activeKey }) => {
+        setPlaylistTitle({ ...playlistTitle, tabIndex: parseInt(activeKey) })
+        if (activeKey === '1' && playlists.length === 0) {
+          return listPlaylists()
+        }
+        if (activeKey === '0' && Object.keys(createdPlaylist).length > 0) {
+          return setAndListPlaylist(createdPlaylist)
+        } else if (activeKey === '1' && selectedPlaylist[0] && Object.keys(selectedPlaylist[0]).length > 0) {
+          return setAndListPlaylist(selectedPlaylist[0])
+        }
+      }}
+    >
+      <Tab title='New' overrides={tabOverrides}>
+        <PlaylistCreate
+          eventData={eventData} orgInfo={orgInfo} cameraInfo={cameraInfo} createdPlaylist={createdPlaylist}
+          setCreatedPlaylist={setCreatedPlaylist} resourceToPlaylist={resourceToPlaylist}
+          uploadedFileIds={uploadedFileIds} setPlaylist={setAndListPlaylist}
+          playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
+          enqueue={enqueue} showError={showError}
+        />
+      </Tab>
+      <Tab title='Existing' overrides={tabOverrides}>
+        <PlaylistSelect
+          playlists={playlists}
+          selectedPlaylist={selectedPlaylist} setSelectedPlaylist={setSelectedPlaylist}
+          setPlaylist={setAndListPlaylist} listPlaylists={listPlaylists} listing={listing}
+        />
+      </Tab>
+    </Tabs>
 
   )
 }
-export default PlaylistStep
+export default ChoosePlaylistStep

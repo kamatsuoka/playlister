@@ -1,10 +1,15 @@
-const tablePadding = '7px'
-const tableOverrides = {
+export const tableOverrides = {
+  Table: {
+    style: ({ $theme }) => ({
+      minWidth: `calc(2 * ${$theme.sizing.scale4800})`
+    })
+  },
   TableHeadCell: {
-    style: {
-      paddingLeft: tablePadding,
-      paddingRight: tablePadding
-    }
+    style: ({ $theme }) => ({
+      paddingLeft: $theme.sizing.scale200,
+      paddingRight: $theme.sizing.scale200,
+      verticalAlign: 'middle'
+    })
   },
   TableBodyRow: {
     style: ({ $theme, $rowIndex }) => ({
@@ -18,13 +23,41 @@ const tableOverrides = {
     })
   },
   TableBodyCell: {
-    style: {
-      paddingLeft: tablePadding,
-      paddingRight: tablePadding,
-      paddingTop: tablePadding,
-      paddingBottom: tablePadding
-    }
+    style: ({ $theme }) => ({
+      paddingLeft: $theme.sizing.scale200,
+      paddingRight: $theme.sizing.scale200,
+      paddingTop: $theme.sizing.scale200,
+      paddingBottom: $theme.sizing.scale200,
+      verticalAlign: 'middle'
+    })
   }
 }
 
-export { tablePadding, tableOverrides }
+export const withCellStyle = styleProps => ({
+  TableHeadCell: {
+    style: ({ $theme }) => ({
+      ...tableOverrides.TableHeadCell.style({ $theme }),
+      ...styleProps({ $theme })
+    })
+  },
+  TableBodyCell: {
+    style: ({ $theme }) => ({
+      ...tableOverrides.TableBodyCell.style({ $theme }),
+      ...styleProps({ $theme })
+    })
+  },
+  TableBodyRow: tableOverrides.TableBodyRow
+})
+
+/*
+const StyledBodyCell = withStyle(StyledTableBodyCell, ({ $theme }) => {
+  const tablePadding = $theme.sizing.scale200
+  return ({
+    paddingLeft: tablePadding,
+    paddingRight: tablePadding,
+    paddingTop: tablePadding,
+    paddingBottom: tablePadding,
+    verticalAlign: 'middle'
+  })
+})
+*/

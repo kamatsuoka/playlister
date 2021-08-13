@@ -10,6 +10,7 @@ import { useSnackbar } from 'baseui/snackbar'
 import { enqueueError } from '../util/enqueueError'
 import PasswordContext from '../context/PasswordContext'
 import { callServer } from '../api/api'
+import Tooltip from './Tooltip'
 
 const LoginPage = ({ current, setCurrent }) => {
   const [, theme] = useStyletron()
@@ -35,6 +36,10 @@ const LoginPage = ({ current, setCurrent }) => {
     }
   }
 
+  const passwordTooltip = 'Enter the application-specific password for playlister, ' +
+    'not your Google password or any other password'
+  const passwordLabel = <Tooltip tooltip={passwordTooltip}>password</Tooltip>
+
   return (
     <>
       <FlexGrid
@@ -43,12 +48,11 @@ const LoginPage = ({ current, setCurrent }) => {
         width={`calc(${theme.sizing.scale4800} * 4)`}
       >
         <FlexGridItem>
-          <FormControl label='password'>
+          <FormControl label={passwordLabel}>
             <Input
               value={password || ''}
               onChange={e => setPassword(e.target.value)}
               type='password'
-              error={!password}
               onKeyUp={e => {
                 if (e.which === 13) { checkPassword() }
               }}
@@ -59,10 +63,7 @@ const LoginPage = ({ current, setCurrent }) => {
           <ActionButton icon={faSignInAlt} onClick={checkPassword} spin={verifying} disabled={!password} />
         </FlexGridItem>
       </FlexGrid>
-      <Paragraph3>
-        This is the application-specific password for playlister,
-        not your Google password or any other password.
-      </Paragraph3>
+      <Paragraph3 />
     </>
   )
 }

@@ -157,7 +157,8 @@ const PlaylistCreate = ({
           disabled={uploadedFileIds.size === 0 || !isValidTitle()}
           grayed={Object.keys(createdPlaylist).length > 0 && createdPlaylist.title === desiredTitle}
           title='create playlist' icon={faPlus} spin={creating}
-          style={{ float: 'left', marginTop: theme.sizing.scale500, marginRight: theme.sizing.scale500 }}
+          className={css({ float: 'left', marginTop: theme.sizing.scale200, marginRight: theme.sizing.scale500 })}
+          text='Create'
         />
         <RadioGroup
           value={playlistTitle.titleChoice}

@@ -28,7 +28,7 @@ function App () {
     setPassword: password => setPasswordState({ ...passwordState, password })
   })
   // index of currently selected step
-  const [current, setCurrent] = useState(0)
+  const [current, setCurrent] = useState(3)
   // info about the organization
   const [orgInfo, setOrgInfo] = useState({ orgName: '' })
   // info about the camera
@@ -50,6 +50,8 @@ function App () {
   })
   // did we successfully get the tail of the spreadsheet?
   const [tailed, setTailed] = useState(false)
+  // step in youtube / playlist page
+  const [youTubeStep, setYouTubeStep] = useState(0)
   // playlist title settings for finding / creating a playlist
   const [playlistTitle, setPlaylistTitle] = useState({
     tabIndex: 0,
@@ -155,7 +157,7 @@ function App () {
                       eventData={eventData} setEventData={setEventData}
                     />
                   </Tab>
-                  <Tab overrides={tabOverrides} title='YouTube'>
+                  <Tab overrides={tabOverrides} title='Upload Videos'>
                     <YouTubePage
                       current={3} setCurrent={setCurrent}
                       files={files} uploads={uploads} setUploads={setUploads}
@@ -170,9 +172,10 @@ function App () {
                       cameraViews={cameraViews} setCameraViews={setCameraViews}
                       allUploaded={allUploaded} uploadedFileIds={uploadedFileIds}
                       allAdded={allAdded} allRenamed={allRenamed}
+                      youTubeStep={youTubeStep} setYouTubeStep={setYouTubeStep}
                     />
                   </Tab>
-                  <Tab overrides={tabOverrides} title='Metadata'>
+                  <Tab overrides={tabOverrides} title='Add Metadata'>
                     <SheetsPage
                       cameraInfo={cameraInfo} eventData={eventData} cameraViews={cameraViews}
                       playlist={playlist} spreadsheetInfo={spreadsheetInfo} setSpreadsheetInfo={setSpreadsheetInfo}
@@ -190,7 +193,7 @@ function App () {
             style={{ textDecoration: 'none', paddingLeft: '16px' }}
           >
             <FontAwesomeIcon className='fa-padded' icon={faGithub} size='sm' style={{ paddingRight: '5px' }} />
-            GitHub
+            playlister
           </StyledLink>
         </footer>
       </BaseProvider>

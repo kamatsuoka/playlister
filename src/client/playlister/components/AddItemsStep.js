@@ -3,13 +3,12 @@ import { useStyletron } from 'baseui'
 import { TableBuilder, TableBuilderColumn } from 'baseui/table-semantic'
 import { tableOverrides } from './TableOverrides'
 import { displayDate } from '../models/dates'
-import { faAngleDoubleDown } from '@fortawesome/free-solid-svg-icons/faAngleDoubleDown'
-import { Heading } from 'baseui/heading'
 import ActionButton from './ActionButton'
 import { resourceToPlaylistItem } from '../models/playlists'
 import GreenCheckMark from './GreenCheckMark'
 import { callServer } from '../api/api'
 import PasswordContext from '../context/PasswordContext'
+import { faPlus } from '@fortawesome/free-solid-svg-icons/faPlus'
 
 /**
  * List of items (videos) in playlist
@@ -18,10 +17,10 @@ import PasswordContext from '../context/PasswordContext'
  * Youtube (as of July 2021) adds new playlist items to the end of the playlist.
  * The insert api seems to ignore the 'position' param.
  */
-const PlaylistItems = ({
+const AddItemsStep = ({
   playlist, files, uploads, playlistItems, setPlaylistItems, allAdded, enqueue, showError
 }) => {
-  const [css] = useStyletron()
+  const [css, theme] = useStyletron()
   const [adding, setAdding] = useState(false)
   const { password } = useContext(PasswordContext)
 
@@ -80,40 +79,41 @@ const PlaylistItems = ({
     return addToPlaylist(sortedVideos)
   }
 
-  function showPlaylistItems () {
-    return (
-      <>
-        <Heading styleLevel={5} className={css({ display: 'inline' })}>3. Add Videos &nbsp;
-          <ActionButton
-            onClick={addAllToPlaylist}
-            title='add videos to playlist'
-            icon={faAngleDoubleDown}
-            spin={adding}
-            grayed={allAdded}
-          />
-        </Heading>
-        <TableBuilder
-          data={Object.values(playlistItems).sort((a, b) => a.position - b.position)}
-          overrides={tableOverrides}
-        >
-          <TableBuilderColumn header=''>
-            {row => row.position !== undefined ? <GreenCheckMark /> : null}
-          </TableBuilderColumn>
-          <TableBuilderColumn header='Title'>
-            {row => row.title}
-          </TableBuilderColumn>
-          <TableBuilderColumn header='Start Time'>
-            {row => displayDate(row.startTime)}
-          </TableBuilderColumn>
-          <TableBuilderColumn header='Position'>
-            {row => row.position}
-          </TableBuilderColumn>
-        </TableBuilder>
-      </>
-    )
-  }
-
-  return playlist.playlistId && playlistItems ? showPlaylistItems() : null
+  return (
+    <>
+      <ActionButton
+        onClick={addAllToPlaylist}
+        title='add videos to playlist'
+        icon={faPlus}
+        spin={adding}
+        disabled={!(playlist.playlistId || files.map(file => uploads[file.fileId]).length)}
+        grayed={allAdded}
+        text='Add'
+        className={css({
+          float: 'left',
+          marginTop: theme.sizing.scale200,
+          marginRight: theme.sizing.scale600
+        })}
+      />
+      <TableBuilder
+        data={Object.values(playlistItems).sort((a, b) => a.position - b.position)}
+        overrides={tableOverrides}
+      >
+        <TableBuilderColumn header=''>
+          {row => row.position !== undefined ? <GreenCheckMark /> : null}
+        </TableBuilderColumn>
+        <TableBuilderColumn header='Title'>
+          {row => row.title}
+        </TableBuilderColumn>
+        <TableBuilderColumn header='Start Time'>
+          {row => displayDate(row.startTime)}
+        </TableBuilderColumn>
+        <TableBuilderColumn header='Position'>
+          {row => row.position}
+        </TableBuilderColumn>
+      </TableBuilder>
+    </>
+  )
 }
 
-export default PlaylistItems
+export default AddItemsStep

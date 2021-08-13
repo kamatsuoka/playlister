@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect } from 'react'
 import dayjs from 'dayjs'
-import { tableOverrides } from './TableOverrides'
+import { tableOverrides, withCellStyle } from './TableOverrides'
 import { TableBuilder, TableBuilderColumn } from 'baseui/table-semantic'
 import { Button, KIND, SIZE } from 'baseui/button'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -89,64 +89,19 @@ const FileList = ({
     }
   }
 
-  const tableCellStyles = $theme => ({
-    verticalAlign: 'center',
-    paddingLeft: $theme.sizing.scale200,
-    paddingRight: $theme.sizing.scale200,
-    paddingTop: $theme.sizing.scale400,
-    paddingBottom: $theme.sizing.scale400
-  })
+  const durationOverrides = withCellStyle(({ $theme }) => ({
+    textAlign: 'right',
+    paddingRight: $theme.sizing.scale800
+  }))
 
-  const columnOverrides = {
-    TableBodyCell: {
-      style: ({ $theme }) => {
-        return tableCellStyles($theme)
-      }
-    }
-  }
-
-  const durationOverrides = {
-    TableHeadCell: {
-      style: ({ $theme }) => ({
-        textAlign: 'right',
-        paddingRight: $theme.sizing.scale800
-      })
-    },
-    TableBodyCell: {
-      style: ({ $theme }) => ({
-        ...tableCellStyles($theme),
-        paddingRight: $theme.sizing.scale800
-      })
-    }
-  }
-
-  const filenameColumnOverrides = {
-    TableBodyCell: {
-      style: ({ $theme }) => ({
-        ...tableCellStyles($theme),
-        paddingLeft: 0
-      })
-    }
-  }
-
-  const removeColumnStyle = {
-    style: ({ $theme }) => ({
-      ...tableCellStyles($theme),
-      textAlign: 'center',
-      paddingLeft: $theme.sizing.scale200,
-      paddingRight: $theme.sizing.scale200
-    })
-  }
-
-  const removeColumnOverrides = {
-    TableHeadCell: removeColumnStyle,
-    TableBodyCell: removeColumnStyle
-  }
+  const removeColumnOverrides = withCellStyle(() => ({
+    textAlign: 'center'
+  }))
 
   return (
     <>
       <TableBuilder data={files} overrides={tableOverrides}>
-        <TableBuilderColumn overrides={columnOverrides} header=''>
+        <TableBuilderColumn overrides={tableOverrides} header=''>
           {row =>
             <Button
               onClick={() => setPreviewUrl(URL.createObjectURL(row.file))}
@@ -162,20 +117,20 @@ const FileList = ({
               <FontAwesomeIcon icon={faPlay} />
             </Button>}
         </TableBuilderColumn>
-        <TableBuilderColumn overrides={filenameColumnOverrides} header='Filename'>
+        <TableBuilderColumn overrides={tableOverrides} header='Filename'>
           {row => row.filename}
         </TableBuilderColumn>
-        <TableBuilderColumn overrides={columnOverrides} header='Start Time'>
+        <TableBuilderColumn overrides={tableOverrides} header='Start Time'>
           {row => displayDate(row.startTime)}
         </TableBuilderColumn>
         <TableBuilderColumn overrides={durationOverrides} header='Duration' numeric>
           {row => durationSeconds(row.duration)}
         </TableBuilderColumn>
-        <TableBuilderColumn overrides={columnOverrides} header='End Time'>
+        <TableBuilderColumn overrides={tableOverrides} header='End Time'>
           {row => displayDate(row.endTime)}
         </TableBuilderColumn>
         <TableBuilderColumn
-          overrides={{ ...columnOverrides, ...removeColumnOverrides }}
+          overrides={removeColumnOverrides}
           header={removeHeader()}
         >
           {row =>
