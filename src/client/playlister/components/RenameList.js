@@ -67,6 +67,20 @@ const RenameList = ({
               options={['chorus', 'corner', 'director', 'elevated']}
               mapOptionToString={option => option}
               onChange={value => setCameraViews({ ...cameraViews, [row.videoId]: value })}
+              overrides={{
+                Input: {
+                  props: {
+                    overrides: {
+                      Input: {
+                        style: ({ $theme }) => ({
+                          paddingTop: $theme.sizing.scale200,
+                          paddingBottom: $theme.sizing.scale200
+                        })
+                      }
+                    }
+                  }
+                }
+              }}
             />}
         </TableBuilderColumn>
         <TableBuilderColumn overrides={columnOverrides} header='New Title'>
