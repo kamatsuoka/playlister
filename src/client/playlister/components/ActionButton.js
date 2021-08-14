@@ -22,6 +22,7 @@ const ActionButton = ({ onClick, title, borderless, disabled, text, icon, spin, 
   const buttonRootStyle = borderless ? {} : borderStyle
   const grayStyle = grayed || disabled ? { opacity: 0.3 } : {}
   const labelClass = text && icon ? css({ marginRight: theme.sizing.scale400 }) : {}
+  const isSelected = !grayed
   return (
     <Button
       onClick={onClick}
@@ -37,7 +38,8 @@ const ActionButton = ({ onClick, title, borderless, disabled, text, icon, spin, 
         }
       }}
       title={title}
-      disabled={disabled}
+      disabled={disabled || spin}
+      isSelected={isSelected}
       {...props}
     >
       <Label1 className={labelClass}>{text}</Label1>

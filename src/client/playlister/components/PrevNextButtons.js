@@ -4,7 +4,7 @@ import { faArrowRight } from '@fortawesome/free-solid-svg-icons/faArrowRight'
 import ActionButton from './ActionButton'
 
 const PrevButton = ({ current, setCurrent, textual, ...props }) => {
-  const { icon = faArrowLeft, ...otherProps } = props
+  const { grayed = true, icon = faArrowLeft, ...otherProps } = props
   return (
     <ActionButton
       borderless
@@ -12,13 +12,14 @@ const PrevButton = ({ current, setCurrent, textual, ...props }) => {
       text={textual ? 'prev' : undefined}
       onClick={() => setCurrent(current - 1)}
       title={props.title ? props.title : 'previous tab'}
+      grayed={grayed}
       {...otherProps}
     />
   )
 }
 
 const NextButton = ({ current, setCurrent, textual, ...props }) => {
-  const { onClick = undefined, icon = faArrowRight, ...otherProps } = props
+  const { grayed, onClick = undefined, icon = faArrowRight, ...otherProps } = props
   const defaultOnClick = () => setCurrent(current + 1)
   return (
     <ActionButton
@@ -27,6 +28,7 @@ const NextButton = ({ current, setCurrent, textual, ...props }) => {
       text={textual ? 'next' : undefined}
       onClick={onClick || defaultOnClick}
       title={props.title ? props.title : 'next tab'}
+      grayed={grayed}
       {...otherProps}
     />
   )

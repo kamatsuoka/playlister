@@ -29,7 +29,7 @@ function App () {
     setPassword: password => setPasswordState({ ...passwordState, password })
   })
   // index of currently selected step
-  const [current, setCurrent] = useState(0)
+  const [current, setCurrent] = useState(3)
   // info about the organization
   const [orgInfo, setOrgInfo] = useState({ orgName: '' })
   // info about the camera

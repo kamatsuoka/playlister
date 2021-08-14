@@ -65,7 +65,7 @@ export const YouTubePage = ({
     <div className={css({ marginTop: theme.sizing.scale600 })}>
       <PrevNextButtons
         current={youTubeStep} setCurrent={setYouTubeStep} align='left'
-        prevProps={{ icon: faArrowUp, ...prevProps }} nextProps={{ icon: faArrowDown, ...nextProps }}
+        prevProps={{ grayed: true, icon: faArrowUp, ...prevProps }} nextProps={{ icon: faArrowDown, ...nextProps }}
         textual {...otherProps}
       />
     </div>
