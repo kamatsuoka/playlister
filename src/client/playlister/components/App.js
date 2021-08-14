@@ -7,7 +7,7 @@ import { Client as Styletron } from 'styletron-engine-atomic'
 import { StyledLink } from 'baseui/link'
 import FilePage from './FilePage'
 import { SnackbarProvider } from 'baseui/snackbar'
-import SetupPage from './SetupPage'
+import EventInfoPage from './EventInfoPage'
 import PrevNextButtons from './PrevNextButtons'
 import { Tab, Tabs } from 'baseui/tabs-motion'
 import YouTubePage from './YouTubePage'
@@ -18,6 +18,7 @@ import { HeadingLevel } from 'baseui/heading'
 import { DEBUG_METADATA, DebugContext } from '../context/DebugContext'
 import LoginPage from './LoginPage'
 import PasswordContext from '../context/PasswordContext'
+import SheetSetupPage from './SheetSetupPage'
 
 const engine = new Styletron()
 
@@ -28,7 +29,7 @@ function App () {
     setPassword: password => setPasswordState({ ...passwordState, password })
   })
   // index of currently selected step
-  const [current, setCurrent] = useState(3)
+  const [current, setCurrent] = useState(0)
   // info about the organization
   const [orgInfo, setOrgInfo] = useState({ orgName: '' })
   // info about the camera
@@ -138,19 +139,24 @@ function App () {
                       current={0} setCurrent={setCurrent}
                     />
                   </Tab>
-                  <Tab overrides={tabOverrides} title='Setup'>
-                    <SetupPage
+                  <Tab overrides={tabOverrides} title='Sheet Setup'>
+                    <SheetSetupPage
                       current={1} setCurrent={setCurrent}
-                      orgInfo={orgInfo} setOrgInfo={setOrgInfo}
-                      eventData={eventData} setEventData={setEventData}
-                      cameraInfo={cameraInfo} setCameraInfo={setCameraInfo}
                       spreadsheetInfo={spreadsheetInfo} setSpreadsheetInfo={setSpreadsheetInfo}
                       tailed={tailed} setTailed={setTailed}
                     />
                   </Tab>
+                  <Tab overrides={tabOverrides} title='Event Info'>
+                    <EventInfoPage
+                      current={2} setCurrent={setCurrent}
+                      orgInfo={orgInfo} setOrgInfo={setOrgInfo}
+                      eventData={eventData} setEventData={setEventData}
+                      cameraInfo={cameraInfo} setCameraInfo={setCameraInfo}
+                    />
+                  </Tab>
                   <Tab overrides={tabOverrides} title='Timestamps'>
                     <FilePage
-                      current={2} setCurrent={setCurrent}
+                      current={3} setCurrent={setCurrent}
                       mediaList={mediaList} setMediaList={setMediaList}
                       files={files} setFiles={setFiles}
                       timeAdjust={timeAdjust} setTimeAdjust={setTimeAdjust}
@@ -159,7 +165,7 @@ function App () {
                   </Tab>
                   <Tab overrides={tabOverrides} title='Upload Videos'>
                     <YouTubePage
-                      current={3} setCurrent={setCurrent}
+                      current={4} setCurrent={setCurrent}
                       files={files} uploads={uploads} setUploads={setUploads}
                       orgInfo={orgInfo} cameraInfo={cameraInfo} eventData={eventData}
                       playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}

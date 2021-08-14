@@ -9,7 +9,7 @@ import ActionButton from './ActionButton'
 import { faAngleDoubleDown } from '@fortawesome/free-solid-svg-icons/faAngleDoubleDown'
 import VideoMetadata from './VideoMetadata'
 import { DEBUG_METADATA, DebugContext } from '../context/DebugContext'
-import { BASE_SHEETS_URL } from './SetupPage'
+import { BASE_SHEETS_URL } from './EventInfoPage'
 import { callServer } from '../api/api'
 import PasswordContext from '../context/PasswordContext'
 
