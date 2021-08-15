@@ -10,14 +10,21 @@ import { SnackbarProvider } from 'baseui/snackbar'
 import EventInfoPage from './EventInfoPage'
 import PrevNextButtons from './PrevNextButtons'
 import { Tab, Tabs } from 'baseui/tabs-motion'
-import UploadPage from './UploadPage'
 import { DEFAULT_DATE, getChosenDate } from '../models/dates'
 import { getVideoNumber } from '../models/renaming'
 import { HeadingLevel } from 'baseui/heading'
-import { DEBUG_METADATA, DebugContext } from '../context/DebugContext'
+import { DEBUG_METADATA, DEBUG_PLAYLISTS, DebugContext } from '../context/DebugContext'
 import LoginPage from './LoginPage'
 import PasswordContext from '../context/PasswordContext'
 import SheetSetupPage from './SheetSetupPage'
+import { NumberedStep, ProgressSteps } from 'baseui/progress-steps'
+import Tooltip from './Tooltip'
+import UploadVideosStep from './UploadVideosStep'
+import ChoosePlaylistStep from './ChoosePlaylistStep'
+import AddItemsStep from './AddItemsStep'
+import RenameStep from './RenameStep'
+import AddMetadataStep from './AddMetadataStep'
+import { UploadPrevNext, uploadTooltip } from './UploadPage'
 
 const engine = new Styletron()
 
@@ -50,8 +57,8 @@ function App () {
   })
   // did we successfully get the tail of the spreadsheet?
   const [tailed, setTailed] = useState(false)
-  // step in youtube / playlist page
-  const [youTubeStep, setYouTubeStep] = useState(0)
+  // step in upload page
+  const [uploadStep, setUploadStep] = useState(0)
   // playlist title settings for finding / creating a playlist
   const [playlistTitle, setPlaylistTitle] = useState({
     tabIndex: 0,
@@ -93,6 +100,10 @@ function App () {
   )
   // sheet urls have the form https://docs.google.com/spreadsheets/d/{SPREADSHEET_ID}/edit#gid={SHEET_ID}
   const [spreadsheetInfo, setSpreadsheetInfo] = useState({ spreadsheetId: '', sheetId: '' })
+  // video metadata to append to google sheet
+  const [videoMetadata, setVideoMetadata] = useState([])
+  // rows appended to google sheet
+  const [addedRows, setAddedRows] = useState([])
 
   /**
    * Gets the new title for a video.
@@ -163,21 +174,58 @@ function App () {
                     />
                   </Tab>
                   <Tab overrides={tabOverrides} title='Upload'>
-                    <UploadPage
-                      files={files} uploads={uploads} setUploads={setUploads}
-                      orgInfo={orgInfo} cameraInfo={cameraInfo} eventData={eventData}
-                      playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
-                      playlists={playlists} setPlaylists={setPlaylists}
-                      selectedPlaylist={selectedPlaylist} setSelectedPlaylist={setSelectedPlaylist}
-                      createdPlaylist={createdPlaylist} setCreatedPlaylist={setCreatedPlaylist}
-                      playlist={playlist} setPlaylist={setPlaylist}
-                      playlistItems={playlistItems} setPlaylistItems={setPlaylistItems}
-                      renamedTitles={renamedTitles} setRenamedTitles={setRenamedTitles} getNewTitle={getNewTitle}
-                      cameraViews={cameraViews} setCameraViews={setCameraViews}
-                      allUploaded={allUploaded} uploadedFileIds={uploadedFileIds}
-                      allAdded={allAdded} allRenamed={allRenamed}
-                      uploadStep={youTubeStep} setUploadStep={setYouTubeStep} spreadsheetInfo={spreadsheetInfo}
-                    />
+                    <ProgressSteps current={uploadStep}>
+                      <NumberedStep title={<Tooltip tooltip={uploadTooltip}>Upload Videos</Tooltip>}>
+                        <UploadVideosStep
+                          files={files} uploads={uploads} setUploads={setUploads} allUploaded={allUploaded}
+                        />
+                        <UploadPrevNext
+                          uploadStep={uploadStep} setUploadStep={setUploadStep}
+                          nextProps={{ grayed: !(allUploaded || debugProps.includes(DEBUG_PLAYLISTS)) }}
+                        />
+                      </NumberedStep>
+                      <NumberedStep title='Choose Playlist'>
+                        <ChoosePlaylistStep
+                          setPlaylist={setPlaylist} playlists={playlists} setPlaylists={setPlaylists}
+                          setPlaylistItems={setPlaylistItems} uploadedFileIds={uploadedFileIds}
+                          createdPlaylist={createdPlaylist} setCreatedPlaylist={setCreatedPlaylist}
+                          selectedPlaylist={selectedPlaylist} setSelectedPlaylist={setSelectedPlaylist}
+                          playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
+                          eventData={eventData} orgInfo={orgInfo} cameraInfo={cameraInfo}
+                        />
+                        <UploadPrevNext
+                          uploadStep={uploadStep} setUploadStep={setUploadStep}
+                          nextProps={{ grayed: !(playlist.playlistId && playlistItems) }}
+                        />
+                      </NumberedStep>
+                      <NumberedStep title='Add Videos to Playlist'>
+                        <AddItemsStep
+                          files={files} uploads={uploads} playlist={playlist}
+                          playlistItems={playlistItems} setPlaylistItems={setPlaylistItems} allAdded={allAdded}
+                        />
+                        <UploadPrevNext
+                          uploadStep={uploadStep} setUploadStep={setUploadStep}
+                          nextProps={{ grayed: !(allAdded || debugProps.includes(DEBUG_PLAYLISTS)) }}
+                        />
+                      </NumberedStep>
+                      <NumberedStep title='Rename Videos'>
+                        <RenameStep
+                          cameraViews={cameraViews} setCameraViews={setCameraViews} allRenamed={allRenamed}
+                          renamedTitles={renamedTitles} setRenamedTitles={setRenamedTitles} getNewTitle={getNewTitle}
+                          playlistItems={playlistItems} cameraInfo={cameraInfo}
+                        />
+                        <UploadPrevNext uploadStep={uploadStep} setUploadStep={setUploadStep} />
+                      </NumberedStep>
+                      <NumberedStep title='Add Metadata to Sheet'>
+                        <AddMetadataStep
+                          cameraInfo={cameraInfo} cameraViews={cameraViews} eventData={eventData}
+                          playlist={playlist} spreadsheetInfo={spreadsheetInfo}
+                          videoMetadata={videoMetadata} setVideoMetadata={setVideoMetadata}
+                          addedRows={addedRows} setAddedRows={setAddedRows}
+                        />
+                        <UploadPrevNext uploadStep={uploadStep} setUploadStep={setUploadStep} last />
+                      </NumberedStep>
+                    </ProgressSteps>
                     <PrevNextButtons current={4} last setCurrent={setCurrent} nextProps={{ grayed: !allRenamed }} />
                   </Tab>
                 </Tabs>

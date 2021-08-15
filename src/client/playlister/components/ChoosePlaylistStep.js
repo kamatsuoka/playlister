@@ -6,18 +6,19 @@ import { resourceToPlaylist, resourceToPlaylistItem } from '../models/playlists'
 import { callServer } from '../api/api'
 import PasswordContext from '../context/PasswordContext'
 import { Tab, Tabs } from 'baseui/tabs-motion'
+import { useSnackbar } from 'baseui/snackbar'
+import { enqueueError } from '../util/enqueueError'
 
 const ChoosePlaylistStep = ({
-  setPlaylist, playlists, setPlaylists,
-  setPlaylistItems, uploadedFileIds,
-  createdPlaylist, setCreatedPlaylist,
-  selectedPlaylist, setSelectedPlaylist,
-  playlistTitle, setPlaylistTitle,
-  eventData, orgInfo, cameraInfo, enqueue, showError
+  setPlaylist, playlists, setPlaylists, setPlaylistItems, uploadedFileIds,
+  createdPlaylist, setCreatedPlaylist, selectedPlaylist, setSelectedPlaylist,
+  playlistTitle, setPlaylistTitle, eventData, orgInfo, cameraInfo
 }) => {
   // const [css, theme] = useStyletron()
   const [listing, setListing] = useState(false)
   const { password } = useContext(PasswordContext)
+  const { enqueue } = useSnackbar()
+  const showError = enqueueError(enqueue)
 
   /**
    * Find list of (hopefully recent) playlists
@@ -59,7 +60,7 @@ const ChoosePlaylistStep = ({
         { password, playlistId: playlist.playlistId }
       )
     }
-  }, [showError, setPlaylist, setPlaylistItems])
+  }, [setPlaylist, setPlaylistItems, showError, password])
 
   const tabOverrides = {
     TabPanel: {
@@ -91,7 +92,6 @@ const ChoosePlaylistStep = ({
           setCreatedPlaylist={setCreatedPlaylist} resourceToPlaylist={resourceToPlaylist}
           uploadedFileIds={uploadedFileIds} setPlaylist={setAndListPlaylist}
           playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
-          enqueue={enqueue} showError={showError}
         />
       </Tab>
       <Tab title='Existing' overrides={tabOverrides}>

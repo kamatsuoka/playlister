@@ -9,6 +9,8 @@ import GreenCheckMark from './GreenCheckMark'
 import { callServer } from '../api/api'
 import PasswordContext from '../context/PasswordContext'
 import { faPlus } from '@fortawesome/free-solid-svg-icons/faPlus'
+import { useSnackbar } from 'baseui/snackbar'
+import { enqueueError } from '../util/enqueueError'
 
 /**
  * List of items (videos) in playlist
@@ -18,11 +20,13 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons/faPlus'
  * The insert api seems to ignore the 'position' param.
  */
 const AddItemsStep = ({
-  playlist, files, uploads, playlistItems, setPlaylistItems, allAdded, enqueue, showError
+  playlist, files, uploads, playlistItems, setPlaylistItems, allAdded
 }) => {
   const [css, theme] = useStyletron()
   const [adding, setAdding] = useState(false)
   const { password } = useContext(PasswordContext)
+  const { enqueue } = useSnackbar()
+  const showError = enqueueError(enqueue)
 
   /**
    * Add videos to playlist in the position specified by their order in the array.

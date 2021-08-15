@@ -3,7 +3,7 @@ import React, { useContext, useState } from 'react'
 import { Input } from 'baseui/input'
 import { useStyletron } from 'baseui'
 import { FormControl } from 'baseui/form-control'
-import { errorMessage } from '../util/enqueueError'
+import { enqueueError, errorMessage } from '../util/enqueueError'
 import { Block } from 'baseui/block'
 import { faPlus } from '@fortawesome/free-solid-svg-icons/faPlus'
 import ActionButton from './ActionButton'
@@ -11,6 +11,7 @@ import { getChosenDate } from '../models/dates'
 import { callServer } from '../api/api'
 import PasswordContext from '../context/PasswordContext'
 import dayjs from 'dayjs'
+import { useSnackbar } from 'baseui/snackbar'
 
 const SUGGESTED = 'suggested'
 const CUSTOM = 'custom'
@@ -18,7 +19,7 @@ const CUSTOM = 'custom'
 const PlaylistCreate = ({
   eventData, orgInfo, cameraInfo, createdPlaylist,
   setCreatedPlaylist, resourceToPlaylist, uploadedFileIds,
-  setPlaylist, playlistTitle, setPlaylistTitle, enqueue, showError
+  setPlaylist, playlistTitle, setPlaylistTitle
 }) => {
   const [css, theme] = useStyletron()
   const [creating, setCreating] = useState(false)
@@ -28,6 +29,8 @@ const PlaylistCreate = ({
   const titleParts = [orgInfo.orgName, eventDate, eventData.eventType, 'cam', cameraInfo.cameraNumber]
   const suggestedTitle = titleParts.filter(p => p).join(' ')
   const { password } = useContext(PasswordContext)
+  const { enqueue } = useSnackbar()
+  const showError = enqueueError(enqueue)
 
   const handleChange = (evt) => {
     setPlaylistTitle({

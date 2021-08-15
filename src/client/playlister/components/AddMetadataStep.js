@@ -5,7 +5,7 @@ import { enqueueError } from '../util/enqueueError'
 import { getChosenDate, localDate } from '../models/dates'
 import { getVideoNumber } from '../models/renaming'
 import ActionButton from './ActionButton'
-import VideoMetadata from './VideoMetadata'
+import VideoMetadata, { wasAdded } from './VideoMetadata'
 import { BASE_SHEETS_URL } from './EventInfoPage'
 import { callServer } from '../api/api'
 import PasswordContext from '../context/PasswordContext'
@@ -13,14 +13,13 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons/faPlus'
 import { useStyletron } from 'baseui'
 
 const AddMetadataStep = ({
-  cameraInfo, eventData, cameraViews, playlist, spreadsheetInfo
+  cameraInfo, eventData, cameraViews, playlist, spreadsheetInfo,
+  videoMetadata, setVideoMetadata, addedRows, setAddedRows
 }) => {
   const [css, theme] = useStyletron()
   const { enqueue } = useSnackbar()
   const showError = enqueueError(enqueue)
-  const [videoMetadata, setVideoMetadata] = useState([])
   const [adding, setAdding] = useState(false)
-  const [addedRows, setAddedRows] = useState([])
   const { password } = useContext(PasswordContext)
 
   const getUrl = (videoId, playlistId, position) =>
@@ -80,6 +79,14 @@ const AddMetadataStep = ({
       const addedRows = updates.updatedData.values
       console.log('got added rows:', addedRows)
       setAdding(false)
+      const allAdded = videoMetadata.every((metadata, i) =>
+        wasAdded({ metadata, row: addedRows[i] })
+      )
+      if (allAdded) {
+        enqueue({ message: 'All done!' })
+      } else {
+        console.error('Not all metadata added')
+      }
       return setAddedRows(addedRows)
     }
     const onError = e => {

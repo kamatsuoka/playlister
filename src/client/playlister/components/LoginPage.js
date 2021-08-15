@@ -21,7 +21,7 @@ const LoginPage = ({ current, setCurrent }) => {
 
   const checkPassword = () => {
     setVerifying(true)
-    const onSuccess = ok => {
+    const onSuccess = () => {
       setVerifying(false)
       return setCurrent(current + 1)
     }
@@ -30,7 +30,7 @@ const LoginPage = ({ current, setCurrent }) => {
       showError(e)
     }
     try {
-      callServer('checkPassword', onSuccess, onFailure, password)
+      return callServer('checkPassword', onSuccess, onFailure, password)
     } catch (e) {
       onFailure(e)
     }
@@ -53,7 +53,7 @@ const LoginPage = ({ current, setCurrent }) => {
               onChange={e => setPassword(e.target.value)}
               type='password'
               onKeyUp={e => {
-                if (e.which === 13) { checkPassword() }
+                if (e.which === 13) { return checkPassword() }
               }}
             />
           </FormControl>

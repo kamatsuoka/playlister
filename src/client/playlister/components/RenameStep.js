@@ -5,14 +5,18 @@ import { useStyletron } from 'baseui'
 import PasswordContext from '../context/PasswordContext'
 import { callServer } from '../api/api'
 import { faAsterisk } from '@fortawesome/free-solid-svg-icons/faAsterisk'
+import { useSnackbar } from 'baseui/snackbar'
+import { enqueueError } from '../util/enqueueError'
 
 const RenameStep = ({
   cameraViews, setCameraViews, allRenamed, renamedTitles, setRenamedTitles,
-  getNewTitle, playlistItems, cameraInfo, enqueue, showError
+  getNewTitle, playlistItems, cameraInfo
 }) => {
   const [css, theme] = useStyletron()
   const [renaming, setRenaming] = useState(false)
   const { password } = useContext(PasswordContext)
+  const { enqueue } = useSnackbar()
+  const showError = enqueueError(enqueue)
 
   const renameVideos = useCallback(() => {
     setRenaming(true)

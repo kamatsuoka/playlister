@@ -153,7 +153,7 @@ const UploadVideosStep = ({ files, uploads, setUploads, allUploaded }) => {
     }
   }
 
-  const syncColumnOverrides = withCellStyle(({ $theme }) => ({
+  const syncColumnOverrides = withCellStyle(() => ({
     textAlign: 'center'
   }))
 
