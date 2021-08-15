@@ -10,8 +10,7 @@ import { SnackbarProvider } from 'baseui/snackbar'
 import EventInfoPage from './EventInfoPage'
 import PrevNextButtons from './PrevNextButtons'
 import { Tab, Tabs } from 'baseui/tabs-motion'
-import YouTubePage from './YouTubePage'
-import SheetsPage from './SheetsPage'
+import UploadPage from './UploadPage'
 import { DEFAULT_DATE, getChosenDate } from '../models/dates'
 import { getVideoNumber } from '../models/renaming'
 import { HeadingLevel } from 'baseui/heading'
@@ -29,7 +28,7 @@ function App () {
     setPassword: password => setPasswordState({ ...passwordState, password })
   })
   // index of currently selected step
-  const [current, setCurrent] = useState(3)
+  const [current, setCurrent] = useState(0)
   // info about the organization
   const [orgInfo, setOrgInfo] = useState({ orgName: '' })
   // info about the camera
@@ -163,9 +162,8 @@ function App () {
                       eventData={eventData} setEventData={setEventData}
                     />
                   </Tab>
-                  <Tab overrides={tabOverrides} title='Upload Videos'>
-                    <YouTubePage
-                      current={4} setCurrent={setCurrent}
+                  <Tab overrides={tabOverrides} title='Upload'>
+                    <UploadPage
                       files={files} uploads={uploads} setUploads={setUploads}
                       orgInfo={orgInfo} cameraInfo={cameraInfo} eventData={eventData}
                       playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
@@ -178,15 +176,9 @@ function App () {
                       cameraViews={cameraViews} setCameraViews={setCameraViews}
                       allUploaded={allUploaded} uploadedFileIds={uploadedFileIds}
                       allAdded={allAdded} allRenamed={allRenamed}
-                      youTubeStep={youTubeStep} setYouTubeStep={setYouTubeStep}
+                      uploadStep={youTubeStep} setUploadStep={setYouTubeStep} spreadsheetInfo={spreadsheetInfo}
                     />
-                  </Tab>
-                  <Tab overrides={tabOverrides} title='Add Metadata'>
-                    <SheetsPage
-                      cameraInfo={cameraInfo} eventData={eventData} cameraViews={cameraViews}
-                      playlist={playlist} spreadsheetInfo={spreadsheetInfo} setSpreadsheetInfo={setSpreadsheetInfo}
-                    />
-                    <PrevNextButtons current={4} setCurrent={setCurrent} last />
+                    <PrevNextButtons current={4} last setCurrent={setCurrent} nextProps={{ grayed: !allRenamed }} />
                   </Tab>
                 </Tabs>
               </HeadingLevel>

@@ -1,7 +1,7 @@
 import React, { useContext } from 'react'
 import PrevNextButtons from './PrevNextButtons'
 import AddItemsStep from './AddItemsStep'
-import UploadStep from './UploadStep'
+import UploadVideosStep from './UploadVideosStep'
 import ChoosePlaylistStep from './ChoosePlaylistStep'
 import RenameStep from './RenameStep'
 import { useSnackbar } from 'baseui/snackbar'
@@ -15,13 +15,14 @@ import { faSyncAlt } from '@fortawesome/free-solid-svg-icons/faSyncAlt'
 import Tooltip from './Tooltip'
 import { faArrowDown } from '@fortawesome/free-solid-svg-icons/faArrowDown'
 import { faArrowUp } from '@fortawesome/free-solid-svg-icons/faArrowUp'
+import AddMetadataStep from './AddMetadataStep'
 
-export const YouTubePage = ({
-  current, setCurrent, files, uploads, setUploads, orgInfo, cameraInfo, eventData,
+export const UploadPage = ({
+  files, uploads, setUploads, orgInfo, cameraInfo, eventData,
   playlistTitle, setPlaylistTitle, playlists, setPlaylists, selectedPlaylist, setSelectedPlaylist,
   createdPlaylist, setCreatedPlaylist, playlist, setPlaylist, playlistItems, setPlaylistItems,
-  renamedTitles, setRenamedTitles, cameraViews, setCameraViews,
-  allUploaded, uploadedFileIds, allAdded, allRenamed, getNewTitle, youTubeStep, setYouTubeStep
+  renamedTitles, setRenamedTitles, cameraViews, setCameraViews, spreadsheetInfo,
+  allUploaded, uploadedFileIds, allAdded, allRenamed, getNewTitle, uploadStep, setUploadStep
 }) => {
   /**
    * uploads items, keyed by file id:
@@ -61,10 +62,10 @@ export const YouTubePage = ({
     </>
   )
 
-  const YouTubePrevNext = ({ prevProps, nextProps, ...otherProps }) => (
+  const UploadPrevNext = ({ prevProps, nextProps, ...otherProps }) => (
     <div className={css({ marginTop: theme.sizing.scale600 })}>
       <PrevNextButtons
-        current={youTubeStep} setCurrent={setYouTubeStep} align='left'
+        current={uploadStep} setCurrent={setUploadStep} align='left'
         prevProps={{ grayed: true, icon: faArrowUp, ...prevProps }} nextProps={{ icon: faArrowDown, ...nextProps }}
         textual {...otherProps}
       />
@@ -73,13 +74,13 @@ export const YouTubePage = ({
 
   return (
     <>
-      <ProgressSteps current={youTubeStep}>
+      <ProgressSteps current={uploadStep}>
         <NumberedStep title={<Tooltip tooltip={uploadTooltip}>Upload Videos</Tooltip>}>
-          <UploadStep
+          <UploadVideosStep
             files={files} uploads={uploads} setUploads={setUploads} allUploaded={allUploaded}
             enqueue={enqueue} showError={showError}
           />
-          <YouTubePrevNext
+          <UploadPrevNext
             nextProps={{ grayed: !(allUploaded || debugProps.includes(DEBUG_PLAYLISTS)) }}
           />
         </NumberedStep>
@@ -93,7 +94,7 @@ export const YouTubePage = ({
             eventData={eventData} orgInfo={orgInfo} cameraInfo={cameraInfo}
             enqueue={enqueue} showError={showError}
           />
-          <YouTubePrevNext
+          <UploadPrevNext
             nextProps={{ grayed: !(playlist.playlistId && playlistItems) }}
           />
         </NumberedStep>
@@ -103,7 +104,7 @@ export const YouTubePage = ({
             playlistItems={playlistItems} setPlaylistItems={setPlaylistItems} allAdded={allAdded}
             enqueue={enqueue} showError={showError}
           />
-          <YouTubePrevNext
+          <UploadPrevNext
             nextProps={{ grayed: !(allAdded || debugProps.includes(DEBUG_PLAYLISTS)) }}
           />
         </NumberedStep>
@@ -114,12 +115,18 @@ export const YouTubePage = ({
             playlistItems={playlistItems} cameraInfo={cameraInfo}
             enqueue={enqueue} showError={showError}
           />
-          <YouTubePrevNext last />
+          <UploadPrevNext />
+        </NumberedStep>
+        <NumberedStep title='Add Metadata to Sheet'>
+          <AddMetadataStep
+            cameraInfo={cameraInfo} cameraViews={cameraViews} eventData={eventData}
+            playlist={playlist} spreadsheetInfo={spreadsheetInfo}
+          />
+          <UploadPrevNext last />
         </NumberedStep>
       </ProgressSteps>
-      <PrevNextButtons current={current} setCurrent={setCurrent} nextProps={{ grayed: !allRenamed }} />
     </>
   )
 }
 
-export default YouTubePage
+export default UploadPage

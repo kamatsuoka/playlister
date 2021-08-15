@@ -56,7 +56,7 @@ const Mocks = {
       itemCount: 0
     }
   }),
-  listPlaylists: () =>  [
+  listPlaylists: () => [
     mockPlaylist('asdf', 'recent playlist 1', 'sample playlist 1', 0, '2021-06-26T00:12:34Z'),
     mockPlaylist('jklm', 'recent playlist 2 with longer title', 'sample playlist 2', 2, '2021-05-25T00:12:34Z'),
     mockPlaylist('zxcv', 'short title', 'sample playlist 1', 3, '2021-03-25T00:12:34Z')
@@ -77,7 +77,8 @@ const Mocks = {
   })),
   renameVideos: ({ videoTitleDesc }) => Object.fromEntries(
     Object.entries(videoTitleDesc).map(([videoId, { title }]) => [videoId, title])
-  )
+  ),
+  appendRows: () => ({ updatedData: { values: [] } })
 }
 
 export default Mocks

@@ -4,27 +4,24 @@ import { useSnackbar } from 'baseui/snackbar'
 import { enqueueError } from '../util/enqueueError'
 import { getChosenDate, localDate } from '../models/dates'
 import { getVideoNumber } from '../models/renaming'
-import { Heading } from 'baseui/heading'
 import ActionButton from './ActionButton'
-import { faAngleDoubleDown } from '@fortawesome/free-solid-svg-icons/faAngleDoubleDown'
 import VideoMetadata from './VideoMetadata'
-import { DEBUG_METADATA, DebugContext } from '../context/DebugContext'
 import { BASE_SHEETS_URL } from './EventInfoPage'
 import { callServer } from '../api/api'
 import PasswordContext from '../context/PasswordContext'
+import { faPlus } from '@fortawesome/free-solid-svg-icons/faPlus'
+import { useStyletron } from 'baseui'
 
-const SheetsPage = ({
-  cameraInfo, eventData, cameraViews,
-  playlist, spreadsheetInfo, setSpreadsheetInfo
+const AddMetadataStep = ({
+  cameraInfo, eventData, cameraViews, playlist, spreadsheetInfo
 }) => {
+  const [css, theme] = useStyletron()
   const { enqueue } = useSnackbar()
   const showError = enqueueError(enqueue)
   const [videoMetadata, setVideoMetadata] = useState([])
   const [adding, setAdding] = useState(false)
   const [addedRows, setAddedRows] = useState([])
   const { password } = useContext(PasswordContext)
-
-  const debugProps = useContext(DebugContext)
 
   const getUrl = (videoId, playlistId, position) =>
     `${BASE_SHEETS_URL}watch?v=${videoId}&list=${playlistId}&index=${position + 1}`
@@ -46,18 +43,6 @@ const SheetsPage = ({
     }))
   }, [eventData, cameraInfo, cameraViews])
 
-  const testDataToMetadata = data => ({
-    date: data[0],
-    videoNumber: data[1],
-    startTime: data[2],
-    endTime: data[3],
-    title: `video ${data[1]}`,
-    link: data[4],
-    cameraNumber: data[5],
-    cameraView: data[6],
-    cameraName: data[7]
-  })
-
   /**
    * Gets the updated list of playlist items
    */
@@ -78,15 +63,6 @@ const SheetsPage = ({
         )
       } catch (e) {
         showError(e)
-      }
-    } else {
-      if (debugProps.includes(DEBUG_METADATA)) {
-        const metadata = [
-          ['8/5/2021', '1', '2021-07-21 13:19:57', '2021-07-21 14:44:24', 'https://www.youtube.com/watch?v=f5RS5smvNUs&list=PLI78W9w-3gY4dnp7Y-bDRW0i0OZdRExUO&index=1', '1', 'chorus', 'kenji q2n4k'],
-          ['8/5/2021', '2', '2021-07-21 14:53:38', '2021-07-21 15:38:40', 'https://www.youtube.com/watch?v=-f_2nFcc_K8&list=PLI78W9w-3gY4dnp7Y-bDRW0i0OZdRExUO&index=2', '1', 'chorus', 'kenji q2n4k'],
-          ['8/5/2021', '3', '2021-07-21 15:38:44', '2021-07-21 16:20:42', 'https://www.youtube.com/watch?v=9KXn-QN34lo&list=PLI78W9w-3gY4dnp7Y-bDRW0i0OZdRExUO&index=3', '1', 'chorus', 'kenji q2n4k']
-        ].map(testDataToMetadata)
-        setVideoMetadata(metadata)
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -137,14 +113,17 @@ const SheetsPage = ({
 
   return (
     <>
-      <Heading styleLevel={5}>Add Video Metadata {' '}
-        <ActionButton
-          onClick={addMetadataToSheet} icon={faAngleDoubleDown} spin={adding}
-        />
-      </Heading>
+      <ActionButton
+        onClick={addMetadataToSheet} icon={faPlus} spin={adding} text='Add'
+        className={css({
+          float: 'left',
+          marginTop: theme.sizing.scale200,
+          marginRight: theme.sizing.scale600
+        })}
+      />
       <VideoMetadata videoMetadata={videoMetadata} addedRows={addedRows} />
     </>
   )
 }
 
-export default SheetsPage
+export default AddMetadataStep

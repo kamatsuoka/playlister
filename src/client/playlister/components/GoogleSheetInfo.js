@@ -11,7 +11,6 @@ import { TableBuilder, TableBuilderColumn } from 'baseui/table-semantic'
 import { tableOverrides } from './TableOverrides'
 import { StyledLink } from 'baseui/link'
 import Tooltip from './Tooltip'
-import { Label2 } from 'baseui/typography'
 import { useStyletron } from 'baseui'
 import { callServer } from '../api/api'
 import PasswordContext from '../context/PasswordContext'
@@ -58,6 +57,7 @@ const GoogleSheetInfo = ({ spreadsheetInfo, setSpreadsheetInfo, tail, setTail, b
       return setTail(tailRows)
     }
     const onFailure = e => {
+      setTailed(false)
       setTailing(false)
       showError(e)
     }
@@ -97,8 +97,10 @@ const GoogleSheetInfo = ({ spreadsheetInfo, setSpreadsheetInfo, tail, setTail, b
 
   const showTail = () => (
     <>
-      <Label2 style={{ textDecoration: 'underline' }}>Recent Rows</Label2>
-      <TableBuilder data={tail} overrides={tableOverrides}>
+      <TableBuilder
+        data={tail} overrides={tableOverrides}
+        emptyMessage='You have access to the sheet but it seems to be empty!'
+      >
         {[...Array(8).keys()].map(i =>
           <TableBuilderColumn header='' key={`column${i}`}>
             {row =>
@@ -118,10 +120,9 @@ const GoogleSheetInfo = ({ spreadsheetInfo, setSpreadsheetInfo, tail, setTail, b
   const tooltip = (
     <>
       The spreadsheet id is found in the url path.
-      <br />
+      <p />
       The url typically looks like
       https://docs.google.com/spreadsheets/d/$SPREADSHEET_ID/edit#gid=...
-      <br />
     </>
   )
 
@@ -166,7 +167,7 @@ const GoogleSheetInfo = ({ spreadsheetInfo, setSpreadsheetInfo, tail, setTail, b
           </FormControl>
         </FlexGridItem>
       </FlexGrid>
-      {tail[0] ? showTail() : null}
+      {tailed ? showTail() : null}
     </>
   )
 }

@@ -18,7 +18,7 @@ import { TableBuilder, TableBuilderColumn } from 'baseui/table-semantic'
 const UPLOADING = 'uploading'
 const ERROR = 'error'
 
-const UploadStep = ({ files, uploads, setUploads, allUploaded }) => {
+const UploadVideosStep = ({ files, uploads, setUploads, allUploaded }) => {
   // used to show status of checking for uploads
   const [checking, setChecking] = useState(false)
   // file ids that have been checked
@@ -187,4 +187,4 @@ const UploadStep = ({ files, uploads, setUploads, allUploaded }) => {
   )
 }
 
-export default UploadStep
+export default UploadVideosStep

@@ -6,8 +6,8 @@ import { copyData, usePersist } from '../hooks/usePersist'
 import PrevNextButtons from './PrevNextButtons'
 import { ToasterContainer } from 'baseui/toast'
 import GoogleSheetInfo from './GoogleSheetInfo'
-import { Paragraph2 } from 'baseui/typography'
 import { Heading } from 'baseui/heading'
+import Tooltip from './Tooltip'
 
 export const BASE_SHEETS_URL = 'https://www.youtube.com/'
 
@@ -24,13 +24,19 @@ const SheetSetupPage = ({
     state: spreadsheetInfo
   })
 
+  const tooltipText = (
+    <>
+      This sheet will hold the video metadata. Before we go any further,
+      enter the spreadsheet id and sheet name below.
+      <p />
+      When you click the search icon,
+      you should see the last few rows of the sheet below.
+    </>
+  )
+
   return (
     <>
-      <Heading styleLevel={5}>Google Sheet</Heading>
-      <Paragraph2>
-        This sheet will hold the video metadata. Before we go any further,
-        make sure you have access to it by clicking the search icon.
-      </Paragraph2>
+      <Heading styleLevel={5}><Tooltip tooltip={tooltipText}>Google Sheet</Tooltip></Heading>
 
       <GoogleSheetInfo
         spreadsheetInfo={spreadsheetInfo} setSpreadsheetInfo={setSpreadsheetInfo}

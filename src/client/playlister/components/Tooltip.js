@@ -8,7 +8,16 @@ import { useStyletron } from 'baseui'
 const Tooltip = ({ tooltip, children }) => {
   const [css] = useStyletron()
   return (
-    <StatefulTooltip accessibilityType='tooltip' content={tooltip} renderAll>
+    <StatefulTooltip
+      accessibilityType='tooltip' content={tooltip} renderAll
+      overrides={{
+        Inner: {
+          style: ({ $theme }) => ({
+            fontSize: $theme.typography.ParagraphXSmall
+          })
+        }
+      }}
+    >
       <span className={css({ borderBottomWidth: '1px', borderBottomStyle: 'dotted' })}>
         {children}
       </span>

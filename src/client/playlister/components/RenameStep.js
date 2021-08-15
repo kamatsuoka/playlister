@@ -1,10 +1,10 @@
 import ActionButton from './ActionButton'
-import { faAngleDoubleRight } from '@fortawesome/free-solid-svg-icons/faAngleDoubleRight'
 import RenameList from './RenameList'
 import React, { useCallback, useContext, useState } from 'react'
 import { useStyletron } from 'baseui'
 import PasswordContext from '../context/PasswordContext'
 import { callServer } from '../api/api'
+import { faAsterisk } from '@fortawesome/free-solid-svg-icons/faAsterisk'
 
 const RenameStep = ({
   cameraViews, setCameraViews, allRenamed, renamedTitles, setRenamedTitles,
@@ -42,7 +42,7 @@ const RenameStep = ({
   return (
     <>
       <ActionButton
-        onClick={renameVideos} spin={renaming} title='sync' icon={faAngleDoubleRight}
+        onClick={renameVideos} spin={renaming} title='rename videos' icon={faAsterisk}
         disabled={Object.keys(playlistItems).length === 0} grayed={allRenamed}
         className={css({
           float: 'left',

@@ -36,8 +36,7 @@ const LoginPage = ({ current, setCurrent }) => {
     }
   }
 
-  const passwordTooltip = 'Enter the application-specific password for playlister, ' +
-    'not your Google password or any other password'
+  const passwordTooltip = 'Enter the playlister password'
   const passwordLabel = <Tooltip tooltip={passwordTooltip}>password</Tooltip>
 
   return (
