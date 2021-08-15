@@ -79,13 +79,15 @@ const AddMetadataStep = ({
       const addedRows = updates.updatedData.values
       console.log('got added rows:', addedRows)
       setAdding(false)
-      const allAdded = videoMetadata.every((metadata, i) =>
-        wasAdded({ metadata, row: addedRows[i] })
-      )
+      const allAdded = videoMetadata.every((metadata, i) => {
+        const added = wasAdded({ metadata, addedRow: addedRows[i] })
+        if (!added) {
+          console.error('got wasAdded = false for metadata', metadata, 'and row', addedRows[i])
+        }
+        return added
+      })
       if (allAdded) {
         enqueue({ message: 'All done!' })
-      } else {
-        console.error('Not all metadata added')
       }
       return setAddedRows(addedRows)
     }
