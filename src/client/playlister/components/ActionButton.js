@@ -1,7 +1,7 @@
 import { Button, KIND, SHAPE, SIZE } from 'baseui/button'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import React from 'react'
-import { Label1 } from 'baseui/typography'
+import { Label2 } from 'baseui/typography'
 import { useStyletron } from 'baseui'
 
 const width = '2px'
@@ -42,7 +42,7 @@ const ActionButton = ({ onClick, title, borderless, disabled, text, icon, spin, 
       isSelected={isSelected}
       {...props}
     >
-      <Label1 className={labelClass}>{text}</Label1>
+      <Label2 className={labelClass}>{text}</Label2>
       {icon ? <FontAwesomeIcon icon={icon} size='lg' spin={spin} pulse={pulse} /> : ' '}
     </Button>
   )

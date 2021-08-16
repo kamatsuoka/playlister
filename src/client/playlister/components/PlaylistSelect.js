@@ -24,7 +24,7 @@ const PlaylistSelect = ({
       <ActionButton
         onClick={listPlaylists}
         overrides={syncButtonOverrides}
-        style={{ verticalAlign: 'middle' }}
+        style={{ verticalAlign: 'middle', marginRight: theme.sizing.scale600 }}
         icon={faSyncAlt} spin={listing}
       />
       <Select
