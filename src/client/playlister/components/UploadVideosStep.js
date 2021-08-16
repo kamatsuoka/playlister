@@ -73,8 +73,7 @@ const UploadVideosStep = ({ files, uploads, setUploads, allUploaded }) => {
     if (!allUploaded) {
       return checkUploads()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [files])
+  }, [allUploaded, checkUploads, files])
 
   const uploadFile = (file, fileId, startTime, endTime) => {
     const progressHandler = percent => {
@@ -99,7 +98,7 @@ const UploadVideosStep = ({ files, uploads, setUploads, allUploaded }) => {
         setAuthToken(token)
         return startUpload(token)
       }
-      return callServer('getToken', onSuccess, errorHandler, {})
+      return callServer('getToken', onSuccess, errorHandler, { password })
     }
   }
 

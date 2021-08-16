@@ -7,7 +7,7 @@ import { openPlaylister } from './ui'
 global.doGet = openPlaylister
 
 global.checkPassword = auth.checkPassword
-global.getToken = withAuth(ScriptApp.getOAuthToken)
+global.getToken = withAuth(() => ScriptApp.getOAuthToken())
 global.findPlaylist = withAuth(youtube.findPlaylist)
 global.listPlaylists = withAuth(youtube.listPlaylists)
 global.findUploads = withAuth(youtube.findUploads)
