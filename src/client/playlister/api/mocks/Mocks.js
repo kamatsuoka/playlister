@@ -36,9 +36,9 @@ const Mocks = {
     }
   },
   tailSheet: () => [
-    ['8/5/2021', '1', '2021-07-21 13:19:57', '2021-07-21 14:44:24', 'https://www.youtube.com/watch?v=f5RS5smvNUs&list=PLI78W9w-3gY4dnp7Y-bDRW0i0OZdRExUO&index=1', '1', 'chorus', 'kenji q2n4k'],
-    ['8/5/2021', '2', '2021-07-21 14:53:38', '2021-07-21 15:38:40', 'https://www.youtube.com/watch?v=-f_2nFcc_K8&list=PLI78W9w-3gY4dnp7Y-bDRW0i0OZdRExUO&index=2', '1', 'chorus', 'kenji q2n4k'],
-    ['8/5/2021', '3', '2021-07-21 15:38:44', '2021-07-21 16:20:42', 'https://www.youtube.com/watch?v=9KXn-QN34lo&list=PLI78W9w-3gY4dnp7Y-bDRW0i0OZdRExUO&index=3', '1', 'chorus', 'kenji q2n4k']
+    ['8/5/2021', '1', '2021-07-21 13:19:57', '2021-07-21 14:44:24', 'https://www.youtube.com/watch?v=f5RS5smvN&list=PLI78W9w-bDRW0i0OZdRExUO&index=1', '1', 'chorus', 'q2n4k'],
+    ['8/5/2021', '2', '2021-07-21 14:53:38', '2021-07-21 15:38:40', 'https://www.youtube.com/watch?v=-f_2nFcK8&list=PLI78W9w-bDRW0i0OZdRExUO&index=2', '1', 'chorus', 'q2n4k'],
+    ['8/5/2021', '3', '2021-07-21 15:38:44', '2021-07-21 16:20:42', 'https://www.youtube.com/watch?v=9KXn-34lo&list=PLI78W9w-bDRW0i0OZdRExUO&index=3', '1', 'chorus', 'q2n4k']
   ],
   findUploads: ({ fileMap }) =>
     Object.values(fileMap).map(({ fileData }) => ({
