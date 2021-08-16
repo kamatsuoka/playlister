@@ -1,7 +1,7 @@
 export const tableOverrides = {
   Table: {
     style: ({ $theme }) => ({
-      minWidth: `calc(2 * ${$theme.sizing.scale4800})`
+      minWidth: `calc(3.5 * ${$theme.sizing.scale4800})`
     })
   },
   TableHeadCell: {

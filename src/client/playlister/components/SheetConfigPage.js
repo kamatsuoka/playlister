@@ -33,7 +33,7 @@ const SheetConfigPage = ({
 
   return (
     <>
-      <Heading styleLevel={5}><Tooltip tooltip={tooltipText}>Find Google Sheet</Tooltip></Heading>
+      <Heading styleLevel={5}><Tooltip tooltip={tooltipText}>Find your Google sheet</Tooltip></Heading>
 
       <GoogleSheetInfo
         spreadsheetInfo={spreadsheetInfo} setSpreadsheetInfo={setSpreadsheetInfo}
