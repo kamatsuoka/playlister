@@ -16,7 +16,7 @@ import { HeadingLevel } from 'baseui/heading'
 import { DEBUG_METADATA, DEBUG_PLAYLISTS, DebugContext } from '../context/DebugContext'
 import LoginPage from './LoginPage'
 import PasswordContext from '../context/PasswordContext'
-import SheetSetupPage from './SheetSetupPage'
+import SheetConfigPage from './SheetConfigPage'
 import { NumberedStep, ProgressSteps } from 'baseui/progress-steps'
 import Tooltip from './Tooltip'
 import UploadVideosStep from './UploadVideosStep'
@@ -34,8 +34,10 @@ function App () {
     password: '',
     setPassword: password => setPasswordState({ ...passwordState, password })
   })
+  // tail of google sheet
+  const [tail, setTail] = useState([])
   // index of currently selected step
-  const [current, setCurrent] = useState(4)
+  const [current, setCurrent] = useState(1)
   // info about the organization
   const [orgInfo, setOrgInfo] = useState({ orgName: '' })
   // info about the camera
@@ -149,11 +151,11 @@ function App () {
                       current={0} setCurrent={setCurrent}
                     />
                   </Tab>
-                  <Tab overrides={tabOverrides} title='Sheet Setup'>
-                    <SheetSetupPage
+                  <Tab overrides={tabOverrides} title='Sheet Config'>
+                    <SheetConfigPage
                       current={1} setCurrent={setCurrent}
                       spreadsheetInfo={spreadsheetInfo} setSpreadsheetInfo={setSpreadsheetInfo}
-                      tailed={tailed} setTailed={setTailed}
+                      tail={tail} setTail={setTail} tailed={tailed} setTailed={setTailed}
                     />
                   </Tab>
                   <Tab overrides={tabOverrides} title='Event Info'>

@@ -14,6 +14,8 @@ import Tooltip from './Tooltip'
 import { useStyletron } from 'baseui'
 import { callServer } from '../api/api'
 import PasswordContext from '../context/PasswordContext'
+import { Label2 } from 'baseui/typography'
+import { Block } from 'baseui/block'
 
 const GoogleSheetInfo = ({ spreadsheetInfo, setSpreadsheetInfo, tail, setTail, baseUrl, tailed, setTailed }) => {
   const [, theme] = useStyletron()
@@ -95,27 +97,49 @@ const GoogleSheetInfo = ({ spreadsheetInfo, setSpreadsheetInfo, tail, setTail, b
     }
   })
 
-  const showTail = () => (
-    <>
-      <TableBuilder
-        data={tail} overrides={tableOverrides}
-        emptyMessage='You have access to the sheet but it seems to be empty!'
-      >
-        {[...Array(8).keys()].map(i =>
-          <TableBuilderColumn header='' key={`column${i}`}>
-            {row =>
-              row[i] && row[i].startsWith(baseUrl)
-                ? (
-                  <StyledLink href={row[i]} target='_blank' rel='noopener noreferrer'>
-                    youtube link
-                  </StyledLink>
-                  )
-                : row[i]}
-          </TableBuilderColumn>
-        )}
-      </TableBuilder>
-    </>
-  )
+  const showTail = () => {
+    const tableData = tail.length >= 3 ? [['...']].concat(tail) : tail
+    const overrides = {
+      ...tableOverrides,
+      Table: {
+        style: ({
+          border: `2px solid ${theme.colors.borderPositive}`
+        })
+      },
+      TableHeadRow: {
+        style: ({ display: 'none' })
+      }
+    }
+    return (
+      <>
+        <Label2>Sheet found</Label2>
+        <Block style={{
+          marginTop: theme.sizing.scale800,
+          marginLeft: theme.sizing.scale800,
+          marginBottom: theme.sizing.scale800
+        }}
+        >
+          <TableBuilder
+            data={tableData} overrides={overrides}
+            emptyMessage='You have access to the sheet but it seems to be empty!'
+          >
+            {[...Array(8).keys()].map(i =>
+              <TableBuilderColumn header='' key={`column${i}`}>
+                {row =>
+                  row[i] && row[i].startsWith(baseUrl)
+                    ? (
+                      <StyledLink href={row[i]} target='_blank' rel='noopener noreferrer'>
+                        youtube link
+                      </StyledLink>
+                      )
+                    : row[i]}
+              </TableBuilderColumn>
+            )}
+          </TableBuilder>
+        </Block>
+      </>
+    )
+  }
 
   const tooltip = (
     <>
@@ -137,7 +161,8 @@ const GoogleSheetInfo = ({ spreadsheetInfo, setSpreadsheetInfo, tail, setTail, b
       >
         <FlexGridItem {...itemProps} style={{ flexGrow: 0, flexShrink: 1, flexBasis: '0%', marginTop: theme.sizing.scale200 }}>
           <ActionButton
-            onClick={() => getTail(3)} disabled={!sheetIdsOkay()} icon={faSearch} spin={tailing}
+            onClick={() => getTail(3)} disabled={!sheetIdsOkay()}
+            grayed={tailed} icon={faSearch} spin={tailing}
             title={sheetIdsOkay()
               ? 'find sheet and show recent rows'
               : 'please enter valid google spreadsheet id and sheet name'}

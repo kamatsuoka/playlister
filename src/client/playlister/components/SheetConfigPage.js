@@ -1,21 +1,18 @@
 /**
  * Configure google sheet that holds video metadata
  */
-import React, { useState } from 'react'
+import React from 'react'
 import { copyData, usePersist } from '../hooks/usePersist'
 import PrevNextButtons from './PrevNextButtons'
-import { ToasterContainer } from 'baseui/toast'
 import GoogleSheetInfo from './GoogleSheetInfo'
 import { Heading } from 'baseui/heading'
 import Tooltip from './Tooltip'
 
 export const BASE_SHEETS_URL = 'https://www.youtube.com/'
 
-const SheetSetupPage = ({
-  current, setCurrent, spreadsheetInfo, setSpreadsheetInfo, tailed, setTailed
+const SheetConfigPage = ({
+  current, setCurrent, spreadsheetInfo, setSpreadsheetInfo, tail, setTail, tailed, setTailed
 }) => {
-  const [tail, setTail] = useState([])
-
   const SPREADSHEET_DATA_KEY = 'spreadsheet_info'
   usePersist({
     key: SPREADSHEET_DATA_KEY,
@@ -36,23 +33,21 @@ const SheetSetupPage = ({
 
   return (
     <>
-      <Heading styleLevel={5}><Tooltip tooltip={tooltipText}>Google Sheet</Tooltip></Heading>
+      <Heading styleLevel={5}><Tooltip tooltip={tooltipText}>Find Google Sheet</Tooltip></Heading>
 
       <GoogleSheetInfo
         spreadsheetInfo={spreadsheetInfo} setSpreadsheetInfo={setSpreadsheetInfo}
         tailed={tailed} setTailed={setTailed} tail={tail} setTail={setTail} baseUrl={BASE_SHEETS_URL}
       />
-      <ToasterContainer>
-        <PrevNextButtons
-          current={current} setCurrent={setCurrent}
-          nextProps={{
-            disabled: !tailed,
-            title: tailed ? '' : 'click the search icon to verify your access to the google sheet'
-          }}
-        />
-      </ToasterContainer>
+      <PrevNextButtons
+        current={current} setCurrent={setCurrent}
+        nextProps={{
+          disabled: !tailed,
+          title: tailed ? '' : 'click the search icon to verify your access to the google sheet'
+        }}
+      />
     </>
   )
 }
 
-export default SheetSetupPage
+export default SheetConfigPage
