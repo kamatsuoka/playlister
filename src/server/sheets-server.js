@@ -14,9 +14,11 @@ export const appendRows = ({ spreadsheetId, range, values }) => {
   const valueInputOption = 'USER_ENTERED'
   const valueRange = Sheets.newRowData()
   valueRange.values = values
+  /*
   const appendRequest = Sheets.newAppendCellsRequest()
-  appendRequest.sheetName = spreadsheetId
+  appendRequest.sheetId = spreadsheetId
   appendRequest.rows = [valueRange]
+*/
   return Sheets.Spreadsheets.Values.append(valueRange, spreadsheetId, range, {
     valueInputOption,
     includeValuesInResponse: true
@@ -43,7 +45,7 @@ export const getRange = (spreadsheetId, range) => {
  * the range appended. The `range` parameter specifies where to search for data.
  *
  * @param spreadsheetId {string} id of spreadsheet
- * @param range {string} range to search for data in spreadsheet (typically e.g. sheetId!A1:C1)
+ * @param range {string} range to search for data in spreadsheet (typically e.g. sheetName!A1:C1)
  * @param rowCount {int} number of rows to return
  * @param header {boolean} true to prepend with first row as header
  * @return {[[]]} array of rows, with each row an array of values

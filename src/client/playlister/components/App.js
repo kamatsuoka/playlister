@@ -21,7 +21,7 @@ import { NumberedStep, ProgressSteps } from 'baseui/progress-steps'
 import Tooltip from './Tooltip'
 import UploadVideosStep from './UploadVideosStep'
 import ChoosePlaylistStep from './ChoosePlaylistStep'
-import AddItemsStep from './AddItemsStep'
+import AddVideosStep from './AddVideosStep'
 import RenameStep from './RenameStep'
 import AddMetadataStep from './AddMetadataStep'
 import { UploadPrevNext, uploadTooltip } from './UploadPage'
@@ -35,7 +35,7 @@ function App () {
     setPassword: password => setPasswordState({ ...passwordState, password })
   })
   // index of currently selected step
-  const [current, setCurrent] = useState(0)
+  const [current, setCurrent] = useState(4)
   // info about the organization
   const [orgInfo, setOrgInfo] = useState({ orgName: '' })
   // info about the camera
@@ -98,8 +98,8 @@ function App () {
   const allAdded = Object.keys(playlist).length > 0 && allUploaded && files.every(file =>
     uploads[file.fileId] && playlistVideoIds.has(uploads[file.fileId].videoId)
   )
-  // sheet urls have the form https://docs.google.com/spreadsheets/d/{SPREADSHEET_ID}/edit#gid={SHEET_ID}
-  const [spreadsheetInfo, setSpreadsheetInfo] = useState({ spreadsheetId: '', sheetId: '' })
+  // sheet urls have the form https://docs.google.com/spreadsheets/d/{SPREADSHEET_ID}/edit#gid=...
+  const [spreadsheetInfo, setSpreadsheetInfo] = useState({ spreadsheetId: '', sheetName: '' })
   // video metadata to append to google sheet
   const [videoMetadata, setVideoMetadata] = useState([])
   // rows appended to google sheet
@@ -174,7 +174,16 @@ function App () {
                     />
                   </Tab>
                   <Tab overrides={tabOverrides} title='Upload'>
-                    <ProgressSteps current={uploadStep}>
+                    <ProgressSteps
+                      current={uploadStep}
+                      overrides={{
+                        Content: {
+                          style: ({ $theme }) => ({
+                            minWidth: `calc(3 * ${$theme.sizing.scale4800})`
+                          })
+                        }
+                      }}
+                    >
                       <NumberedStep title={<Tooltip tooltip={uploadTooltip}>Upload Videos</Tooltip>}>
                         <UploadVideosStep
                           files={files} uploads={uploads} setUploads={setUploads} allUploaded={allUploaded}
@@ -198,8 +207,8 @@ function App () {
                           nextProps={{ grayed: !(playlist.playlistId && playlistItems) }}
                         />
                       </NumberedStep>
-                      <NumberedStep title='Add Videos to Playlist'>
-                        <AddItemsStep
+                      <NumberedStep title='Add to Playlist'>
+                        <AddVideosStep
                           files={files} uploads={uploads} playlist={playlist}
                           playlistItems={playlistItems} setPlaylistItems={setPlaylistItems} allAdded={allAdded}
                         />
@@ -212,11 +221,11 @@ function App () {
                         <RenameStep
                           cameraViews={cameraViews} setCameraViews={setCameraViews} allRenamed={allRenamed}
                           renamedTitles={renamedTitles} setRenamedTitles={setRenamedTitles} getNewTitle={getNewTitle}
-                          playlistItems={playlistItems} cameraInfo={cameraInfo}
+                          playlist={playlist} playlistItems={playlistItems} cameraInfo={cameraInfo}
                         />
                         <UploadPrevNext uploadStep={uploadStep} setUploadStep={setUploadStep} />
                       </NumberedStep>
-                      <NumberedStep title='Add Metadata to Sheet'>
+                      <NumberedStep title='Add to Sheet'>
                         <AddMetadataStep
                           cameraInfo={cameraInfo} cameraViews={cameraViews} eventData={eventData}
                           playlist={playlist} spreadsheetInfo={spreadsheetInfo}

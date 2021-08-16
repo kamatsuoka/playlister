@@ -75,7 +75,7 @@ const GoogleSheetInfo = ({ spreadsheetInfo, setSpreadsheetInfo, tail, setTail, b
     } catch (e) {
       showError(e)
     }
-  }, [spreadsheetInfo.spreadsheetId, spreadsheetInfo.sheetName, showError, setTail])
+  }, [setTail, setTailed, showError, spreadsheetInfo.sheetName, spreadsheetInfo.spreadsheetId, password])
 
   const itemProps = {
     display: 'flex',

@@ -7,10 +7,12 @@ import { callServer } from '../api/api'
 import { faAsterisk } from '@fortawesome/free-solid-svg-icons/faAsterisk'
 import { useSnackbar } from 'baseui/snackbar'
 import { enqueueError } from '../util/enqueueError'
+import { Block } from 'baseui/block'
+import { Label2, Paragraph2 } from 'baseui/typography'
 
 const RenameStep = ({
   cameraViews, setCameraViews, allRenamed, renamedTitles, setRenamedTitles,
-  getNewTitle, playlistItems, cameraInfo
+  getNewTitle, playlist, playlistItems, cameraInfo
 }) => {
   const [css, theme] = useStyletron()
   const [renaming, setRenaming] = useState(false)
@@ -45,16 +47,24 @@ const RenameStep = ({
 
   return (
     <>
-      <ActionButton
-        onClick={renameVideos} spin={renaming} title='rename videos' icon={faAsterisk}
-        disabled={Object.keys(playlistItems).length === 0} grayed={allRenamed}
-        className={css({
-          float: 'left',
-          marginTop: theme.sizing.scale200,
-          marginRight: theme.sizing.scale600
-        })}
-        text='Rename'
-      />
+      <Block className={css({ display: 'flex', alignItems: 'center' })}>
+        <ActionButton
+          onClick={renameVideos} spin={renaming} title='rename videos' icon={faAsterisk}
+          disabled={Object.keys(playlistItems).length === 0} grayed={allRenamed}
+          className={css({
+            float: 'left',
+            marginTop: theme.sizing.scale200,
+            marginRight: theme.sizing.scale600
+          })}
+          text='Rename'
+        />
+        <Paragraph2>
+          videos in &nbsp;
+        </Paragraph2>
+        <Label2>
+          {playlist.title}
+        </Label2>
+      </Block>
       <RenameList
         playlistItems={playlistItems} renamedTitles={renamedTitles} getNewTitle={getNewTitle}
         cameraViews={cameraViews} setCameraViews={setCameraViews} cameraInfo={cameraInfo}

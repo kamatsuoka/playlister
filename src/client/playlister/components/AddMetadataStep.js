@@ -11,6 +11,8 @@ import { callServer } from '../api/api'
 import PasswordContext from '../context/PasswordContext'
 import { faPlus } from '@fortawesome/free-solid-svg-icons/faPlus'
 import { useStyletron } from 'baseui'
+import { Label2, Paragraph2 } from 'baseui/typography'
+import { Block } from 'baseui/block'
 
 const AddMetadataStep = ({
   cameraInfo, eventData, cameraViews, playlist, spreadsheetInfo,
@@ -118,18 +120,24 @@ const AddMetadataStep = ({
     } catch (e) {
       showError(e)
     }
-  }, [password, videoMetadata, spreadsheetInfo.spreadsheetId, spreadsheetInfo.sheetName, showError])
+  }, [videoMetadata, setAddedRows, enqueue, showError, spreadsheetInfo.sheetName,
+    spreadsheetInfo.spreadsheetId, password])
 
   return (
     <>
-      <ActionButton
-        onClick={addMetadataToSheet} icon={faPlus} spin={adding} text='Add'
-        className={css({
-          float: 'left',
-          marginTop: theme.sizing.scale200,
-          marginRight: theme.sizing.scale600
-        })}
-      />
+      <Block className={css({ display: 'flex', alignItems: 'center' })}>
+        <ActionButton
+          onClick={addMetadataToSheet} icon={faPlus} spin={adding} text='Add'
+          className={css({
+            marginTop: theme.sizing.scale200,
+            marginRight: theme.sizing.scale600
+          })}
+        />
+        <Paragraph2>metadata to sheet &nbsp;</Paragraph2>
+        <Label2>
+          {spreadsheetInfo.sheetName}
+        </Label2>
+      </Block>
       <VideoMetadata videoMetadata={videoMetadata} addedRows={addedRows} />
     </>
   )
