@@ -37,7 +37,7 @@ function App () {
   // tail of google sheet
   const [tail, setTail] = useState([])
   // index of currently selected step
-  const [current, setCurrent] = useState(1)
+  const [current, setCurrent] = useState(0)
   // info about the organization
   const [orgInfo, setOrgInfo] = useState({ orgName: '' })
   // info about the camera
@@ -115,8 +115,8 @@ function App () {
    */
   const getNewTitle = (videoId, index) => {
     const cameraView = cameraViews[videoId] || cameraInfo.defaultCameraView
-    return `${orgInfo.orgName} ${getChosenDate(eventData)} ${cameraView} ` +
-      getVideoNumber(cameraInfo, index)
+    return `${orgInfo.orgName} ${getChosenDate(eventData)} ` +
+      `${getVideoNumber(cameraInfo, index)} ${cameraView}`
   }
 
   /**

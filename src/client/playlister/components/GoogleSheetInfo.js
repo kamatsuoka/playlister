@@ -180,7 +180,7 @@ const GoogleSheetInfo = ({ spreadsheetInfo, setSpreadsheetInfo, tail, setTail, b
             />
           </FormControl>
         </FlexGridItem>
-        <FlexGridItem {...itemWidthProps({ width: '30%' })}>
+        <FlexGridItem {...itemWidthProps({ width: '25%' })}>
           <FormControl caption='sheet name'>
             <Input
               value={spreadsheetInfo.sheetName || ''}
