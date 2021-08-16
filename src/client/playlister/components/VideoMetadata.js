@@ -15,7 +15,7 @@ export const wasAdded = ({ metadata, addedRow }) =>
   addedRow[2] === metadata.startTime &&
   addedRow[3] === metadata.endTime &&
   addedRow[4] === metadata.link &&
-  addedRow[5] === metadata.cameraNumber &&
+  addedRow[5] === metadata.cameraNumber.toString() &&
   addedRow[6] === metadata.cameraView &&
   addedRow[7] === metadata.cameraName
 
