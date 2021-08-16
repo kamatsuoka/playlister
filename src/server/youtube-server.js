@@ -1,9 +1,10 @@
 import dayjs from './dayjs/dayjs.min'
 import duration from './dayjs/plugin/duration'
 
+// noinspection JSUnresolvedFunction
 dayjs.extend(duration)
 
-const CATEGORY_ID_MUSIC = 10
+const CATEGORY_ID_MUSIC = '10'
 
 /**
  * Searches a list of items for one with given title
@@ -21,7 +22,7 @@ const findMatchingItem = (result, title) => {
  */
 export const findPlaylist = ({ title, nextPageToken = '' }) => {
   const MAX_RESULTS = 50
-  const part = ['snippet', 'contentDetails']
+  const part = 'snippet,contentDetails'
   const optionalArgs = {
     maxResults: MAX_RESULTS,
     mine: true
@@ -36,7 +37,7 @@ export const findPlaylist = ({ title, nextPageToken = '' }) => {
     return playlist
   }
   if (response.nextPageToken) {
-    return findPlaylist(title, response.nextPageToken)
+    return findPlaylist({ title, nextPageToken: response.nextPageToken })
   }
   return null
 }
@@ -46,7 +47,7 @@ export const findPlaylist = ({ title, nextPageToken = '' }) => {
  */
 export const listPlaylists = () => {
   const MAX_RESULTS = 50
-  const part = ['id', 'snippet', 'contentDetails']
+  const part = 'id,snippet,contentDetails'
   const optionalArgs = {
     maxResults: MAX_RESULTS,
     mine: true
@@ -68,7 +69,7 @@ export function insertPlaylist ({ title, description }) {
       privacyStatus: 'unlisted'
     }
   }
-  const part = ['snippet', 'contentDetails', 'status']
+  const part = 'snippet,contentDetails,status'
   return YouTube.Playlists.insert(resource, part)
 }
 
@@ -144,6 +145,7 @@ export function findUploads ({ fileMap }) {
           continue
         }
         Logger.log(`matching video: ${JSON.stringify(video)}`)
+        // noinspection JSUnresolvedFunction
         const videoSeconds = dayjs.duration(video.contentDetails.duration).asSeconds()
         if (Math.abs(videoSeconds - fileMap[match.filename].durationSeconds) > 1) {
           Logger.log(`duration of video ${video.id}, "${video.snippet.title}" at ${videoSeconds} seconds ` +
