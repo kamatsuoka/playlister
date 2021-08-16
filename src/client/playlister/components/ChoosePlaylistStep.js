@@ -34,7 +34,7 @@ const ChoosePlaylistStep = ({
       showError(err)
     }
     try {
-      return callServer('listPlaylists', onSuccess, onFailure, {})
+      return callServer('listPlaylists', onSuccess, onFailure, { password })
     } catch (e) {
       onFailure(e)
     }

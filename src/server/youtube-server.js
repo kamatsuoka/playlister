@@ -280,20 +280,24 @@ export function listPlaylistItems ({ playlistId }) {
 /**
  * Adds an array of video ids to a playlist in the order specified,.
  * If video is already in playlist, just set its position.
+ *
+ * @param videos {Array} array of video data including videoId
+ * @param playlistId id of playlist to add videos to
  */
-export function addToPlaylist ({ videoIds, playlistId }) {
+export function addToPlaylist ({ videos, playlistId }) {
+  const videoIds = videos.map(v => v.videoId)
   const videoItems = new Map() // map of video id to playlist item id
   const addVideoItem = item => videoItems.set(item.snippet.resourceId.videoId, item.id)
   // add any existing playlist items id to videoItems
   listPlaylistItems({ playlistId }).forEach(addVideoItem)
-  Logger.log(`videoItems already in playlist: ${videoItems}`)
+  console.log('videoItems already in playlist: ', videoItems)
   // add any new videos to the playlist and add their new playlist item id to videoItems
   const newVideoIds = videoIds.filter(id => !videoItems.has(id))
-  Logger.log(`video ids not already in playlist: ${newVideoIds}`)
+  console.log('video ids not already in playlist', newVideoIds)
   newVideoIds.forEach(videoId =>
     addVideoItem(insertPlaylistItem(videoId, playlistId))
   )
-  Logger.log(`updated videoItems: ${videoItems}`)
+  console.log('updated videoItems: ', videoItems)
   // set playlist positions based on the order in videoIds and return updated playlist items
   return videoIds.map((videoId, position) =>
     updatePlaylistItem({
