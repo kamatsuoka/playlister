@@ -73,7 +73,8 @@ const UploadVideosStep = ({ files, uploads, setUploads, allUploaded }) => {
     if (!allUploaded) {
       return checkUploads()
     }
-  }, [allUploaded, checkUploads, files])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [files])
 
   const uploadFile = (file, fileId, startTime, endTime) => {
     const progressHandler = percent => {
