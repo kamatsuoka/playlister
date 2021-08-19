@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { youtubeTitle } from '../../models/renaming'
+import { callServer } from '../api'
 
 class RetryHandler {
   constructor () {
@@ -32,6 +33,7 @@ class RetryHandler {
  */
 class ResumableUploader {
   constructor ({
+    password,
     baseUrl,
     file,
     contentType,
@@ -44,7 +46,17 @@ class ResumableUploader {
     chunkSize = 0,
     params = {}
   }) {
-    Object.assign(this, { file, videoResource, token, onComplete, onProgress, onError, offset, chunkSize })
+    Object.assign(this, {
+      password,
+      file,
+      videoResource,
+      token,
+      onComplete,
+      onProgress,
+      onError,
+      offset,
+      chunkSize
+    })
     this.contentType = contentType || file.type || 'application/octet-stream'
     this.retryHandler = new RetryHandler()
     params.uploadType = 'resumable'
@@ -112,23 +124,23 @@ class ResumableUploader {
   axios = window.axios
 
   upload () {
-    axios.post(this.url, this.videoResource, {
-      headers: {
-        Authorization: 'Bearer ' + this.token,
-        'Content-Type': 'application/json',
-        'X-Upload-Content-Length': this.file.size,
-        'X-Upload-Content-Type': this.contentType
-      }
-    }).then(response => {
-      // would prefer creating a new object to mutating this object's variables
-      this.url = response.headers.location
+    const onSuccess = redirectUrl => {
+      this.url = redirectUrl
       this.sendFile()
-    }).catch(error => {
+    }
+    const onFailure = error => {
       if (error.response) {
         this.onUploadError(error.response)
       } else if (error.message) {
         this.onError(error.message)
       }
+    }
+    return callServer('getUploadUrl', onSuccess, onFailure, {
+      password: this.password,
+      url: this.url,
+      videoResource: this.videoResource,
+      fileSize: this.file.size,
+      contentType: this.contentType
     })
   }
 
@@ -149,11 +161,13 @@ class UploadWatcher {
   /**
    * Constructs an upload watcher.
    *
+   * @param password application password
    * @param progressHandler (percent: int) => ...
    * @param completeHandler ({id, title, ...}) => ...
    * @param errorHandler (error: str | { error: {message: str}}) => ...
    */
-  constructor (progressHandler, completeHandler, errorHandler) {
+  constructor (password, progressHandler, completeHandler, errorHandler) {
+    this.password = password
     this.videoId = ''
     this.uploadStartTime = 0
     this.progressHandler = progressHandler
@@ -175,6 +189,7 @@ class UploadWatcher {
     }
     console.log(`uploading file with name ${file.name}, videoResource`, videoResource)
     const uploader = new ResumableUploader({
+      password: this.password,
       baseUrl: 'https://www.googleapis.com/upload/youtube/v3/videos',
       file: file,
       token: token,

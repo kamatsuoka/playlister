@@ -322,3 +322,26 @@ export function renameVideos ({ videoTitleDesc }) {
     [videoId, title]
   ))
 }
+
+/**
+ * Gets upload url to start resumable video upload
+ */
+export function getUploadUrl ({ url, videoResource, fileSize, contentType }) {
+  const token = ScriptApp.getOAuthToken()
+  const headers = {
+    Authorization: 'Bearer ' + token,
+    'Content-Type': 'application/json',
+    'X-Upload-Content-Length': fileSize,
+    'X-Upload-Content-Type': contentType
+  }
+  const payloadString = JSON.stringify(videoResource)
+  console.log('getUploadUrl payloadString: ', payloadString)
+  const params = {
+    method: 'post',
+    payload: payloadString,
+    headers: headers
+  }
+  const response = UrlFetchApp.fetch(url, params)
+  console.log('getUploadUrl response:', response)
+  return response.getHeaders().Location || response.getHeaders().location
+}

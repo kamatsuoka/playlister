@@ -5,7 +5,7 @@ import PasswordContext from '../context/PasswordContext'
 import { youtubeTitle } from '../models/renaming'
 import { useSnackbar } from 'baseui/snackbar'
 import { enqueueError } from '../util/enqueueError'
-import UploadWatcher from '../api/youtube/youtube-uploader'
+import UploadWatcher from '../api/youtube/uploader'
 import { Button, KIND, SIZE } from 'baseui/button'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faQuestion } from '@fortawesome/free-solid-svg-icons/faQuestion'
@@ -29,7 +29,6 @@ const UploadVideosStep = ({ files, uploads, setUploads, allUploaded }) => {
   const [uploadProgress, setUploadProgress] = useState({})
   const { enqueue } = useSnackbar()
   const showError = enqueueError(enqueue)
-  const [authToken, setAuthToken] = useState('')
 
   const checkUploads = useCallback(() => {
     console.log('in checkUploads')
@@ -88,19 +87,9 @@ const UploadVideosStep = ({ files, uploads, setUploads, allUploaded }) => {
       console.log('completeHandler: uploaded = ', uploaded)
       return setUploads(uploads => ({ ...uploads, [fileId]: uploaded }))
     }
-    const startUpload = authToken =>
-      new UploadWatcher(progressHandler, completeHandler, errorHandler)
-        .uploadFile(file, fileId, startTime, endTime, authToken)
 
-    if (authToken) {
-      return startUpload(authToken)
-    } else {
-      const onSuccess = token => {
-        setAuthToken(token)
-        return startUpload(token)
-      }
-      return callServer('getToken', onSuccess, errorHandler, { password })
-    }
+    new UploadWatcher(password, progressHandler, completeHandler, errorHandler)
+      .uploadFile(file, fileId, startTime, endTime)
   }
 
   const getButtonContent = fileId => {
