@@ -8,16 +8,21 @@ import GreenCheckMark from './GreenCheckMark'
  * Checks if a video metadata entry was added by comparing its data to an
  * added row returned from the 'appendRows' server function.
  */
-export const wasAdded = ({ metadata, addedRow }) =>
-  addedRow &&
-  addedRow[0] === metadata.date &&
-  addedRow[1] === metadata.videoNumber &&
-  addedRow[2] === metadata.startTime &&
-  addedRow[3] === metadata.endTime &&
-  addedRow[4] === metadata.link &&
-  addedRow[5] === metadata.cameraNumber.toString() &&
-  addedRow[6] === metadata.cameraView &&
-  addedRow[7] === metadata.cameraName
+export const wasAdded = ({ metadata, addedRow }) => {
+  if (!addedRow) {
+    return false
+  }
+  // check each item individually for debugging
+  const props = ['date', 'videoNumber', 'startTime', 'endTime', 'link', 'cameraNumber', 'cameraView', 'cameraName']
+  props.forEach((prop, index) => {
+    if (addedRow[index] !== metadata[prop].toString()) {
+      console.log(`comparing addedRow  ${JSON.stringify(addedRow)} with metadata ${JSON.stringify(metadata)}`)
+      console.log(`value ${addedRow[index]} in added row didn't match value ${metadata[prop]} for property ${prop}`)
+      return false
+    }
+  })
+  return true
+}
 
 const VideoMetadata = ({ videoMetadata, addedRows }) => (
   <TableBuilder data={videoMetadata} overrides={tableOverrides}>
