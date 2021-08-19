@@ -326,13 +326,14 @@ export function renameVideos ({ videoTitleDesc }) {
 /**
  * Gets upload url to start resumable video upload
  */
-export function getUploadUrl ({ url, videoResource, fileSize, contentType }) {
+export function getUploadUrl ({ url, origin, videoResource, fileSize, contentType }) {
   const token = ScriptApp.getOAuthToken()
   const headers = {
     Authorization: 'Bearer ' + token,
     'Content-Type': 'application/json',
     'X-Upload-Content-Length': fileSize,
-    'X-Upload-Content-Type': contentType
+    'X-Upload-Content-Type': contentType,
+    origin
   }
   const payloadString = JSON.stringify(videoResource)
   console.log('getUploadUrl payloadString: ', payloadString)
@@ -341,7 +342,8 @@ export function getUploadUrl ({ url, videoResource, fileSize, contentType }) {
     payload: payloadString,
     headers: headers
   }
+  console.log(`getUploadUrl params: ${JSON.stringify(params)}`)
   const response = UrlFetchApp.fetch(url, params)
-  console.log('getUploadUrl response:', response)
+  console.log(`getUploadUrl response headers: ${JSON.stringify(response.getHeaders())}`)
   return response.getHeaders().Location || response.getHeaders().location
 }

@@ -137,6 +137,7 @@ class ResumableUploader {
     }
     return callServer('getUploadUrl', onSuccess, onFailure, {
       password: this.password,
+      origin: window.location.origin,
       url: this.url,
       videoResource: this.videoResource,
       fileSize: this.file.size,

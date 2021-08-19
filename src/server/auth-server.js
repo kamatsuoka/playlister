@@ -10,12 +10,14 @@ export const checkPassword = password => {
   if (hash !== 'mtBO93jfSmM/wBFk1rSFzgxsv3yr0EBeyesLN8L2XylbWkOEpZ8ebovEjGXD4uRXwSATzZHVXWIBa27r809chw==') {
     throw new Error('invalid password')
   }
+  PropertiesService.getUserProperties().setProperty('validated', 'true')
 }
 
 /**
  * Runs a function after checking password
  */
 export const withAuth = fn => ({ password, ...params }) => {
+  console.log('in withAuth, validated = ', PropertiesService.getUserProperties().getProperty('validated'))
   checkPassword(password)
   return fn(params)
 }
