@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useState } from 'react'
 import { useStyletron } from 'baseui'
 import { TableBuilder, TableBuilderColumn } from 'baseui/table-semantic'
 import { tableOverrides } from './TableOverrides'
@@ -7,7 +7,6 @@ import ActionButton from './ActionButton'
 import { resourceToPlaylistItem } from '../models/playlists'
 import GreenCheckMark from './GreenCheckMark'
 import { callServer } from '../api/api'
-import PasswordContext from '../context/PasswordContext'
 import { faPlus } from '@fortawesome/free-solid-svg-icons/faPlus'
 import { useSnackbar } from 'baseui/snackbar'
 import { enqueueError } from '../util/enqueueError'
@@ -25,7 +24,6 @@ const AddVideosStep = ({
 }) => {
   const [css, theme] = useStyletron()
   const [adding, setAdding] = useState(false)
-  const { password } = useContext(PasswordContext)
   const { enqueue } = useSnackbar()
   const showError = enqueueError(enqueue)
 
@@ -54,7 +52,7 @@ const AddVideosStep = ({
       showError(err)
     }
     return callServer('addToPlaylist', onSuccess, onFailure,
-      { password, videos: sortedVideos, playlistId: playlist.playlistId }
+      { videos: sortedVideos, playlistId: playlist.playlistId }
     )
   }
 

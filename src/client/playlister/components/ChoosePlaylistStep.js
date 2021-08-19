@@ -1,10 +1,9 @@
 import PlaylistCreate from './PlaylistCreate'
 import PlaylistSelect from './PlaylistSelect'
-import React, { useCallback, useContext, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 // import { useStyletron } from 'baseui'
 import { resourceToPlaylist, resourceToPlaylistItem } from '../models/playlists'
 import { callServer } from '../api/api'
-import PasswordContext from '../context/PasswordContext'
 import { Tab, Tabs } from 'baseui/tabs-motion'
 import { useSnackbar } from 'baseui/snackbar'
 import { enqueueError } from '../util/enqueueError'
@@ -16,7 +15,6 @@ const ChoosePlaylistStep = ({
 }) => {
   // const [css, theme] = useStyletron()
   const [listing, setListing] = useState(false)
-  const { password } = useContext(PasswordContext)
   const { enqueue } = useSnackbar()
   const showError = enqueueError(enqueue)
 
@@ -34,7 +32,7 @@ const ChoosePlaylistStep = ({
       showError(err)
     }
     try {
-      return callServer('listPlaylists', onSuccess, onFailure, { password })
+      return callServer('listPlaylists', onSuccess, onFailure, { })
     } catch (e) {
       onFailure(e)
     }
@@ -57,10 +55,10 @@ const ChoosePlaylistStep = ({
     if (playlist.playlistId) {
       console.log('calling listPlaylistItems ...')
       return callServer('listPlaylistItems', onSuccess, showError,
-        { password, playlistId: playlist.playlistId }
+        { playlistId: playlist.playlistId }
       )
     }
-  }, [setPlaylist, setPlaylistItems, showError, password])
+  }, [setPlaylist, setPlaylistItems, showError])
 
   const tabOverrides = {
     TabPanel: {

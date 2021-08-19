@@ -1,8 +1,7 @@
 import ActionButton from './ActionButton'
 import RenameList from './RenameList'
-import React, { useCallback, useContext, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { useStyletron } from 'baseui'
-import PasswordContext from '../context/PasswordContext'
 import { callServer } from '../api/api'
 import { faAsterisk } from '@fortawesome/free-solid-svg-icons/faAsterisk'
 import { useSnackbar } from 'baseui/snackbar'
@@ -16,7 +15,6 @@ const RenameStep = ({
 }) => {
   const [css, theme] = useStyletron()
   const [renaming, setRenaming] = useState(false)
-  const { password } = useContext(PasswordContext)
   const { enqueue } = useSnackbar()
   const showError = enqueueError(enqueue)
 
@@ -41,7 +39,7 @@ const RenameStep = ({
       showError(err)
     }
     console.log('calling youtube.renameVideos with args', videoTitleDesc)
-    return callServer('renameVideos', onSuccess, onFailure, { password, videoTitleDesc })
+    return callServer('renameVideos', onSuccess, onFailure, { videoTitleDesc })
     // eslint-disable-next-line
   }, [playlistItems])
 

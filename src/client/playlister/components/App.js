@@ -15,7 +15,6 @@ import { getVideoNumber } from '../models/renaming'
 import { HeadingLevel } from 'baseui/heading'
 import { DEBUG_METADATA, DEBUG_PLAYLISTS, DebugContext } from '../context/DebugContext'
 import LoginPage from './LoginPage'
-import PasswordContext from '../context/PasswordContext'
 import SheetConfigPage from './SheetConfigPage'
 import { NumberedStep, ProgressSteps } from 'baseui/progress-steps'
 import Tooltip from './Tooltip'
@@ -29,11 +28,6 @@ import { UploadPrevNext, uploadTooltip } from './UploadPage'
 const engine = new Styletron()
 
 function App () {
-  // app password state -- note that password is an object: { value, setPassword }
-  const [passwordState, setPasswordState] = useState({
-    password: '',
-    setPassword: password => setPasswordState({ ...passwordState, password })
-  })
   // tail of google sheet
   const [tail, setTail] = useState([])
   // index of currently selected step
@@ -142,107 +136,105 @@ function App () {
     <StyletronProvider value={engine}>
       <BaseProvider theme={LightTheme}>
         <SnackbarProvider>
-          <PasswordContext.Provider value={passwordState}>
-            <DebugContext.Provider value={debugProps}>
-              <HeadingLevel>
-                <Tabs activeKey={current} disabled>
-                  <Tab overrides={tabOverrides} title='Login'>
-                    <LoginPage
-                      current={0} setCurrent={setCurrent}
-                    />
-                  </Tab>
-                  <Tab overrides={tabOverrides} title='Sheet Config'>
-                    <SheetConfigPage
-                      current={1} setCurrent={setCurrent}
-                      spreadsheetInfo={spreadsheetInfo} setSpreadsheetInfo={setSpreadsheetInfo}
-                      tail={tail} setTail={setTail} tailed={tailed} setTailed={setTailed}
-                    />
-                  </Tab>
-                  <Tab overrides={tabOverrides} title='Event Info'>
-                    <EventInfoPage
-                      current={2} setCurrent={setCurrent}
-                      orgInfo={orgInfo} setOrgInfo={setOrgInfo}
-                      eventData={eventData} setEventData={setEventData}
-                      cameraInfo={cameraInfo} setCameraInfo={setCameraInfo}
-                    />
-                  </Tab>
-                  <Tab overrides={tabOverrides} title='Timestamps'>
-                    <FilePage
-                      current={3} setCurrent={setCurrent}
-                      mediaList={mediaList} setMediaList={setMediaList}
-                      files={files} setFiles={setFiles}
-                      timeAdjust={timeAdjust} setTimeAdjust={setTimeAdjust}
-                      eventData={eventData} setEventData={setEventData}
-                    />
-                  </Tab>
-                  <Tab overrides={tabOverrides} title='Upload'>
-                    <ProgressSteps
-                      current={uploadStep}
-                      overrides={{
-                        Content: {
-                          style: ({ $theme }) => ({
-                            minWidth: `calc(3 * ${$theme.sizing.scale4800})`
-                          })
-                        }
-                      }}
-                    >
-                      <NumberedStep title={<Tooltip tooltip={uploadTooltip}>Upload Videos</Tooltip>}>
-                        <UploadVideosStep
-                          files={files} uploads={uploads} setUploads={setUploads} allUploaded={allUploaded}
-                        />
-                        <UploadPrevNext
-                          uploadStep={uploadStep} setUploadStep={setUploadStep}
-                          nextProps={{ grayed: !(allUploaded || debugProps.includes(DEBUG_PLAYLISTS)) }}
-                        />
-                      </NumberedStep>
-                      <NumberedStep title='Choose Playlist'>
-                        <ChoosePlaylistStep
-                          setPlaylist={setPlaylist} playlists={playlists} setPlaylists={setPlaylists}
-                          setPlaylistItems={setPlaylistItems} uploadedFileIds={uploadedFileIds}
-                          createdPlaylist={createdPlaylist} setCreatedPlaylist={setCreatedPlaylist}
-                          selectedPlaylist={selectedPlaylist} setSelectedPlaylist={setSelectedPlaylist}
-                          playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
-                          eventData={eventData} orgInfo={orgInfo} cameraInfo={cameraInfo}
-                        />
-                        <UploadPrevNext
-                          uploadStep={uploadStep} setUploadStep={setUploadStep}
-                          nextProps={{ grayed: !(playlist.playlistId && playlistItems) }}
-                        />
-                      </NumberedStep>
-                      <NumberedStep title='Add to Playlist'>
-                        <AddVideosStep
-                          files={files} uploads={uploads} playlist={playlist}
-                          playlistItems={playlistItems} setPlaylistItems={setPlaylistItems} allAdded={allAdded}
-                        />
-                        <UploadPrevNext
-                          uploadStep={uploadStep} setUploadStep={setUploadStep}
-                          nextProps={{ grayed: !(allAdded || debugProps.includes(DEBUG_PLAYLISTS)) }}
-                        />
-                      </NumberedStep>
-                      <NumberedStep title='Rename Videos'>
-                        <RenameStep
-                          cameraViews={cameraViews} setCameraViews={setCameraViews} allRenamed={allRenamed}
-                          renamedTitles={renamedTitles} setRenamedTitles={setRenamedTitles} getNewTitle={getNewTitle}
-                          playlist={playlist} playlistItems={playlistItems} cameraInfo={cameraInfo}
-                        />
-                        <UploadPrevNext uploadStep={uploadStep} setUploadStep={setUploadStep} />
-                      </NumberedStep>
-                      <NumberedStep title='Add to Sheet'>
-                        <AddMetadataStep
-                          cameraInfo={cameraInfo} cameraViews={cameraViews} eventData={eventData}
-                          playlist={playlist} spreadsheetInfo={spreadsheetInfo}
-                          videoMetadata={videoMetadata} setVideoMetadata={setVideoMetadata}
-                          addedRows={addedRows} setAddedRows={setAddedRows}
-                        />
-                        <UploadPrevNext uploadStep={uploadStep} setUploadStep={setUploadStep} last />
-                      </NumberedStep>
-                    </ProgressSteps>
-                    <PrevNextButtons current={4} last setCurrent={setCurrent} nextProps={{ grayed: !allRenamed }} />
-                  </Tab>
-                </Tabs>
-              </HeadingLevel>
-            </DebugContext.Provider>
-          </PasswordContext.Provider>
+          <DebugContext.Provider value={debugProps}>
+            <HeadingLevel>
+              <Tabs activeKey={current} disabled>
+                <Tab overrides={tabOverrides} title='Login'>
+                  <LoginPage
+                    current={0} setCurrent={setCurrent}
+                  />
+                </Tab>
+                <Tab overrides={tabOverrides} title='Sheet Config'>
+                  <SheetConfigPage
+                    current={1} setCurrent={setCurrent}
+                    spreadsheetInfo={spreadsheetInfo} setSpreadsheetInfo={setSpreadsheetInfo}
+                    tail={tail} setTail={setTail} tailed={tailed} setTailed={setTailed}
+                  />
+                </Tab>
+                <Tab overrides={tabOverrides} title='Event Info'>
+                  <EventInfoPage
+                    current={2} setCurrent={setCurrent}
+                    orgInfo={orgInfo} setOrgInfo={setOrgInfo}
+                    eventData={eventData} setEventData={setEventData}
+                    cameraInfo={cameraInfo} setCameraInfo={setCameraInfo}
+                  />
+                </Tab>
+                <Tab overrides={tabOverrides} title='Timestamps'>
+                  <FilePage
+                    current={3} setCurrent={setCurrent}
+                    mediaList={mediaList} setMediaList={setMediaList}
+                    files={files} setFiles={setFiles}
+                    timeAdjust={timeAdjust} setTimeAdjust={setTimeAdjust}
+                    eventData={eventData} setEventData={setEventData}
+                  />
+                </Tab>
+                <Tab overrides={tabOverrides} title='Upload'>
+                  <ProgressSteps
+                    current={uploadStep}
+                    overrides={{
+                      Content: {
+                        style: ({ $theme }) => ({
+                          minWidth: `calc(3 * ${$theme.sizing.scale4800})`
+                        })
+                      }
+                    }}
+                  >
+                    <NumberedStep title={<Tooltip tooltip={uploadTooltip}>Upload Videos</Tooltip>}>
+                      <UploadVideosStep
+                        files={files} uploads={uploads} setUploads={setUploads} allUploaded={allUploaded}
+                      />
+                      <UploadPrevNext
+                        uploadStep={uploadStep} setUploadStep={setUploadStep}
+                        nextProps={{ grayed: !(allUploaded || debugProps.includes(DEBUG_PLAYLISTS)) }}
+                      />
+                    </NumberedStep>
+                    <NumberedStep title='Choose Playlist'>
+                      <ChoosePlaylistStep
+                        setPlaylist={setPlaylist} playlists={playlists} setPlaylists={setPlaylists}
+                        setPlaylistItems={setPlaylistItems} uploadedFileIds={uploadedFileIds}
+                        createdPlaylist={createdPlaylist} setCreatedPlaylist={setCreatedPlaylist}
+                        selectedPlaylist={selectedPlaylist} setSelectedPlaylist={setSelectedPlaylist}
+                        playlistTitle={playlistTitle} setPlaylistTitle={setPlaylistTitle}
+                        eventData={eventData} orgInfo={orgInfo} cameraInfo={cameraInfo}
+                      />
+                      <UploadPrevNext
+                        uploadStep={uploadStep} setUploadStep={setUploadStep}
+                        nextProps={{ grayed: !(playlist.playlistId && playlistItems) }}
+                      />
+                    </NumberedStep>
+                    <NumberedStep title='Add to Playlist'>
+                      <AddVideosStep
+                        files={files} uploads={uploads} playlist={playlist}
+                        playlistItems={playlistItems} setPlaylistItems={setPlaylistItems} allAdded={allAdded}
+                      />
+                      <UploadPrevNext
+                        uploadStep={uploadStep} setUploadStep={setUploadStep}
+                        nextProps={{ grayed: !(allAdded || debugProps.includes(DEBUG_PLAYLISTS)) }}
+                      />
+                    </NumberedStep>
+                    <NumberedStep title='Rename Videos'>
+                      <RenameStep
+                        cameraViews={cameraViews} setCameraViews={setCameraViews} allRenamed={allRenamed}
+                        renamedTitles={renamedTitles} setRenamedTitles={setRenamedTitles} getNewTitle={getNewTitle}
+                        playlist={playlist} playlistItems={playlistItems} cameraInfo={cameraInfo}
+                      />
+                      <UploadPrevNext uploadStep={uploadStep} setUploadStep={setUploadStep} />
+                    </NumberedStep>
+                    <NumberedStep title='Add to Sheet'>
+                      <AddMetadataStep
+                        cameraInfo={cameraInfo} cameraViews={cameraViews} eventData={eventData}
+                        playlist={playlist} spreadsheetInfo={spreadsheetInfo}
+                        videoMetadata={videoMetadata} setVideoMetadata={setVideoMetadata}
+                        addedRows={addedRows} setAddedRows={setAddedRows}
+                      />
+                      <UploadPrevNext uploadStep={uploadStep} setUploadStep={setUploadStep} last />
+                    </NumberedStep>
+                  </ProgressSteps>
+                  <PrevNextButtons current={4} last setCurrent={setCurrent} nextProps={{ grayed: !allRenamed }} />
+                </Tab>
+              </Tabs>
+            </HeadingLevel>
+          </DebugContext.Provider>
         </SnackbarProvider>
         <footer>
           <StyledLink

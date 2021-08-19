@@ -1,7 +1,6 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { displayDate, parseDescription } from '../models/dates'
 import { callServer } from '../api/api'
-import PasswordContext from '../context/PasswordContext'
 import { youtubeTitle } from '../models/renaming'
 import { useSnackbar } from 'baseui/snackbar'
 import { enqueueError } from '../util/enqueueError'
@@ -23,7 +22,6 @@ const UploadVideosStep = ({ files, uploads, setUploads, allUploaded }) => {
   const [checking, setChecking] = useState(false)
   // file ids that have been checked
   const [checkedFileIds, setCheckedFileIds] = useState(new Set())
-  const { password } = useContext(PasswordContext)
   const [uploadButtonState, setUploadButtonState] = useState({})
   // map of fileId to upload progress
   const [uploadProgress, setUploadProgress] = useState({})
@@ -62,11 +60,11 @@ const UploadVideosStep = ({ files, uploads, setUploads, allUploaded }) => {
     )
 
     try {
-      return callServer('findUploads', onSuccess, onFailure, ({ password, fileMap }))
+      return callServer('findUploads', onSuccess, onFailure, ({ fileMap }))
     } catch (e) {
       onFailure(e)
     }
-  }, [showError, files, setChecking, password, setUploads])
+  }, [showError, files, setChecking, setUploads])
 
   useEffect(() => {
     if (!allUploaded) {
@@ -88,7 +86,7 @@ const UploadVideosStep = ({ files, uploads, setUploads, allUploaded }) => {
       return setUploads(uploads => ({ ...uploads, [fileId]: uploaded }))
     }
 
-    new UploadWatcher(password, progressHandler, completeHandler, errorHandler)
+    return new UploadWatcher(progressHandler, completeHandler, errorHandler)
       .uploadFile(file, fileId, startTime, endTime)
   }
 
@@ -127,7 +125,7 @@ const UploadVideosStep = ({ files, uploads, setUploads, allUploaded }) => {
         <Button
           onClick={() => {
             setUploadButtonState({ ...uploadButtonState, [row.fileId]: UPLOADING })
-            uploadFile(row.file, row.fileId, row.startTime, row.endTime)
+            return uploadFile(row.file, row.fileId, row.startTime, row.endTime)
           }}
           title='Upload'
           kind={KIND.tertiary}

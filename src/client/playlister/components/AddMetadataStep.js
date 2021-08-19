@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { resourceToPlaylistItem } from '../models/playlists'
 import { useSnackbar } from 'baseui/snackbar'
 import { enqueueError } from '../util/enqueueError'
@@ -8,7 +8,6 @@ import ActionButton from './ActionButton'
 import VideoMetadata, { wasAdded } from './VideoMetadata'
 import { BASE_SHEETS_URL } from './EventInfoPage'
 import { callServer } from '../api/api'
-import PasswordContext from '../context/PasswordContext'
 import { faPlus } from '@fortawesome/free-solid-svg-icons/faPlus'
 import { useStyletron } from 'baseui'
 import { Label2, Paragraph2 } from 'baseui/typography'
@@ -22,7 +21,6 @@ const AddMetadataStep = ({
   const { enqueue } = useSnackbar()
   const showError = enqueueError(enqueue)
   const [adding, setAdding] = useState(false)
-  const { password } = useContext(PasswordContext)
 
   const getUrl = (videoId, playlistId, position) =>
     `${BASE_SHEETS_URL}watch?v=${videoId}&list=${playlistId}&index=${position + 1}`
@@ -60,7 +58,7 @@ const AddMetadataStep = ({
       setVideoMetadata([])
       try {
         return callServer('listPlaylistItems', onSuccess, showError,
-          { password, playlistId: playlist.playlistId }
+          { playlistId: playlist.playlistId }
         )
       } catch (e) {
         showError(e)
@@ -112,7 +110,6 @@ const AddMetadataStep = ({
         meta.cameraName
       ])
       return callServer('appendRows', onSuccess, onError, {
-        password,
         spreadsheetId: spreadsheetInfo.spreadsheetId,
         range,
         values
@@ -120,8 +117,7 @@ const AddMetadataStep = ({
     } catch (e) {
       showError(e)
     }
-  }, [videoMetadata, setAddedRows, enqueue, showError, spreadsheetInfo.sheetName,
-    spreadsheetInfo.spreadsheetId, password])
+  }, [videoMetadata, setAddedRows, enqueue, showError, spreadsheetInfo.sheetName, spreadsheetInfo.spreadsheetId])
 
   return (
     <>

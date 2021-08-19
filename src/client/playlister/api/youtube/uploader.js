@@ -33,7 +33,6 @@ class RetryHandler {
  */
 class ResumableUploader {
   constructor ({
-    password,
     baseUrl,
     file,
     contentType,
@@ -47,7 +46,6 @@ class ResumableUploader {
     params = {}
   }) {
     Object.assign(this, {
-      password,
       file,
       videoResource,
       token,
@@ -136,7 +134,6 @@ class ResumableUploader {
       }
     }
     return callServer('getUploadUrl', onSuccess, onFailure, {
-      password: this.password,
       origin: window.location.origin,
       url: this.url,
       videoResource: this.videoResource,
@@ -162,13 +159,11 @@ class UploadWatcher {
   /**
    * Constructs an upload watcher.
    *
-   * @param password application password
    * @param progressHandler (percent: int) => ...
    * @param completeHandler ({id, title, ...}) => ...
    * @param errorHandler (error: str | { error: {message: str}}) => ...
    */
-  constructor (password, progressHandler, completeHandler, errorHandler) {
-    this.password = password
+  constructor (progressHandler, completeHandler, errorHandler) {
     this.videoId = ''
     this.uploadStartTime = 0
     this.progressHandler = progressHandler
@@ -190,7 +185,6 @@ class UploadWatcher {
     }
     console.log(`uploading file with name ${file.name}, videoResource`, videoResource)
     const uploader = new ResumableUploader({
-      password: this.password,
       baseUrl: 'https://www.googleapis.com/upload/youtube/v3/videos',
       file: file,
       token: token,
@@ -238,7 +232,7 @@ class UploadWatcher {
       }
     })
     this.uploadStartTime = Date.now()
-    uploader.upload()
+    return uploader.upload()
   }
 }
 

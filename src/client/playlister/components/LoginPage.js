@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useState } from 'react'
 import { FlexGrid, FlexGridItem } from 'baseui/flex-grid'
 import { FormControl } from 'baseui/form-control'
 import { Input } from 'baseui/input'
@@ -8,7 +8,6 @@ import ActionButton from './ActionButton'
 import { faSignInAlt } from '@fortawesome/free-solid-svg-icons/faSignInAlt'
 import { useSnackbar } from 'baseui/snackbar'
 import { enqueueError } from '../util/enqueueError'
-import PasswordContext from '../context/PasswordContext'
 import { callServer } from '../api/api'
 import Tooltip from './Tooltip'
 
@@ -17,7 +16,7 @@ const LoginPage = ({ current, setCurrent }) => {
   const [verifying, setVerifying] = useState(false)
   const { enqueue } = useSnackbar()
   const showError = enqueueError(enqueue)
-  const { password, setPassword } = useContext(PasswordContext)
+  const [password, setPassword] = useState('')
 
   const checkPassword = () => {
     setVerifying(true)

@@ -344,6 +344,7 @@ export function getUploadUrl ({ url, origin, videoResource, fileSize, contentTyp
   }
   console.log(`getUploadUrl params: ${JSON.stringify(params)}`)
   const response = UrlFetchApp.fetch(url, params)
-  console.log(`getUploadUrl response headers: ${JSON.stringify(response.getHeaders())}`)
-  return response.getHeaders().Location || response.getHeaders().location
+  const responseHeaders = response.getHeaders()
+  console.log(`getUploadUrl response headers: ${JSON.stringify(responseHeaders)}`)
+  return responseHeaders.Location || responseHeaders.location
 }
