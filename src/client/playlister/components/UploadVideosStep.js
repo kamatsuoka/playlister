@@ -10,21 +10,23 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faQuestion } from '@fortawesome/free-solid-svg-icons/faQuestion'
 import ActionButton from './ActionButton'
 import { faSyncAlt } from '@fortawesome/free-solid-svg-icons/faSyncAlt'
+import { faUpload } from '@fortawesome/free-solid-svg-icons/faUpload'
 import { tableOverrides, withCellStyle } from './TableOverrides'
 import GreenCheckMark from './GreenCheckMark'
 import { TableBuilder, TableBuilderColumn } from 'baseui/table-semantic'
+import { useStyletron } from 'baseui'
+import { Block } from 'baseui/block'
 
 const UPLOADING = 'uploading'
 const ERROR = 'error'
+const COMPLETE = 'complete'
 
-const UploadVideosStep = ({ files, uploads, setUploads, allUploaded }) => {
+const UploadVideosStep = ({ files, uploads, checkedFileIds, setCheckedFileIds, setUploads, allUploaded }) => {
+  const [css, theme] = useStyletron()
   // used to show status of checking for uploads
   const [checking, setChecking] = useState(false)
-  // file ids that have been checked
-  const [checkedFileIds, setCheckedFileIds] = useState(new Set())
-  const [uploadButtonState, setUploadButtonState] = useState({})
-  // map of fileId to upload progress
-  const [uploadProgress, setUploadProgress] = useState({})
+  // map of fileId to upload status
+  const [uploading, setUploading] = useState({})
   const { enqueue } = useSnackbar()
   const showError = enqueueError(enqueue)
 
@@ -64,6 +66,7 @@ const UploadVideosStep = ({ files, uploads, setUploads, allUploaded }) => {
     } catch (e) {
       onFailure(e)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showError, files, setChecking, setUploads])
 
   useEffect(() => {
@@ -74,15 +77,17 @@ const UploadVideosStep = ({ files, uploads, setUploads, allUploaded }) => {
   }, [files])
 
   const uploadFile = (file, fileId, startTime, endTime) => {
+    setUploading(uploading => ({ ...uploading, [fileId]: { state: UPLOADING } }))
     const progressHandler = percent => {
-      setUploadProgress({ ...uploadProgress, [fileId]: percent })
+      setUploading(uploading => ({ ...uploading, [fileId]: { ...uploading[fileId], progress: percent } }))
     }
     const errorHandler = error => {
-      setUploadButtonState({ ...uploadButtonState, [fileId]: ERROR })
+      setUploading(uploading => ({ ...uploading, [fileId]: { ...uploading[fileId], state: ERROR, error } }))
       showError(error)
     }
     const completeHandler = uploaded => {
       console.log('completeHandler: uploaded = ', uploaded)
+      setUploading(uploading => ({ ...uploading, [fileId]: { ...uploading[fileId], state: COMPLETE } }))
       return setUploads(uploads => ({ ...uploads, [fileId]: uploaded }))
     }
 
@@ -91,13 +96,14 @@ const UploadVideosStep = ({ files, uploads, setUploads, allUploaded }) => {
   }
 
   const getButtonContent = fileId => {
-    if (!uploadButtonState[fileId]) {
+    const status = uploading[fileId]
+    if (!status) {
       return '⇧ upload'
     }
-    if (uploadButtonState[fileId] === UPLOADING) {
+    if (status.state === UPLOADING) {
       return ' '
     }
-    if (uploadButtonState[fileId] === ERROR) {
+    if (status.state === ERROR) {
       return 'upload error'
     }
   }
@@ -116,21 +122,18 @@ const UploadVideosStep = ({ files, uploads, setUploads, allUploaded }) => {
     if (uploads[row.fileId] && uploads[row.fileId].publishedAt) {
       return displayDate(uploads[row.fileId].publishedAt)
     }
-    if (uploadProgress[row.fileId]) {
-      return `${uploadProgress[row.fileId]}%`
+    if (uploading[row.fileId] && uploading[row.fileId].progress) {
+      return `${uploading[row.fileId].progress}%`
     }
     const checked = checkedFileIds.has(row.fileId)
     if (checked) {
       return (
         <Button
-          onClick={() => {
-            setUploadButtonState({ ...uploadButtonState, [row.fileId]: UPLOADING })
-            return uploadFile(row.file, row.fileId, row.startTime, row.endTime)
-          }}
+          onClick={() => uploadFile(row.file, row.fileId, row.startTime, row.endTime)}
           title='Upload'
           kind={KIND.tertiary}
           size={SIZE.mini}
-          isLoading={uploadButtonState[row.fileId] === UPLOADING}
+          isLoading={uploading[row.fileId] && uploading[row.fileId].state === UPLOADING}
         >
           {getButtonContent(row.fileId)}
         </Button>
@@ -151,8 +154,39 @@ const UploadVideosStep = ({ files, uploads, setUploads, allUploaded }) => {
     />
   )
 
+  // have all files been checked?
+  const allChecked = files.map(data => data.fileId).every(id => checkedFileIds.has(id))
+
+  // are any files being uploaded?
+  const anyUploading = Object.values(uploading).some(status => status.state === UPLOADING)
+
+  const uploadAll = () => {
+    const filesToUpload = files.filter(file => !uploads[file.fileId])
+    // noinspection JSIgnoredPromiseFromCall
+    filesToUpload.forEach(file => {
+      console.log(`uploading file with id: ${file.fileId}`)
+      uploadFile(file.file, file.fileId, file.startTime, file.endTime)
+    })
+  }
+
   return (
     <>
+      <Block className={css({ display: 'flex', alignItems: 'center' })}>
+        <ActionButton
+          onClick={uploadAll}
+          title='upload all videos'
+          icon={faUpload}
+          spin={anyUploading && !allUploaded}
+          disabled={!allChecked}
+          grayed={allUploaded}
+          text='Upload All'
+          className={css({
+            float: 'left',
+            marginTop: theme.sizing.scale200,
+            marginRight: theme.sizing.scale600
+          })}
+        />
+      </Block>
       <TableBuilder data={files} overrides={tableOverrides}>
         <TableBuilderColumn overrides={syncColumnOverrides} header={syncButton}>
           {row => uploads[row.fileId] ? <GreenCheckMark /> : null}

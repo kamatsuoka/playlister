@@ -53,6 +53,8 @@ function App () {
   })
   // did we successfully get the tail of the spreadsheet?
   const [tailed, setTailed] = useState(false)
+  // file ids that have been checked for their upload status
+  const [checkedFileIds, setCheckedFileIds] = useState(new Set())
   // step in upload page
   const [uploadStep, setUploadStep] = useState(0)
   // playlist title settings for finding / creating a playlist
@@ -181,7 +183,8 @@ function App () {
                   >
                     <NumberedStep title={<Tooltip tooltip={uploadTooltip}>Upload Videos</Tooltip>}>
                       <UploadVideosStep
-                        files={files} uploads={uploads} setUploads={setUploads} allUploaded={allUploaded}
+                        files={files} uploads={uploads} checkedFileIds={checkedFileIds}
+                        setCheckedFileIds={setCheckedFileIds} setUploads={setUploads} allUploaded={allUploaded}
                       />
                       <UploadPrevNext
                         uploadStep={uploadStep} setUploadStep={setUploadStep}

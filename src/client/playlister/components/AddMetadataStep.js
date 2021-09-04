@@ -70,6 +70,20 @@ const AddMetadataStep = ({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(getPlaylistItems, [playlist.playlistId])
 
+  // has all metadata been added to google sheet?
+  const allAdded = addedRows => {
+    if (addedRows.length === 0) {
+      return false
+    }
+    return videoMetadata.every((metadata, i) => {
+      const added = wasAdded({ metadata, addedRow: addedRows[i] })
+      if (!added) {
+        console.error('got wasAdded = false for metadata', metadata, 'and row', addedRows[i])
+      }
+      return added
+    })
+  }
+
   /**
    * Adds video metadata to sheet
    */
@@ -79,14 +93,7 @@ const AddMetadataStep = ({
       const addedRows = updates.updatedData.values
       console.log('got added rows:', addedRows)
       setAdding(false)
-      const allAdded = videoMetadata.every((metadata, i) => {
-        const added = wasAdded({ metadata, addedRow: addedRows[i] })
-        if (!added) {
-          console.error('got wasAdded = false for metadata', metadata, 'and row', addedRows[i])
-        }
-        return added
-      })
-      if (allAdded) {
+      if (allAdded(addedRows)) {
         enqueue({ message: 'All done!' })
       }
       return setAddedRows(addedRows)
@@ -117,13 +124,14 @@ const AddMetadataStep = ({
     } catch (e) {
       showError(e)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [videoMetadata, setAddedRows, enqueue, showError, spreadsheetInfo.sheetName, spreadsheetInfo.spreadsheetId])
 
   return (
     <>
       <Block className={css({ display: 'flex', alignItems: 'center' })}>
         <ActionButton
-          onClick={addMetadataToSheet} icon={faPlus} spin={adding} text='Add'
+          onClick={addMetadataToSheet} icon={faPlus} spin={adding} text='Add' grayed={allAdded(addedRows)}
           className={css({
             marginTop: theme.sizing.scale200,
             marginRight: theme.sizing.scale600

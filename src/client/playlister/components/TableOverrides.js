@@ -19,7 +19,8 @@ export const tableOverrides = {
           : $theme.colors.backgroundSecondary,
       ':hover': {
         backgroundColor: $theme.colors.backgroundTertiary
-      }
+      },
+      height: $theme.sizing.scale1400
     })
   },
   TableBodyCell: {

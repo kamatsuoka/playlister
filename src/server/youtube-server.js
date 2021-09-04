@@ -110,7 +110,7 @@ export function findUploads ({ fileMap }) {
     // Although it's not documented, playlist items seem to come back in reverse
     // chronological order. We're going to assume our files were uploaded
     // recently enough that we don't need to look back more than 50 items.
-    const items = listPlaylistItems({ playlistId })
+    const items = listPlaylistItems({ playlistId, prune: false })
     Logger.log(`for channel ${channel.id}, got ${items.length} PlaylistItems`)
     if (items.length === 0) {
       return []
@@ -259,7 +259,7 @@ function updatePlaylistItem ({ playlistItemId, videoId, playlistId, position }) 
  *
  * @returns Array[{ id, snippet: { title, description, playlistId, position }, resourceId: { videoId } } ]
  */
-export function listPlaylistItems ({ playlistId }) {
+export function listPlaylistItems ({ playlistId, prune = true }) {
   console.log(`calling listPlaylistItems with playlistId = ${playlistId}`)
   const optionalArgs = {
     playlistId: playlistId,
@@ -268,10 +268,12 @@ export function listPlaylistItems ({ playlistId }) {
   }
   const items = YouTube.PlaylistItems.list('snippet', optionalArgs).items
   let pruned = false
-  for (const item of items) {
-    if (item.snippet.title === 'Deleted video') {
-      YouTube.PlaylistItems.remove(item.id)
-      pruned = true
+  if (prune) {
+    for (const item of items) {
+      if (item.snippet.title === 'Deleted video') {
+        YouTube.PlaylistItems.remove(item.id)
+        pruned = true
+      }
     }
   }
   return pruned ? YouTube.PlaylistItems.list('snippet', optionalArgs).items : items

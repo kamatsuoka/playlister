@@ -3,6 +3,7 @@ import { tableOverrides } from './TableOverrides'
 import { StyledLink } from 'baseui/link'
 import React from 'react'
 import GreenCheckMark from './GreenCheckMark'
+import dayjs from 'dayjs'
 
 /**
  * Checks if a video metadata entry was added by comparing its data to an
@@ -15,8 +16,21 @@ export const wasAdded = ({ metadata, addedRow }) => {
   // check each item individually for debugging
   const props = ['date', 'videoNumber', 'startTime', 'endTime', 'link', 'cameraNumber', 'cameraView', 'cameraName']
   props.forEach((prop, index) => {
-    if (addedRow[index] !== metadata[prop].toString()) {
-      console.log(`comparing addedRow  ${JSON.stringify(addedRow)} with metadata ${JSON.stringify(metadata)}`)
+    if (prop === 'startTime' || prop === 'endTime') {
+      const metaTime = metadata[prop]
+      const addedTime = addedRow[index]
+      if (metaTime) {
+        if (!addedTime) {
+          console.log(`field missing in added row for value ${metadata[prop]} for property ${prop}`)
+        } else {
+          const metaDayJs = dayjs(metaTime)
+          const addedDayJs = dayjs(addedTime)
+          if (!metaDayJs.isSame(addedDayJs)) {
+            console.log(`dayJs value ${addedDayJs} in added row didn't match value ${metaDayJs} for property ${prop}`)
+          }
+        }
+      }
+    } else if (addedRow[index] !== metadata[prop].toString()) {
       console.log(`value ${addedRow[index]} in added row didn't match value ${metadata[prop]} for property ${prop}`)
       return false
     }
