@@ -1,3 +1,3 @@
-const openPlaylister = () => HtmlService.createHtmlOutputFromFile('index')
+const openPlaylister = () => HtmlService.createHtmlOutputFromFile('index').setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
 
 export { openPlaylister }
