@@ -45,3 +45,7 @@ export const getChosenDate = eventData =>
   eventData.dateChoice === DEFAULT_DATE ? eventData.defaultDate : eventData.customDate
 
 export const localDate = date => displayDate(date).replace(/ [A-Z]{3}$/, '')
+
+const metadataTemplate = 'M/D/YYYY'
+
+export const metadataDate = date => dayjs(date).format(metadataTemplate)

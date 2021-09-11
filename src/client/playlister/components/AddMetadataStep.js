@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { resourceToPlaylistItem } from '../models/playlists'
 import { useSnackbar } from 'baseui/snackbar'
 import { enqueueError } from '../util/enqueueError'
-import { getChosenDate, localDate } from '../models/dates'
+import { getChosenDate, localDate, metadataDate } from '../models/dates'
 import { getVideoNumber } from '../models/renaming'
 import ActionButton from './ActionButton'
 import VideoMetadata, { wasAdded } from './VideoMetadata'
@@ -27,7 +27,7 @@ const AddMetadataStep = ({
 
   const playlistItemsToVideoMetadata = useCallback(items => {
     return items.map((item, index) => ({
-      date: getChosenDate(eventData),
+      date: metadataDate(getChosenDate(eventData)),
       videoNumber: getVideoNumber(cameraInfo, index),
       startTime: localDate(item.startTime),
       endTime: localDate(item.endTime),
