@@ -122,7 +122,7 @@ export function findUploads ({ fileMap }) {
         title: item.snippet.title,
         description: item.snippet.description,
         publishedAt: item.snippet.publishedAt
-      }))
+      })).filter(upload => dayjs().diff(dayjs(upload.publishedAt), 'days') < 4) // filter out old uploads
       const matches = uploads.flatMap(upload => {
         if (filenameSet.has(upload.title)) {
           upload.filename = upload.title
