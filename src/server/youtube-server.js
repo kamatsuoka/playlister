@@ -117,12 +117,14 @@ export function findUploads ({ fileMap }) {
     } else {
       const pubDates = items.map(item => item.snippet.publishedAt).sort()
       Logger.log(`PlaylistItems published dates range from ${pubDates[0]} to ${pubDates[pubDates.length - 1]}`)
+      const maxDaysOld = 3
       const uploads = items.map(item => ({
         videoId: item.snippet.resourceId.videoId,
         title: item.snippet.title,
         description: item.snippet.description,
         publishedAt: item.snippet.publishedAt
-      })).filter(upload => dayjs().diff(dayjs(upload.publishedAt), 'days') < 4) // filter out old uploads
+      })).filter(upload => dayjs().diff(dayjs(upload.publishedAt), 'days') <= maxDaysOld)
+      Logger.log(`Found ${uploads.length} uploads <= ${maxDaysOld} days old`)
       const matches = uploads.flatMap(upload => {
         if (filenameSet.has(upload.title)) {
           upload.filename = upload.title
