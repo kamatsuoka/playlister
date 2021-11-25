@@ -49,11 +49,19 @@ const MediaReader = ({ setMediaList }) => {
     if (tracks.some(track => track['@type'] === 'Video')) {
       const general = tracks.filter(track => track['@type'] === 'General')[0]
       if (general.Format && general.Duration && general.Encoded_Date) {
-        return {
+        const info = {
           format: general.Format,
           duration: general.Duration ? Math.round(general.Duration) : null,
           startTime: general.Encoded_Date
         }
+        const timeCode = tracks.filter(track => track.Type === 'Time code')[0]
+        if (timeCode && timeCode.Format === 'QuickTime TC' &&
+          timeCode.Title && timeCode.Title.startsWith('GoPro TCD') &&
+          timeCode.TimeCode_FirstFrame) {
+          // on GoPro 10, time code of first frame looks like 20:03:58:02
+          info.timeCodeFirstFrame = timeCode.TimeCode_FirstFrame.split(':').slice(0, 3).join(':')
+        }
+        return info
       }
     }
     throw new Error('No media detected')

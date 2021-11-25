@@ -7,6 +7,7 @@ import { withStyle } from 'styletron-react'
 import { useStyletron } from 'baseui'
 import { Accordion, StatefulPanel } from 'baseui/accordion'
 import EventDate from './EventDate'
+import TimeCode from './TimeCode'
 
 const TableCell = withStyle(StyledTableBodyCell, ({ $theme }) => ({
   paddingTop: $theme.sizing.scale200,
@@ -22,6 +23,7 @@ const TimeOffset = ({
   mediaList,
   timeAdjust, setTimeAdjust,
   overrideTimeZone, setOverrideTimeZone,
+  useTimeCode, setUseTimeCode,
   eventData, setEventData
 }) => {
   const [css, theme] = useStyletron()
@@ -118,6 +120,14 @@ const TimeOffset = ({
               </TableCell>
               <TableCell colSpan={3}>
                 <TimezoneOverride mediaList={mediaList} value={overrideTimeZone} setValue={setOverrideTimeZone} />
+              </TableCell>
+            </StyledTableBodyRow>
+            <StyledTableBodyRow>
+              <TableCell style={{ verticalAlign: 'middle' }}>
+                Use Time Code
+              </TableCell>
+              <TableCell colSpan={3}>
+                <TimeCode mediaList={mediaList} value={useTimeCode} setValue={setUseTimeCode} />
               </TableCell>
             </StyledTableBodyRow>
             <StyledTableBodyRow>

@@ -29,6 +29,7 @@ const FilePage = ({
    * - file
    */
   const [overrideTimeZone, setOverrideTimeZone] = useState(true)
+  const [useTimeCode, setUseTimeCode] = useState(false)
   const [previewUrl, setPreviewUrl] = useState(null)
 
   const startDates = getStartDates(files)
@@ -79,6 +80,7 @@ const FilePage = ({
         <FileList
           mediaList={mediaList} setMediaList={setMediaList}
           overrideTimeZone={overrideTimeZone} timeAdjust={timeAdjust}
+          useTimeCode={useTimeCode}
           files={files} setFiles={setFiles}
           setPreviewUrl={setPreviewUrl} eventData={eventData} setEventData={setEventData}
         />
@@ -86,6 +88,7 @@ const FilePage = ({
           mediaList={mediaList} startDates={startDates}
           timeAdjust={timeAdjust} setTimeAdjust={setTimeAdjust}
           overrideTimeZone={overrideTimeZone} setOverrideTimeZone={setOverrideTimeZone}
+          useTimeCode={useTimeCode} setUseTimeCode={setUseTimeCode}
           eventData={eventData} setEventData={setEventData}
         />
         {startDates.length > 1

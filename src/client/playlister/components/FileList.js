@@ -20,7 +20,7 @@ dayjs.extend(utc)
  * List of file media info with time adjustments applied
  */
 const FileList = ({
-  mediaList, setMediaList, overrideTimeZone, timeAdjust, files, setFiles, setPreviewUrl
+  mediaList, setMediaList, overrideTimeZone, timeAdjust, useTimeCode, files, setFiles, setPreviewUrl
 }) => {
   /**
    * Handles removing a file from the list of files
@@ -55,9 +55,17 @@ const FileList = ({
       .add(timeAdjust.minute || 0, 'minute')
       .add(timeAdjust.second || 0, 'second')
 
+    const getStartTime = media => {
+      if (useTimeCode && media.timeCodeFirstFrame) {
+        // this probably breaks if timeCodeFirstFrame crosses the day boundary from startTime
+        return media.startTime.replace(/\d{2}:\d{2}:\d{2}/, media.timeCodeFirstFrame)
+      } else {
+        return media.startTime
+      }
+    }
+
     const calculateStartEnd = media => {
-      const parsedStartTime = parseTimestamp(media.startTime)
-      const startTime = adjustTime(parsedStartTime)
+      const startTime = adjustTime(parseTimestamp(getStartTime(media)))
       const endTime = startTime.add(media.duration, 'second')
       return {
         fileId: media.fileId,
@@ -75,7 +83,7 @@ const FileList = ({
         media.startTime ? [calculateStartEnd(media)] : []
       ).sort((s1, s2) => s1.startTime > s2.startTime ? 1 : -1)
     setFiles(fileDatas)
-  }, [mediaList, overrideTimeZone, setFiles, timeAdjust])
+  }, [mediaList, overrideTimeZone, useTimeCode, setFiles, timeAdjust])
 
   const removeHeader = () => {
     if (mediaList.length === 0) {
